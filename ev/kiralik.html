@@ -1,0 +1,144 @@
+<!doctype html><html lang="tr"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Kiralık ev Raporu</title>
+<style>:root{color-scheme:light;--acc:#2f6f4f;--s1:#2a78d6;--s1a:#9cc0ec;--art:#2f6f4f;--eks:#c4532a;
+--ink:#222;--ink2:#555;--ink3:#888;--yuzey:#fff;--zemin:#f4f4f2;--cizgi:#eee}
+body{font-family:-apple-system,"Segoe UI",Arial,sans-serif;background:var(--zemin);color:var(--ink);margin:0 auto;
+padding:20px 16px 40px;max-width:900px}
+h1{font-weight:600;font-size:22px;margin:6px 0}h2{font-size:18px;margin:32px 0 6px}
+.nav{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.nav a{padding:5px 12px;border-radius:14px;background:#fff;border:1px solid #ddd;text-decoration:none;color:#333;font-size:13px}
+.nav a.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.n{color:#666;font-size:13px;line-height:1.5}
+.kartlar{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px}
+.kart{background:var(--yuzey);border-radius:10px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.kart b{display:block;font-size:22px;font-variant-numeric:tabular-nums}.kart span{color:#666;font-size:13px}
+.kutu{background:var(--yuzey);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.08);overflow-x:auto}
+.pad{padding:14px}
+ul.oc{background:var(--yuzey);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin:12px 0 0;
+padding:12px 14px 12px 32px;line-height:1.6;font-size:15px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--cizgi);text-align:left;white-space:nowrap}
+th{font-size:12px;color:#666;font-weight:600;background:#fafaf8}
+.s{text-align:right;font-variant-numeric:tabular-nums}.b{font-weight:600}
+tr.ilce{cursor:pointer}tr.ilce:hover{background:#f6f8f6}tr.ilce td:first-child::before{content:"▸ ";color:#999}
+tr.ilce.acik td:first-child::before{content:"▾ "}
+tr.mah{display:none;background:#fafaf8;font-size:13px}tr.mah td:first-child{padding-left:28px}
+tr.mah.goster{display:table-row}tr.gizli{display:none!important}
+.d{color:var(--art);font-weight:600}.e{color:var(--eks);font-weight:600}a{color:#1f5a8a}
+td.baslik{white-space:normal;min-width:200px}td.baslik small{display:block;color:#777;font-size:12px;margin-top:3px}
+s{color:#999}.il{display:flex;gap:10px;align-items:center}
+.ft{flex:none;width:64px;height:48px;object-fit:cover;border-radius:6px;background:#eee;display:inline-block}
+input.ara{width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #ccc;border-radius:8px;font-size:15px;margin:0 0 8px}
+/* secim dugmeleri */
+.secim{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.secim button{font:inherit;font-size:13px;padding:5px 12px;border-radius:14px;border:1px solid #ccc;background:#fff;color:#333;cursor:pointer}
+.secim button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.secim .ayr{width:100%;height:0}
+/* yatay cubuk grafikler (HTML: telefonda yazilar kuculmez) */
+.cg{display:grid;gap:4px}
+.cs{display:grid;grid-template-columns:minmax(80px,130px) 1fr minmax(70px,auto);align-items:center;gap:10px;
+font-size:14px;padding:3px 0;border-radius:4px}
+.cs:hover{background:#f3f6fa}
+.ce{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cy{position:relative;height:20px}
+.cy i{position:absolute;left:0;top:2px;bottom:2px;border-radius:0 4px 4px 0;background:var(--s1)}
+.cy b{position:absolute;top:9px;height:2px;background:#1b3f6b;opacity:.55}
+.cy u{position:absolute;top:5px;width:2px;height:10px;background:#1b3f6b;opacity:.55}
+.cd{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+.cd small{font-weight:400;color:var(--ink3)}
+.az{color:var(--ink3);font-size:12px}
+.lej{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin-top:10px}
+.lej i{display:inline-block;width:14px;height:10px;border-radius:2px;background:var(--s1);margin-right:5px;vertical-align:middle}
+.lej b{display:inline-block;width:18px;height:2px;background:#1b3f6b;opacity:.55;margin-right:5px;vertical-align:middle}
+/* ozellik etkisi: ortadan saga (+) / sola (-) */
+.oz{display:grid;gap:6px}
+.ozs{display:grid;grid-template-columns:minmax(100px,140px) 1fr 64px;gap:10px;align-items:center;font-size:14px}
+.ozc{position:relative;height:22px;background:linear-gradient(#ccc,#ccc) center/1px 100% no-repeat}
+.ozc i{position:absolute;top:3px;bottom:3px}
+.ozs small{display:block;color:var(--ink3);font-size:12px}
+@media(max-width:600px){.cs{grid-template-columns:86px 1fr auto;gap:6px;font-size:13px}
+.ozs{grid-template-columns:96px 1fr 52px;gap:6px}th,td{padding:7px 6px}.ft{width:48px;height:38px}
+td.baslik{min-width:130px;font-size:13px}.il{gap:6px}}</style>
+<div class="nav"><a href="../">🏠 Raporlar</a><a href="../urunler/televizyon.html">📺 Televizyon</a><a href="satilik.html">🏠 Satılık ev</a><a class="on" href="kiralik.html">🔑 Kiralık ev</a></div>
+<h1>Kiralık ev · İstanbul Anadolu yakası</h1>
+<p class="n">Kaynak: sahibinden.com · 12.10.2026 04:44 tarihli liste turu</p>
+<div class="kartlar"><div class="kart"><b>18.822</b><span>ilan</span></div><div class="kart"><b>45.000 TL</b><span>orta kira (aylık)</span></div><div class="kart"><b>500 TL</b><span>orta m² kirası</span></div><div class="kart"><b>100 m²</b><span>orta büyüklük (brüt)</span></div></div>
+<ul class='oc'><li>En pahalı ilçe <b>Kadıköy</b> (m² 773 TL), en uygun <b>Sultanbeyli</b> (m² 311 TL). Aynı büyüklükteki ev en pahalı ilçede en uygundakinin <b>2,5 katı</b> kirasına.</li><li>Orta kira: 2+1 <b>42.000</b> TL, 3+1 <b>60.000</b> TL.</li></ul>
+
+<h2>İlçelere göre kira</h2>
+<p class="n">Ölçüyü ve oda tipini seç. Çubuğun üstüne gel/dokun → ayrıntı.</p>
+<div class="secim" id="isec"><button data-o="tlm2">m² kirası</button><button data-o="fiyat">Aylık kira</button><span class="ayr"></span><button data-g="Tümü">Tümü</button><button data-g="1+1">1+1</button><button data-g="2+1">2+1</button><button data-g="3+1">3+1</button><button data-g="4+1 ve üstü">4+1 ve üstü</button></div><div class="kutu pad"><div id="ig"></div><div class="lej"><span><i></i>orta değer (medyan)</span><span><b></b>ilanların ortadaki yarısı (%25–%75)</span><span>· sağdaki küçük sayı: ilan</span></div></div>
+
+<h2>İlçe ve mahalle tablosu</h2>
+<p class="n">m² kirasına göre pahalıdan ucuza. İlçeye dokun → mahalleleri aç.</p>
+<input class="ara" id="mara" placeholder="Mahalle ya da ilçe ara: Caferağa, Suadiye, Kozyatağı…">
+<div class="kutu"><table><tr><th>İlçe / mahalle</th><th class=s>İlan</th><th class=s>m² kirası (TL)</th><th class=s>Orta kira</th><th class=s>1+1</th><th class=s>2+1</th><th class=s>3+1</th></tr><tr class="ilce" data-i="0"><td class="b">Kadıköy</td><td class="s">2.410</td><td class="s b">773</td><td class="s">80.500</td><td class="s">50.750</td><td class="s">74.450</td><td class="s">90.000</td></tr><tr class="mah" data-i="0"><td>Mahallesi bilinmeyen</td><td class="s">2.410</td><td class="s b">773</td><td class="s">80.500</td><td class="s">50.750</td><td class="s">74.450</td><td class="s">90.000</td></tr><tr class="ilce" data-i="1"><td class="b">Adalar</td><td class="s">52</td><td class="s b">615</td><td class="s">70.000</td><td class="s">40.000</td><td class="s">60.000</td><td class="s">80.000</td></tr><tr class="mah" data-i="1"><td>Mahallesi bilinmeyen</td><td class="s">52</td><td class="s b">615</td><td class="s">70.000</td><td class="s">40.000</td><td class="s">60.000</td><td class="s">80.000</td></tr><tr class="ilce" data-i="2"><td class="b">Ataşehir</td><td class="s">1.856</td><td class="s b">583</td><td class="s">45.000</td><td class="s">40.000</td><td class="s">45.000</td><td class="s">60.000</td></tr><tr class="mah" data-i="2"><td>Mahallesi bilinmeyen</td><td class="s">1.856</td><td class="s b">583</td><td class="s">45.000</td><td class="s">40.000</td><td class="s">45.000</td><td class="s">60.000</td></tr><tr class="ilce" data-i="3"><td class="b">Üsküdar</td><td class="s">1.850</td><td class="s b">556</td><td class="s">55.000</td><td class="s">38.000</td><td class="s">47.000</td><td class="s">65.000</td></tr><tr class="mah" data-i="3"><td>Mahallesi bilinmeyen</td><td class="s">1.850</td><td class="s b">556</td><td class="s">55.000</td><td class="s">38.000</td><td class="s">47.000</td><td class="s">65.000</td></tr><tr class="ilce" data-i="4"><td class="b">Maltepe</td><td class="s">2.057</td><td class="s b">536</td><td class="s">48.500</td><td class="s">40.975</td><td class="s">47.000</td><td class="s">57.000</td></tr><tr class="mah" data-i="4"><td>Mahallesi bilinmeyen</td><td class="s">2.057</td><td class="s b">536</td><td class="s">48.500</td><td class="s">40.975</td><td class="s">47.000</td><td class="s">57.000</td></tr><tr class="ilce" data-i="5"><td class="b">Kartal</td><td class="s">1.370</td><td class="s b">526</td><td class="s">46.000</td><td class="s">40.000</td><td class="s">45.500</td><td class="s">55.000</td></tr><tr class="mah" data-i="5"><td>Mahallesi bilinmeyen</td><td class="s">1.370</td><td class="s b">526</td><td class="s">46.000</td><td class="s">40.000</td><td class="s">45.500</td><td class="s">55.000</td></tr><tr class="ilce" data-i="6"><td class="b">Ümraniye</td><td class="s">1.965</td><td class="s b">467</td><td class="s">45.000</td><td class="s">40.000</td><td class="s">42.000</td><td class="s">53.000</td></tr><tr class="mah" data-i="6"><td>Mahallesi bilinmeyen</td><td class="s">1.965</td><td class="s b">467</td><td class="s">45.000</td><td class="s">40.000</td><td class="s">42.000</td><td class="s">53.000</td></tr><tr class="ilce" data-i="7"><td class="b">Şile</td><td class="s">246</td><td class="s b">444</td><td class="s">40.000</td><td class="s">32.000</td><td class="s">40.000</td><td class="s">47.500</td></tr><tr class="mah" data-i="7"><td>Mahallesi bilinmeyen</td><td class="s">246</td><td class="s b">444</td><td class="s">40.000</td><td class="s">32.000</td><td class="s">40.000</td><td class="s">47.500</td></tr><tr class="ilce" data-i="8"><td class="b">Çekmeköy</td><td class="s">1.260</td><td class="s b">427</td><td class="s">40.000</td><td class="s">34.000</td><td class="s">36.000</td><td class="s">52.500</td></tr><tr class="mah" data-i="8"><td>Mahallesi bilinmeyen</td><td class="s">1.260</td><td class="s b">427</td><td class="s">40.000</td><td class="s">34.000</td><td class="s">36.000</td><td class="s">52.500</td></tr><tr class="ilce" data-i="9"><td class="b">Beykoz</td><td class="s">638</td><td class="s b">424</td><td class="s">45.000</td><td class="s">32.000</td><td class="s">40.000</td><td class="s">57.000</td></tr><tr class="mah" data-i="9"><td>Mahallesi bilinmeyen</td><td class="s">638</td><td class="s b">424</td><td class="s">45.000</td><td class="s">32.000</td><td class="s">40.000</td><td class="s">57.000</td></tr><tr class="ilce" data-i="10"><td class="b">Pendik</td><td class="s">2.125</td><td class="s b">423</td><td class="s">39.000</td><td class="s">35.000</td><td class="s">37.000</td><td class="s">46.000</td></tr><tr class="mah" data-i="10"><td>Mahallesi bilinmeyen</td><td class="s">2.125</td><td class="s b">423</td><td class="s">39.000</td><td class="s">35.000</td><td class="s">37.000</td><td class="s">46.000</td></tr><tr class="ilce" data-i="11"><td class="b">Tuzla</td><td class="s">1.015</td><td class="s b">412</td><td class="s">40.000</td><td class="s">35.000</td><td class="s">36.000</td><td class="s">49.000</td></tr><tr class="mah" data-i="11"><td>Mahallesi bilinmeyen</td><td class="s">1.015</td><td class="s b">412</td><td class="s">40.000</td><td class="s">35.000</td><td class="s">36.000</td><td class="s">49.000</td></tr><tr class="ilce" data-i="12"><td class="b">Sancaktepe</td><td class="s">1.262</td><td class="s b">368</td><td class="s">35.500</td><td class="s">35.000</td><td class="s">34.000</td><td class="s">42.000</td></tr><tr class="mah" data-i="12"><td>Mahallesi bilinmeyen</td><td class="s">1.262</td><td class="s b">368</td><td class="s">35.500</td><td class="s">35.000</td><td class="s">34.000</td><td class="s">42.000</td></tr><tr class="ilce" data-i="13"><td class="b">Sultanbeyli</td><td class="s">716</td><td class="s b">311</td><td class="s">31.000</td><td class="s">27.250</td><td class="s">30.000</td><td class="s">35.000</td></tr><tr class="mah" data-i="13"><td>Mahallesi bilinmeyen</td><td class="s">716</td><td class="s b">311</td><td class="s">31.000</td><td class="s">27.250</td><td class="s">30.000</td><td class="s">35.000</td></tr><tr><td class="b">Toplam</td><td class="s">18.822</td><td class="s b">500</td><td class="s">45.000</td><td class="s">38.000</td><td class="s">42.000</td><td class="s">60.000</td></tr></table></div>
+<p class="n"><b>Orta kira</b> = ilanların tam ortasındaki kira (medyan; birkaç aşırı
+ucuz/pahalı ilan sonucu bozmaz). <b>m² kirası</b> brüt m² ile. Kiralar aylık.
+3'ten az ilanı olan grupta "–". Aylık 5 bin TL altı, gerçek dışı m² ya da m² kirası olan ilanlar (yanlış kategorideki satılıklar, günlük/oda kiralamalar, yazım hataları) hesaba katılmadı ama ilan sayısına dahil.</p>
+
+<h2>Kira aralığına göre ilan sayısı</h2>
+<div class="kutu pad"><div class="cg"><div class="cs" title="20 bin altı: 362 ilan"><span class="ce">20 bin altı</span><span class="cy"><i style="width:8.3%;background:var(--s1)"></i></span><span class="cd">362 <small>· %2</small></span></div><div class="cs" title="20–30 bin: 1.877 ilan"><span class="ce">20–30 bin</span><span class="cy"><i style="width:43.2%;background:var(--s1)"></i></span><span class="cd">1.877 <small>· %10</small></span></div><div class="cs" title="30–40 bin: 4.347 ilan"><span class="ce">30–40 bin</span><span class="cy"><i style="width:100.0%;background:var(--s1)"></i></span><span class="cd">4.347 <small>· %23</small></span></div><div class="cs" title="40–50 bin: 3.939 ilan"><span class="ce">40–50 bin</span><span class="cy"><i style="width:90.6%;background:var(--s1)"></i></span><span class="cd">3.939 <small>· %21</small></span></div><div class="cs" title="50–65 bin: 3.259 ilan"><span class="ce">50–65 bin</span><span class="cy"><i style="width:75.0%;background:var(--s1)"></i></span><span class="cd">3.259 <small>· %17</small></span></div><div class="cs" title="65–80 bin: 1.948 ilan"><span class="ce">65–80 bin</span><span class="cy"><i style="width:44.8%;background:var(--s1)"></i></span><span class="cd">1.948 <small>· %10</small></span></div><div class="cs" title="80–100 bin: 1.265 ilan"><span class="ce">80–100 bin</span><span class="cy"><i style="width:29.1%;background:var(--s1)"></i></span><span class="cd">1.265 <small>· %7</small></span></div><div class="cs" title="100–150 bin: 1.149 ilan"><span class="ce">100–150 bin</span><span class="cy"><i style="width:26.4%;background:var(--s1)"></i></span><span class="cd">1.149 <small>· %6</small></span></div><div class="cs" title="150 bin üstü: 639 ilan"><span class="ce">150 bin üstü</span><span class="cy"><i style="width:14.7%;background:var(--s1)"></i></span><span class="cd">639 <small>· %3</small></span></div></div></div>
+
+<h2>Oda sayısına göre</h2>
+<div class="kutu"><table><tr><th>Oda</th><th class=s>İlan</th><th class=s>Orta büyüklük</th><th class=s>Orta kira</th><th class=s>m² kirası (TL)</th></tr><tr><td class="b">1+1</td><td class="s">3.198</td><td class="s">65 m²</td><td class="s b">38.500</td><td class="s">614</td></tr><tr><td class="b">2+1</td><td class="s">7.878</td><td class="s">90 m²</td><td class="s b">42.000</td><td class="s">462</td></tr><tr><td class="b">3+1</td><td class="s">5.904</td><td class="s">130 m²</td><td class="s b">60.000</td><td class="s">458</td></tr><tr><td class="b">4+1 ve üstü</td><td class="s">1.245</td><td class="s">200 m²</td><td class="s b">104.000</td><td class="s">500</td></tr></table></div>
+<p class="n">Oda grubu ilk sayıya göre: 2+1 grubunda 2+2 de var; 4+1 ve üstü tek grup. Stüdyolar dahil değil.</p>
+
+<h2>Özellikler kirayı ne kadar etkiliyor?</h2>
+<p class="n">Aynı mahalledeki ilanlar karşılaştırıldı (ör. Moda'daki site içi daireler ile Moda'daki site dışı
+daireler); fark m² kirasında. Böylece "pahalı ilçede site çok" gibi etkiler sonucu bozmaz.
+Yine de kesin neden-sonuç değildir: site içindeki evler genelde daha yeni binalardır; asansörsüz
+binalar da çoğunlukla eski ve az katlıdır, farkın bir kısmı bina yaşından gelir.</p>
+<p class="n">Özellik bilgisi (zengin turu) henüz yeterli değil.</p>
+
+<h2>Mahallesine göre ucuz görünen ilanlar</h2>
+<p class="n">m² kirası kendi mahallesinin orta değerinden %35–%60 düşük
+ilanlar (toplam 0; en belirgin 20'si). Daha da ucuz görünenler (neredeyse hep yanlış m²) ve
+başlığında günlük, paylaşımlı, oda kiralık, apart geçenler çıkarıldı. <b>Dikkat:</b> kalanların da çoğunun bir
+sebebi olur — bodrum/bahçe katı, eski bina, yanlış m². Fırsat değil, bakılacak liste.</p>
+<p class="n">Mahallesine göre belirgin ucuz ilan yok.</p>
+
+<h2>Son değişim</h2>
+<p class="n">Karşılaştırma için ikinci bir tamamlanmış liste turu bekleniyor.</p>
+
+<h2>Kirası en çok düşen 20 ilan</h2>
+<p class="n">Henüz kirası düşen ilan yok.</p>
+<p class="n">%1–%30 arası düşüşler (daha büyükleri çoğunlukla yem ilan ya da yazım hatası düzeltmesi). İlan adına dokun → sahibinden'de aç.</p>
+<script>
+function ilceAc(tr, ac){tr.classList.toggle('acik',ac);
+document.querySelectorAll('tr.mah[data-i="'+tr.dataset.i+'"]').forEach(function(m){m.classList.toggle('goster',ac)})}
+document.querySelectorAll('tr.ilce').forEach(function(tr){tr.addEventListener('click',function(){
+ilceAc(tr,!tr.classList.contains('acik'))})});
+// mahalle arama: eslesen mahalleler ve ilceleri gosterilir
+document.getElementById('mara').addEventListener('input',function(e){
+var q=e.target.value.trim().toLocaleLowerCase('tr');
+document.querySelectorAll('tr.ilce').forEach(function(tr){
+ var ms=document.querySelectorAll('tr.mah[data-i="'+tr.dataset.i+'"]'),bir=false,
+ ilceUyar=tr.cells[0].textContent.toLocaleLowerCase('tr').indexOf(q)>=0;
+ ms.forEach(function(m){var u=!q||ilceUyar||m.cells[0].textContent.toLocaleLowerCase('tr').indexOf(q)>=0;
+  m.classList.toggle('gizli',!u);bir=bir||u});
+ tr.classList.toggle('gizli',!!q&&!bir&&!ilceUyar);
+ ilceAc(tr,!!q&&bir&&!ilceUyar||(!!q&&ilceUyar));
+ if(!q)ilceAc(tr,false);
+})});
+// ilce grafigi
+var G=[{"ad": "Kadıköy", "Tümü": {"tlm2": {"n": 2406, "med": 773, "q1": 591, "q3": 958}, "fiyat": {"n": 2406, "med": 80500, "q1": 60000, "q3": 110000}}, "1+1": {"tlm2": {"n": 276, "med": 817, "q1": 686, "q3": 1000}, "fiyat": {"n": 276, "med": 50750, "q1": 45000, "q3": 60000}}, "2+1": {"tlm2": {"n": 706, "med": 800, "q1": 620, "q3": 971}, "fiyat": {"n": 706, "med": 75000, "q1": 59000, "q3": 87500}}, "3+1": {"tlm2": {"n": 1076, "med": 739, "q1": 548, "q3": 923}, "fiyat": {"n": 1076, "med": 92000, "q1": 75000, "q3": 120000}}, "4+1 ve üstü": {"tlm2": {"n": 263, "med": 792, "q1": 609, "q3": 1036}, "fiyat": {"n": 263, "med": 160000, "q1": 125000, "q3": 220000}}}, {"ad": "Adalar", "Tümü": {"tlm2": {"n": 49, "med": 615, "q1": 542, "q3": 721}, "fiyat": {"n": 49, "med": 70000, "q1": 55000, "q3": 87500}}, "1+1": {"tlm2": null, "fiyat": null}, "2+1": {"tlm2": {"n": 20, "med": 646, "q1": 572, "q3": 714}, "fiyat": {"n": 20, "med": 62500, "q1": 51250, "q3": 75000}}, "3+1": {"tlm2": {"n": 18, "med": 592, "q1": 527, "q3": 737}, "fiyat": {"n": 18, "med": 77500, "q1": 65000, "q3": 97500}}, "4+1 ve üstü": {"tlm2": null, "fiyat": null}}, {"ad": "Ataşehir", "Tümü": {"tlm2": {"n": 1856, "med": 583, "q1": 446, "q3": 750}, "fiyat": {"n": 1856, "med": 45000, "q1": 35800, "q3": 61000}}, "1+1": {"tlm2": {"n": 544, "med": 729, "q1": 610, "q3": 833}, "fiyat": {"n": 544, "med": 40000, "q1": 35000, "q3": 50000}}, "2+1": {"tlm2": {"n": 639, "med": 515, "q1": 400, "q3": 624}, "fiyat": {"n": 639, "med": 45000, "q1": 36000, "q3": 60000}}, "3+1": {"tlm2": {"n": 486, "med": 490, "q1": 385, "q3": 589}, "fiyat": {"n": 486, "med": 60500, "q1": 48000, "q3": 75000}}, "4+1 ve üstü": {"tlm2": {"n": 48, "med": 567, "q1": 400, "q3": 773}, "fiyat": {"n": 48, "med": 100000, "q1": 68125, "q3": 160000}}}, {"ad": "Üsküdar", "Tümü": {"tlm2": {"n": 1846, "med": 556, "q1": 429, "q3": 725}, "fiyat": {"n": 1846, "med": 55000, "q1": 42000, "q3": 85000}}, "1+1": {"tlm2": {"n": 217, "med": 640, "q1": 476, "q3": 829}, "fiyat": {"n": 217, "med": 38000, "q1": 30000, "q3": 48000}}, "2+1": {"tlm2": {"n": 704, "med": 553, "q1": 433, "q3": 686}, "fiyat": {"n": 704, "med": 47500, "q1": 39125, "q3": 61875}}, "3+1": {"tlm2": {"n": 633, "med": 529, "q1": 407, "q3": 693}, "fiyat": {"n": 633, "med": 65000, "q1": 52000, "q3": 95000}}, "4+1 ve üstü": {"tlm2": {"n": 245, "med": 559, "q1": 430, "q3": 784}, "fiyat": {"n": 245, "med": 125000, "q1": 80000, "q3": 187500}}}, {"ad": "Maltepe", "Tümü": {"tlm2": {"n": 2055, "med": 536, "q1": 420, "q3": 668}, "fiyat": {"n": 2055, "med": 48500, "q1": 39000, "q3": 63000}}, "1+1": {"tlm2": {"n": 407, "med": 662, "q1": 546, "q3": 806}, "fiyat": {"n": 407, "med": 41000, "q1": 35000, "q3": 47000}}, "2+1": {"tlm2": {"n": 884, "med": 533, "q1": 430, "q3": 667}, "fiyat": {"n": 884, "med": 47000, "q1": 37500, "q3": 60000}}, "3+1": {"tlm2": {"n": 609, "med": 458, "q1": 375, "q3": 573}, "fiyat": {"n": 609, "med": 58000, "q1": 46000, "q3": 74000}}, "4+1 ve üstü": {"tlm2": {"n": 109, "med": 431, "q1": 344, "q3": 538}, "fiyat": {"n": 109, "med": 82000, "q1": 62250, "q3": 118000}}}, {"ad": "Kartal", "Tümü": {"tlm2": {"n": 1369, "med": 526, "q1": 419, "q3": 625}, "fiyat": {"n": 1369, "med": 46000, "q1": 40000, "q3": 59000}}, "1+1": {"tlm2": {"n": 272, "med": 631, "q1": 540, "q3": 741}, "fiyat": {"n": 272, "med": 40000, "q1": 36000, "q3": 46000}}, "2+1": {"tlm2": {"n": 588, "med": 525, "q1": 438, "q3": 600}, "fiyat": {"n": 588, "med": 46000, "q1": 40000, "q3": 55000}}, "3+1": {"tlm2": {"n": 408, "med": 445, "q1": 354, "q3": 534}, "fiyat": {"n": 408, "med": 55000, "q1": 45000, "q3": 67875}}, "4+1 ve üstü": {"tlm2": {"n": 46, "med": 434, "q1": 361, "q3": 528}, "fiyat": {"n": 46, "med": 83500, "q1": 70000, "q3": 105000}}}, {"ad": "Ümraniye", "Tümü": {"tlm2": {"n": 1954, "med": 467, "q1": 382, "q3": 592}, "fiyat": {"n": 1954, "med": 45000, "q1": 36875, "q3": 58000}}, "1+1": {"tlm2": {"n": 279, "med": 615, "q1": 475, "q3": 727}, "fiyat": {"n": 279, "med": 40000, "q1": 30000, "q3": 45500}}, "2+1": {"tlm2": {"n": 933, "med": 471, "q1": 400, "q3": 571}, "fiyat": {"n": 933, "med": 42000, "q1": 35000, "q3": 51750}}, "3+1": {"tlm2": {"n": 585, "med": 417, "q1": 353, "q3": 515}, "fiyat": {"n": 585, "med": 53000, "q1": 45000, "q3": 65000}}, "4+1 ve üstü": {"tlm2": {"n": 113, "med": 407, "q1": 312, "q3": 562}, "fiyat": {"n": 113, "med": 75000, "q1": 55000, "q3": 110000}}}, {"ad": "Şile", "Tümü": {"tlm2": {"n": 246, "med": 444, "q1": 382, "q3": 522}, "fiyat": {"n": 246, "med": 40000, "q1": 34000, "q3": 46000}}, "1+1": {"tlm2": {"n": 55, "med": 517, "q1": 444, "q3": 600}, "fiyat": {"n": 55, "med": 32000, "q1": 28000, "q3": 40000}}, "2+1": {"tlm2": {"n": 135, "med": 444, "q1": 389, "q3": 494}, "fiyat": {"n": 135, "med": 40000, "q1": 35000, "q3": 45500}}, "3+1": {"tlm2": {"n": 41, "med": 382, "q1": 300, "q3": 456}, "fiyat": {"n": 41, "med": 48000, "q1": 43500, "q3": 56000}}, "4+1 ve üstü": {"tlm2": null, "fiyat": null}}, {"ad": "Çekmeköy", "Tümü": {"tlm2": {"n": 1256, "med": 427, "q1": 367, "q3": 550}, "fiyat": {"n": 1256, "med": 40000, "q1": 32800, "q3": 53750}}, "1+1": {"tlm2": {"n": 265, "med": 507, "q1": 419, "q3": 653}, "fiyat": {"n": 265, "med": 34000, "q1": 28000, "q3": 43500}}, "2+1": {"tlm2": {"n": 600, "med": 411, "q1": 367, "q3": 481}, "fiyat": {"n": 600, "med": 36000, "q1": 32000, "q3": 45000}}, "3+1": {"tlm2": {"n": 306, "med": 403, "q1": 340, "q3": 537}, "fiyat": {"n": 306, "med": 53000, "q1": 42000, "q3": 74250}}, "4+1 ve üstü": {"tlm2": {"n": 78, "med": 492, "q1": 346, "q3": 683}, "fiyat": {"n": 78, "med": 130000, "q1": 57450, "q3": 160000}}}, {"ad": "Beykoz", "Tümü": {"tlm2": {"n": 634, "med": 424, "q1": 312, "q3": 577}, "fiyat": {"n": 634, "med": 45000, "q1": 30000, "q3": 65000}}, "1+1": {"tlm2": {"n": 73, "med": 462, "q1": 347, "q3": 666}, "fiyat": {"n": 73, "med": 32000, "q1": 25000, "q3": 40000}}, "2+1": {"tlm2": {"n": 230, "med": 412, "q1": 312, "q3": 530}, "fiyat": {"n": 230, "med": 40000, "q1": 30000, "q3": 55000}}, "3+1": {"tlm2": {"n": 233, "med": 407, "q1": 310, "q3": 503}, "fiyat": {"n": 233, "med": 58000, "q1": 40000, "q3": 70000}}, "4+1 ve üstü": {"tlm2": {"n": 66, "med": 406, "q1": 168, "q3": 708}, "fiyat": {"n": 66, "med": 68000, "q1": 20750, "q3": 180000}}}, {"ad": "Pendik", "Tümü": {"tlm2": {"n": 2124, "med": 423, "q1": 333, "q3": 525}, "fiyat": {"n": 2124, "med": 39000, "q1": 32000, "q3": 50000}}, "1+1": {"tlm2": {"n": 421, "med": 526, "q1": 461, "q3": 609}, "fiyat": {"n": 421, "med": 35000, "q1": 30000, "q3": 40000}}, "2+1": {"tlm2": {"n": 921, "med": 409, "q1": 330, "q3": 488}, "fiyat": {"n": 921, "med": 37000, "q1": 30000, "q3": 45250}}, "3+1": {"tlm2": {"n": 645, "med": 373, "q1": 296, "q3": 468}, "fiyat": {"n": 645, "med": 46000, "q1": 37500, "q3": 62000}}, "4+1 ve üstü": {"tlm2": {"n": 83, "med": 370, "q1": 304, "q3": 529}, "fiyat": {"n": 83, "med": 83000, "q1": 56000, "q3": 113000}}}, {"ad": "Tuzla", "Tümü": {"tlm2": {"n": 1014, "med": 412, "q1": 333, "q3": 500}, "fiyat": {"n": 1014, "med": 40000, "q1": 32000, "q3": 50000}}, "1+1": {"tlm2": {"n": 170, "med": 518, "q1": 463, "q3": 590}, "fiyat": {"n": 170, "med": 35000, "q1": 30000, "q3": 40000}}, "2+1": {"tlm2": {"n": 444, "med": 388, "q1": 328, "q3": 473}, "fiyat": {"n": 444, "med": 36000, "q1": 30000, "q3": 44975}}, "3+1": {"tlm2": {"n": 311, "med": 379, "q1": 317, "q3": 474}, "fiyat": {"n": 311, "med": 50000, "q1": 38000, "q3": 61000}}, "4+1 ve üstü": {"tlm2": {"n": 64, "med": 414, "q1": 301, "q3": 498}, "fiyat": {"n": 64, "med": 80000, "q1": 54750, "q3": 107250}}}, {"ad": "Sancaktepe", "Tümü": {"tlm2": {"n": 1261, "med": 368, "q1": 289, "q3": 466}, "fiyat": {"n": 1261, "med": 35500, "q1": 29000, "q3": 46500}}, "1+1": {"tlm2": {"n": 171, "med": 510, "q1": 400, "q3": 614}, "fiyat": {"n": 171, "med": 35000, "q1": 27000, "q3": 42000}}, "2+1": {"tlm2": {"n": 642, "med": 360, "q1": 296, "q3": 438}, "fiyat": {"n": 642, "med": 34000, "q1": 28000, "q3": 41000}}, "3+1": {"tlm2": {"n": 366, "med": 333, "q1": 267, "q3": 449}, "fiyat": {"n": 366, "med": 42000, "q1": 33875, "q3": 61250}}, "4+1 ve üstü": {"tlm2": {"n": 65, "med": 269, "q1": 228, "q3": 397}, "fiyat": {"n": 65, "med": 43000, "q1": 36250, "q3": 69000}}}, {"ad": "Sultanbeyli", "Tümü": {"tlm2": {"n": 715, "med": 311, "q1": 250, "q3": 375}, "fiyat": {"n": 715, "med": 31000, "q1": 26000, "q3": 37000}}, "1+1": {"tlm2": {"n": 42, "med": 418, "q1": 282, "q3": 524}, "fiyat": {"n": 42, "med": 27250, "q1": 20000, "q3": 34250}}, "2+1": {"tlm2": {"n": 432, "med": 328, "q1": 256, "q3": 382}, "fiyat": {"n": 432, "med": 30000, "q1": 25000, "q3": 35000}}, "3+1": {"tlm2": {"n": 187, "med": 295, "q1": 227, "q3": 345}, "fiyat": {"n": 187, "med": 35000, "q1": 28000, "q3": 42500}}, "4+1 ve üstü": {"tlm2": {"n": 52, "med": 279, "q1": 240, "q3": 302}, "fiyat": {"n": 52, "med": 43000, "q1": 36625, "q3": 46000}}}],MN=false,olcu='tlm2',grup='Tümü';
+function yaz(v){return olcu==='tlm2'||!MN?Math.round(v).toLocaleString('tr-TR')+' TL':(v/1e6).toFixed(2).replace('.',',')+' mn'}
+function ciz(){
+ var rs=G.map(function(s){return{ad:s.ad,d:s[grup][olcu]}}),var_=rs.filter(function(r){return r.d});
+ var_.sort(function(a,b){return b.d.med-a.d.med});
+ var tavan=Math.max.apply(null,var_.map(function(r){return r.d.q3}))||1,yok=rs.filter(function(r){return!r.d});
+ var h=var_.map(function(r){var d=r.d,p=function(x){return(x/tavan*100).toFixed(1)+'%'};
+  return '<div class="cs" title="'+r.ad+': orta '+yaz(d.med)+' · ilanların yarısı '+yaz(d.q1)+' – '+yaz(d.q3)+' arası · '+d.n+' ilan">'
+  +'<span class="ce">'+r.ad+'</span><span class="cy"><i style="width:'+p(d.med)+'"></i>'
+  +'<b style="left:'+p(d.q1)+';width:calc('+p(d.q3)+' - '+p(d.q1)+')"></b><u style="left:'+p(d.q1)+'"></u><u style="left:'+p(d.q3)+'"></u></span>'
+  +'<span class="cd">'+yaz(d.med)+' <small>· '+d.n+'</small></span></div>'}).join('');
+ if(yok.length)h+='<div class="az">Yeterli ilan yok ('+'10'+'\'dan az): '+yok.map(function(r){return r.ad}).join(', ')+'</div>';
+ document.getElementById('ig').innerHTML=h;
+ document.querySelectorAll('#isec button').forEach(function(b){
+  b.classList.toggle('on',b.dataset.o===olcu||b.dataset.g===grup)});
+}
+document.getElementById('isec').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+ if(b.dataset.o)olcu=b.dataset.o;if(b.dataset.g)grup=b.dataset.g;ciz()});
+ciz();
+</script></html>
