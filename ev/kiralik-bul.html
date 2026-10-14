@@ -57,7 +57,7 @@ background:var(--yuzey);cursor:pointer}
 /* fare ile kullanilan ekranda kutular da kucuk; dokunmatikte 16 px (iOS yakinlastirmasin) */
 @media(pointer:fine){.panel input[type=number],.panel input[type=search],.panel select{font-size:14px;min-height:34px;padding:4px 9px}}
 @media(pointer:coarse){.cipler button{min-height:36px;font-size:14px}}
-.agr{display:grid;grid-template-columns:6.8em 1fr 1.8em;gap:0 8px;align-items:center;font-size:13px}
+.agr{display:grid;grid-template-columns:6.8em 1fr 2.6em;gap:0 8px;align-items:center;font-size:13px}
 .agr input{width:100%;accent-color:var(--acc);min-height:36px;margin:0}
 .agr output{text-align:right;font-variant-numeric:tabular-nums}
 button.d{font-size:15px;min-height:42px;padding:6px 14px;border-radius:9px;border:1px solid var(--cizgi);
@@ -153,7 +153,7 @@ button.daha{width:100%}
 <div class="bolum-ic"><label><span class="sr">Mahalle veya kelime ara</span>
 <input id="ara" type="search" enterkeyhint="search" autocomplete="off" placeholder="Suadiye, Kozyatağı, eşyalı…"></label></div></details>
 <details class="bolum"><summary>Puanlama<span class="deger" id="d_puan"></span></summary>
-<div class="bolum-ic"><p class="alt" style="margin:0 0 4px;font-size:13px">Her başlığın puana etkisi. Varsayılan: kat 20, bina yeniliği 18, bölge 17, kira 16, site içinde 15, net m² 14.</p>
+<div class="bolum-ic"><p class="alt" style="margin:0 0 4px;font-size:13px">Her başlığın puandaki payı; toplam hep %100. Birini artırınca diğerleri kendi paylarına göre azalır. Varsayılan: kat %20, bina yeniliği %18, bölge %17, kira %16, site içinde %15, net m² %14.</p>
 <div class="agr" id="agr"></div>
 <button type="button" class="metin" id="agsifir" style="font-size:14px">Varsayılana dön</button></div></details>
 </div>
@@ -227,7 +227,18 @@ function urlYap(){var p=new URLSearchParams();
  if(AG.some(function(a){return S.w[a[0]]!==a[1]}))p.set('w',AG.map(function(a){return S.w[a[0]]}).join(','));
  return location.origin+location.pathname+'?'+p.toString()}
 try{var k=urlden()||JSON.parse(localStorage.getItem('evbul')||'null');
- if(k){for(var x in BOS)if(x in k)S[x]=k[x];AG.forEach(function(a){if(typeof S.w[a[0]]!=='number')S.w[a[0]]=a[1]})}}catch(e){}
+ if(k){for(var x in BOS)if(x in k)S[x]=k[x];AG.forEach(function(a){if(typeof S.w[a[0]]!=='number')S.w[a[0]]=a[1]});S.w=yuzde(S.w)}}catch(e){}
+// agirliklar hep toplami 100 olan tam sayilar (yuzde). Birini degistirince fark digerlerinden
+// mevcut paylariyla orantili alinir / onlara verilir (en buyuk kalan yontemiyle yuvarlanir).
+function dagit(oran,toplam){var top=0,ks=Object.keys(oran);ks.forEach(function(k){top+=oran[k]});
+ var sonuc={},kalan=toplam,parca=ks.map(function(k){var x=top>0?oran[k]/top*toplam:toplam/ks.length;
+  sonuc[k]=Math.floor(x);kalan-=sonuc[k];return[k,x-sonuc[k]]});
+ parca.sort(function(a,b){return b[1]-a[1]});for(var i=0;i<kalan;i++)sonuc[parca[i%parca.length][0]]++;return sonuc}
+function yuzde(w){var o={};AG.forEach(function(a){o[a[0]]=Math.max(0,+w[a[0]]||0)});return dagit(o,100)}
+function agDegis(k,v){v=Math.max(0,Math.min(100,Math.round(v)));var diger={};
+ var top=0;AG.forEach(function(a){if(a[0]!==k){diger[a[0]]=S.w[a[0]];top+=S.w[a[0]]}});
+ // digerleri hep 0'sa (biri %100'e cekilmisti) varsayilan oncelik oranlari kullanilir
+ if(!top)AG.forEach(function(a){if(a[0]!==k)diger[a[0]]=a[1]});var w=dagit(diger,100-v);w[k]=v;S.w=w}
 function kaydet(){try{localStorage.setItem('evbul',JSON.stringify(S))}catch(e){}
  try{history.replaceState(null,'',urlYap())}catch(e){}}
 
@@ -332,8 +343,12 @@ function cipler(id,ls,secili,degis){var el=$(id);
 function aCik(alan){return function(v){var i=S[alan].indexOf(v);if(i>=0)S[alan].splice(i,1);else S[alan].push(v)}}
 function arayuzYaz(){ALAN.forEach(function(id){if(document.activeElement!==$(id))$(id).value=S[id]});$('gizle').checked=S.gizle;
  ['oda','ilceler','ozellik'].forEach(function(id){$(id)._boya()});agCiz()}
-function agCiz(){$('agr').innerHTML=AG.map(function(a){return'<label for="w_'+a[0]+'">'+a[2]+'</label><input id="w_'+a[0]+'" type="range" min="0" max="40" step="1" data-k="'+a[0]+'" value="'+S.w[a[0]]+'"><output for="w_'+a[0]+'">'+S.w[a[0]]+'</output>'}).join('');
- $('agr').querySelectorAll('input').forEach(function(i){i.oninput=function(){S.w[i.dataset.k]=+i.value;i.nextElementSibling.textContent=i.value;kaydet();ciz()}})}
+function agCiz(){$('agr').innerHTML=AG.map(function(a){return'<label for="w_'+a[0]+'">'+a[2]+'</label><input id="w_'+a[0]+'" type="range" min="0" max="100" step="1" data-k="'+a[0]+'" value="'+S.w[a[0]]+'" aria-valuetext="yüzde '+S.w[a[0]]+'"><output for="w_'+a[0]+'">%'+S.w[a[0]]+'</output>'}).join('');
+ var zam;$('agr').querySelectorAll('input').forEach(function(i){i.oninput=function(){agDegis(i.dataset.k,+i.value);agYaz();
+  clearTimeout(zam);zam=setTimeout(function(){kaydet();ciz()},120)}})}
+// surukleme sirasinda yeniden cizmeden yalniz degerleri guncelle (odak surgude kalsin)
+function agYaz(){$('agr').querySelectorAll('input').forEach(function(i){var v=S.w[i.dataset.k];if(+i.value!==v)i.value=v;
+ i.setAttribute('aria-valuetext','yüzde '+v);i.nextElementSibling.textContent='%'+v})}
 
 // telefon: soldan kayan panel
 var sonOdak=null;
