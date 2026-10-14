@@ -130,6 +130,8 @@ display:flex;align-items:center;gap:4px 12px;flex-wrap:wrap;padding:8px max(16px
 box-shadow:0 -2px 12px rgba(0,0,0,.08)}
 .secbar[hidden]{display:none}
 .secbar #secsay{font-weight:600;font-size:15px;margin-right:auto}
+.secdug{display:flex;gap:8px}
+@media(max-width:600px){.secdug{width:100%}.secdug button{flex:1}}
 body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 #yazdir{display:none}
 @media print{
@@ -190,7 +192,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <button type="button" class="d" id="ac" aria-controls="panel" aria-expanded="false">Süzgeçler <span class="sayi" id="acsayi" hidden></span></button>
 <label><span class="sr">Sıralama</span><select id="sira"><option value="puan">Puana göre</option><option value="ucuz">Kirası düşük</option>
 <option value="yeni">Yeni ilanlar</option><option value="m2">Büyük olan</option></select></label>
-<span class="bosluk"></span><button type="button" class="metin" id="paylas">Paylaş</button>
+<span class="bosluk"></span><button type="button" class="metin" id="paylas">Aramayı paylaş</button>
 </div>
 <div class="aktif" id="aktif" aria-label="Seçili süzgeçler" hidden></div>
 <p id="say" role="status" aria-live="polite">İlanlar yükleniyor…</p>
@@ -200,7 +202,8 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <span id="secsay" aria-live="polite"></span>
 <button type="button" class="metin" id="yalniz" aria-pressed="false">Yalnız seçilenler</button>
 <button type="button" class="metin" id="secsil">Temizle</button>
-<button type="button" class="d ana" id="pdf">PDF oluştur</button></div>
+<span class="secdug"><button type="button" class="d" id="secpaylas">Seçilenleri paylaş</button>
+<button type="button" class="d ana" id="pdf">PDF oluştur</button></span></div>
 
 <section class="aciklama" aria-labelledby="nasil">
 <h2 id="nasil">Puan nasıl hesaplanıyor?</h2>
@@ -372,6 +375,8 @@ function ozet(){degerYaz();var e=etiketler(),el=$('aktif');
 function ciz(){SON=hesap();GOSTER=20;liste();ozet()}
 // --- secim (cihazda kalir; suzgec temizlemek silmez) ve PDF (tarayicinin yazdirma ozelligiyle)
 var SEC=[];try{SEC=JSON.parse(localStorage.getItem('evbul_secili')||'[]')}catch(e){}
+var SEC_URL=new URLSearchParams(location.search).get('sec');
+if(SEC_URL){SEC=SEC_URL.split(',').filter(Boolean);S.yalnizSecili=true}
 function secKaydet(){try{localStorage.setItem('evbul_secili',JSON.stringify(SEC))}catch(e){}}
 function secCubuk(){var n=SEC.length;$('secbar').hidden=!n;document.body.classList.toggle('secvar',!!n);
  $('secsay').textContent=n+' ilan seçili';$('yalniz').setAttribute('aria-pressed',S.yalnizSecili?'true':'false');
@@ -396,6 +401,16 @@ function pdf(){
  function yaz(){if(bitti)return;bitti=true;window.print();setTimeout(function(){document.title=eski},500)}
  if(!kalan)yaz();imgs.forEach(function(im){if(im.complete){if(!--kalan)yaz()}else im.onload=im.onerror=function(){if(!--kalan)yaz()}});
  setTimeout(yaz,3000)}
+// secilenleri mesaj olarak paylas (iPhone: paylas menusu -> WhatsApp; yoksa WhatsApp Web)
+function secPaylas(){
+ var rs=D.satir.filter(function(r){return SEC.indexOf(r[F.no])>=0}).map(PUANLA).sort(function(a,b){return b.t-a.t});
+ var u=urlYap()+'&sec='+SEC.join(','),EN=10;
+ var satir=rs.slice(0,EN).map(function(x,i){var r=x.r,b=bilgi(r);
+  return(i+1)+'. '+b.baslik+'\n'+tl(r[F.fiyat])+' TL · '+b.yer+' · '+r[F.oda]+'\n'+b.link}).join('\n\n');
+ var metin='Seçtiğim '+rs.length+' kiralık ilan:\n\n'+satir+(rs.length>EN?'\n\n… ve '+(rs.length-EN)+' ilan daha':'')
+  +'\n\nHepsini puanlarıyla görmek için:';
+ if(navigator.share){navigator.share({title:'Kiralık ilanlar',text:metin,url:u}).catch(function(){});return}
+ window.open('https://wa.me/?text='+encodeURIComponent(metin+'\n'+u),'_blank','noopener')}
 function liste(){
  $('liste').innerHTML=SON.slice(0,GOSTER).map(kart).join('');secCubuk();
  var n=SON.length.toLocaleString('tr-TR');
@@ -447,11 +462,11 @@ function kur(){
   c.closest('li').classList.toggle('secili',c.checked);secKaydet();secCubuk()});
  $('yalniz').onclick=function(){S.yalnizSecili=!S.yalnizSecili;ciz();window.scrollTo(0,$('sonuclar').offsetTop-8)};
  $('secsil').onclick=function(){if(!confirm(SEC.length+' ilanın seçimi kaldırılsın mı?'))return;SEC=[];S.yalnizSecili=false;secKaydet();ciz()};
- $('pdf').onclick=pdf;
+ $('pdf').onclick=pdf;$('secpaylas').onclick=secPaylas;
  $('paylas').onclick=function(){var u=urlYap(),b=$('paylas');
   if(navigator.share){navigator.share({title:document.title,url:u}).catch(function(){});return}
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
-   setTimeout(function(){b.textContent='Paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
+   setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
 fetch('kiralik-bul.json?v=202610141121').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz()})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
