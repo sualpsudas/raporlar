@@ -405,7 +405,7 @@ function pdfGruplar(rs){var no=0,ilceler={};
     +ms[m].sort(function(a,b){return b.t-a.t}).map(function(x){no++;return pdfIlan(x,no)}).join('')+'</section>'}).join('')+'</section>'}).join('')}
 function pdfIlan(x,no){var r=x.r,b=bilgi(r);
    return'<div class="p-ilan">'+(b.foto?'<img src="'+b.foto+'" alt="" referrerpolicy="no-referrer">':'<span class="p-bos"></span>')
-    +'<div><h4>'+no+'. <a href="'+b.link+'">'+esc(b.baslik)+'</a></h4><p>'+esc(b.yer)+'<br>'+esc(b.satir)+(b.oz?'<br>'+esc(b.oz):'')+'</p>'
+    +'<div><h4>'+no+'. <a href="'+b.link+'">'+esc(b.baslik)+'</a></h4><p>'+esc(b.satir)+(b.oz?'<br>'+esc(b.oz):'')+'</p>'
     +'<p class="p-fiyat"><b>'+tl(r[F.fiyat])+' TL</b>'+(r[F.eski]?' (önceki '+tl(r[F.eski])+' TL)':'')+' · Puan <b>'+Math.round(x.t)+'</b></p>'
     +'<p class="p-ay">'+AG.map(function(a){return a[2]+' '+Math.round(x.p[a[0]])}).join(' · ')
     +(KAT_NOT[r[F.katN]]?' · '+KAT_NOT[r[F.katN]]:'')+(r[F.ses]?' · mahallenin 2016 sınıfı '+esc(r[F.ses]):'')+'</p>'
