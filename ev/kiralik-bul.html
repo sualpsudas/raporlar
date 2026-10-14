@@ -235,10 +235,16 @@ function dagit(oran,toplam){var top=0,ks=Object.keys(oran);ks.forEach(function(k
   sonuc[k]=Math.floor(x);kalan-=sonuc[k];return[k,x-sonuc[k]]});
  parca.sort(function(a,b){return b[1]-a[1]});for(var i=0;i<kalan;i++)sonuc[parca[i%parca.length][0]]++;return sonuc}
 function yuzde(w){var o={};AG.forEach(function(a){o[a[0]]=Math.max(0,+w[a[0]]||0)});return dagit(o,100)}
-function agDegis(k,v){v=Math.max(0,Math.min(100,Math.round(v)));var diger={};
- var top=0;AG.forEach(function(a){if(a[0]!==k){diger[a[0]]=S.w[a[0]];top+=S.w[a[0]]}});
+// Diger basliklarin orani, bu surguye dokunuldugu andaki degerlerden alinir (taban). Her adimda
+// guncel degerden alinsaydi: %100'den surukleyerek inerken ilk bosalan 1 puan tek basliga gider,
+// sonraki adimlarda hep ona giderdi. Taban baska bir surguye gecince ya da sifirlaninca yenilenir.
+var agAktif=null,agTaban=null;
+function agDegis(k,v){v=Math.max(0,Math.min(100,Math.round(v)));
+ if(k!==agAktif){agAktif=k;agTaban=kopya(S.w)}
+ var diger={},top=0;AG.forEach(function(a){if(a[0]!==k){diger[a[0]]=agTaban[a[0]];top+=agTaban[a[0]]}});
  // digerleri hep 0'sa (biri %100'e cekilmisti) varsayilan oncelik oranlari kullanilir
- if(!top)AG.forEach(function(a){if(a[0]!==k)diger[a[0]]=a[1]});var w=dagit(diger,100-v);w[k]=v;S.w=w}
+ if(!top)AG.forEach(function(a){if(a[0]!==k)diger[a[0]]=a[1]});
+ var w=dagit(diger,100-v);w[k]=v;S.w=w}
 function kaydet(){try{localStorage.setItem('evbul',JSON.stringify(S))}catch(e){}
  try{history.replaceState(null,'',urlYap())}catch(e){}}
 
@@ -368,7 +374,7 @@ function kur(){
  ALAN.forEach(function(id){var el=$(id);
   el.addEventListener(el.tagName==='SELECT'?'change':'input',function(){S[id]=el.value;clearTimeout(zam);zam=setTimeout(function(){kaydet();ciz()},250)})});
  $('gizle').addEventListener('change',function(){S.gizle=$('gizle').checked;kaydet();ciz()});
- $('agsifir').onclick=function(){AG.forEach(function(a){S.w[a[0]]=a[1]});kaydet();agCiz();ciz()};
+ $('agsifir').onclick=function(){agAktif=null;AG.forEach(function(a){S.w[a[0]]=a[1]});kaydet();agCiz();ciz()};
  $('temizle').onclick=function(){var w=S.w,sr=S.sira;S=kopya(BOS);S.w=w;S.sira=sr;kaydet();arayuzYaz();ciz()};
  $('daha').onclick=function(){var ilk=GOSTER;GOSTER+=20;liste();var li=$('liste').children[ilk];if(li){var a=li.querySelector('h2 a');if(a)a.focus()}};
  $('ac').onclick=panelAc;$('kapat').onclick=panelKapat;$('perde').onclick=panelKapat;
