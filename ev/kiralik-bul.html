@@ -138,35 +138,20 @@ box-shadow:0 -2px 12px rgba(0,0,0,.08)}
 .secdug{display:flex;gap:8px}
 @media(max-width:600px){.secdug{width:100%}.secdug button{flex:1}}
 body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
-/* PDF onizlemesi: ekranda tam sayfa kagit gibi; "PDF olarak kaydet" yazdirma ekranini acar */
 #yazdir{display:none}
-#yazdir.acik{display:block;position:fixed;inset:0;z-index:30;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#fff;color:#000;
- color-scheme:light;font-size:14px;padding:0 max(16px,env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
-.p-arac{position:sticky;top:0;z-index:1;background:#fff;display:flex;justify-content:space-between;align-items:center;gap:8px;
- padding:calc(8px + env(safe-area-inset-top)) 0 8px;border-bottom:1px solid #ccc;margin-bottom:10px}
-.p-arac .metin{color:#0b57a4}
-#yazdir h1{font-size:20px;margin:0 0 4px}
-.p-ust{font-size:12px;color:#333;margin:0 0 8px;border-bottom:1px solid #999;padding-bottom:8px}
-.p-ilan{display:grid;grid-template-columns:34mm 1fr 30mm;gap:4mm;padding:2.5mm 0;border-bottom:1px solid #ddd;break-inside:avoid;page-break-inside:avoid}
-.p-ilan.p-yeni{border-top:1.5px solid #000}
-.p-ilan img,.p-bos{width:34mm;height:25mm;object-fit:cover;border-radius:2mm;background:#eee;display:block}
-.p-yer{font-size:13px;color:#222;text-align:right;line-height:1.35}.p-yer b{font-size:14px}
-.p-ilan h4{font-size:14px;margin:0 0 3px}.p-ilan a{color:#0b4f8a;text-decoration:none}
-.p-ilan p{margin:0 0 3px;color:#222}.p-uyari{font-size:12px;color:#8a3200!important}.p-fiyat{font-size:14px}.p-ay,.p-link{font-size:11px;color:#444!important}
-@media screen and (max-width:600px){.p-ilan{grid-template-columns:64px minmax(0,1fr);gap:10px}
- .p-ilan img,.p-bos{width:64px;height:48px}.p-yer{grid-column:2;grid-row:1;text-align:left;font-size:12px}
- .p-yer b{font-size:12px}.p-yer br{display:none}.p-yer b::after{content:", "}.p-ilan>div:nth-child(2){grid-row:2;grid-column:1/-1}}
 @media print{
  @page{size:A4;margin:14mm 12mm}
  body{background:#fff!important;color:#000;padding:0!important;font-size:10.5pt}
  body>*:not(#yazdir){display:none!important}
- #yazdir,#yazdir.acik{display:block!important;position:static;overflow:visible;padding:0;font-size:10.5pt}
- .p-arac{display:none!important}
+ #yazdir{display:block!important;color:#000;font-size:10.5pt}
  #yazdir h1{font-size:16pt;margin:0 0 2mm}
- .p-ust{font-size:9.5pt;margin:0 0 4mm;padding-bottom:3mm}
- .p-yer{font-size:10pt}.p-yer b{font-size:11pt}
- .p-ilan h4{font-size:11pt;margin:0 0 1mm}.p-ilan p{margin:0 0 1mm}
- .p-uyari{font-size:9pt}.p-fiyat{font-size:11pt}.p-ay,.p-link{font-size:8.5pt}
+ .p-ust{font-size:9.5pt;color:#333;margin:0 0 4mm;border-bottom:1px solid #999;padding-bottom:3mm}
+ .p-ilan{display:grid;grid-template-columns:34mm 1fr 30mm;gap:4mm;padding:2.5mm 0;border-bottom:1px solid #ddd;break-inside:avoid;page-break-inside:avoid}
+ .p-ilan.p-yeni{border-top:1.5px solid #000}
+ .p-ilan img,.p-bos{width:34mm;height:25mm;object-fit:cover;border-radius:2mm;background:#eee;display:block}
+ .p-yer{font-size:10pt;color:#222;text-align:right;line-height:1.35}.p-yer b{font-size:11pt}
+ .p-ilan h4{font-size:11pt;margin:0 0 1mm}.p-ilan a{color:#0b4f8a;text-decoration:none}
+ .p-ilan p{margin:0 0 1mm;color:#222}.p-uyari{font-size:9pt;color:#8a3200!important}.p-fiyat{font-size:11pt}.p-ay,.p-link{font-size:8.5pt;color:#444!important}
 }
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
 @media(max-width:389px){.ilan{grid-template-columns:68px minmax(0,1fr);gap:10px}.ilan .ft{width:68px;height:51px}h1{font-size:22px}}
@@ -235,7 +220,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 </details>
 </main>
 </div>
-<div id="yazdir" role="dialog" aria-modal="true" aria-label="PDF önizlemesi" aria-hidden="true"></div>
+<div id="yazdir" aria-hidden="true"></div>
 <script>
 (function(){
 var AG=[["kat", 20, "Kat"], ["yas", 18, "Bina yeniliği"], ["bolge", 17, "Bölge"], ["fiyat", 16, "Kira"], ["site", 15, "Site içinde"], ["m2", 14, "Net m²"]],YAS_TAVAN=35,BIL=35,VERI_GUN=new Date('2026-10-14'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
@@ -394,32 +379,25 @@ var SEC=[];try{SEC=JSON.parse(localStorage.getItem('evbul_secili')||'[]')}catch(
 var SEC_URL=new URLSearchParams(location.search).get('sec');
 if(SEC_URL){SEC=SEC_URL.split(',').filter(Boolean);S.yalnizSecili=true}
 function secKaydet(){try{localStorage.setItem('evbul_secili',JSON.stringify(SEC))}catch(e){}}
-function secCubuk(){var n=SEC.length;$('secbar').hidden=!n;document.body.classList.toggle('secvar',!!n);
+function secCubuk(){var n=SEC.length;pdfSonra();$('secbar').hidden=!n;document.body.classList.toggle('secvar',!!n);
  $('secsay').textContent=n+' ilan seçili';$('yalniz').setAttribute('aria-pressed',S.yalnizSecili?'true':'false');
  $('yalniz').textContent=S.yalnizSecili?'Tümünü göster':'Yalnız seçilenler'}
-// iPhone Safari yazdirmayi yalniz dokunma aninda acar: once onizleme, "PDF olarak kaydet" dogrudan window.print().
-// Ana Ekran'a eklenmis uygulama (standalone) yazdirmayi desteklemez -> ayni onizlemeyi Safari'de ac.
+// PDF: tarayicinin yazdirma ekrani (PDF olarak kaydet / paylas). iPhone Safari yazdirmayi yalniz dokunma
+// aninda acar -> icerik secim degisince arka planda hazirlanir (fotograflar onceden yuklenir), dugmede
+// beklemeden window.print(). Ana Ekran'a eklenmis uygulama (standalone) yazdirmayi desteklemez -> Safari'de ac.
 var AYRI_UYG=window.navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
-var pdfOdak=null;
-function pdfKapat(){$('yazdir').classList.remove('acik');$('yazdir').setAttribute('aria-hidden','true');
- document.body.classList.remove('kilit');$('sonuclar').inert=false;if(pdfOdak&&pdfOdak.focus)pdfOdak.focus()}
-function pdfKaydet(){
- if(AYRI_UYG){window.open(urlYap()+'&sec='+SEC.join(',')+'&pdf=1','_blank');return}
- var eski=document.title;document.title='Kiralık ilanlar '+$('guncel').textContent;window.print();
- setTimeout(function(){document.title=eski},1000)}
-function pdf(){
- var rs=D.satir.filter(function(r){return SEC.indexOf(r[F.no])>=0}).map(PUANLA).sort(function(a,b){return b.t-a.t});
+function pdfHazirla(){if(!D||!PUANLA||!SEC.length)return;
+ var rs=D.satir.filter(function(r){return SEC.indexOf(r[F.no])>=0}).map(PUANLA);
  var et=etiketler().map(function(x){return x[0]}).join(', ');
  var ag=AG.map(function(a){return a[2]+' %'+S.w[a[0]]}).join(', ');
  var tarih=$('guncel').textContent;
- $('yazdir').innerHTML='<div class="p-arac"><button type="button" class="metin" id="pkapat">Kapat</button>'
-  +'<button type="button" class="d ana" id="pkaydet">'+(AYRI_UYG?'Safari\'de aç':'PDF olarak kaydet')+'</button></div>'
-  +'<h1>Seçilen kiralık ilanlar</h1><p class="p-ust">'+rs.length+' ilan · İstanbul Anadolu Yakası · sahibinden.com · '+esc(tarih)+' verisi'
-  +(et?'<br>Süzgeçler: '+esc(et):'')+'<br>Puan ağırlıkları: '+esc(ag)+'</p>'
-  +pdfGruplar(rs);
- pdfOdak=document.activeElement;var y=$('yazdir');y.classList.add('acik');y.removeAttribute('aria-hidden');y.scrollTop=0;
- document.body.classList.add('kilit');$('sonuclar').inert=true;
- $('pkapat').onclick=pdfKapat;$('pkaydet').onclick=pdfKaydet;setTimeout(function(){$('pkaydet').focus()},50)}
+ $('yazdir').innerHTML='<h1>Seçilen kiralık ilanlar</h1><p class="p-ust">'+rs.length+' ilan · İstanbul Anadolu Yakası · sahibinden.com · '+esc(tarih)+' verisi'
+  +(et?'<br>Süzgeçler: '+esc(et):'')+'<br>Puan ağırlıkları: '+esc(ag)+'</p>'+pdfGruplar(rs)}
+var pdfZam;function pdfSonra(){clearTimeout(pdfZam);pdfZam=setTimeout(pdfHazirla,300)}
+function pdf(){
+ if(AYRI_UYG){window.open(urlYap()+'&sec='+SEC.join(',')+'&pdf=1','_blank');return}
+ pdfHazirla();var eski=document.title;document.title='Kiralık ilanlar '+$('guncel').textContent;window.print();
+ setTimeout(function(){document.title=eski},1000)}
 function pdfGruplar(rs){var tr=function(a,b){return a.localeCompare(b,'tr')},onceki=null;
  var mah=function(x){return D.mah[x.r[F.mah]]||'Mahallesi bilinmeyen'};
  rs.sort(function(a,b){return tr(D.ilce[a.r[F.ilce]],D.ilce[b.r[F.ilce]])||tr(mah(a),mah(b))||b.t-a.t});
@@ -488,7 +466,7 @@ function kur(){
  $('ac').onclick=panelAc;$('kapat').onclick=panelKapat;$('perde').onclick=panelKapat;
  $('goster').onclick=function(){panelKapat();window.scrollTo(0,$('sonuclar').offsetTop-8)};
  document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;
-  if($('yazdir').classList.contains('acik'))pdfKapat();else if($('panel').classList.contains('acik'))panelKapat()});
+  if($('panel').classList.contains('acik'))panelKapat()});
  GENIS.addEventListener?GENIS.addEventListener('change',genislik):GENIS.addListener(genislik);genislik();
  $('liste').addEventListener('change',function(e){var c=e.target;if(!c.dataset||!c.dataset.no)return;
   var i=SEC.indexOf(c.dataset.no);if(c.checked&&i<0)SEC.push(c.dataset.no);if(!c.checked&&i>=0)SEC.splice(i,1);
@@ -501,7 +479,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=202610141121').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf'))pdf()})
+fetch('kiralik-bul.json?v=202610141121').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
