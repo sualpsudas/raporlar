@@ -94,9 +94,6 @@ button.metin{border:0;background:none;color:var(--link);cursor:pointer;min-heigh
 #ac{display:inline-flex;align-items:center;gap:6px}
 #ac .sayi{background:var(--secili);color:var(--zemin);border-radius:10px;font-size:13px;padding:0 7px;line-height:20px}
 .paylas-satir{padding:10px 0 4px;display:flex;flex-direction:column;align-items:flex-start;gap:0}
-.paylas-satir span{font-size:12px;color:var(--ink3)}
-.ipucu{font-size:14px;color:var(--ink2);background:var(--yuzey);border-radius:10px;padding:8px 12px;margin:8px 0 0}
-.ipucu .metin{font-size:14px;min-height:32px;padding:0}
 .aktif{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0}
 .aktif button{font-size:14px;min-height:34px;padding:2px 6px 2px 12px;border-radius:17px;border:1px solid var(--cizgi);
 background:var(--yuzey);cursor:pointer;display:inline-flex;align-items:center;gap:4px}
@@ -128,8 +125,9 @@ display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hi
 .not{font-size:14px;color:var(--ink2);margin:6px 0 0}.not .u{color:var(--uyari)}
 .diger{font-size:14px;margin:6px 0 0}.diger a{margin-right:14px;display:inline-flex;align-items:center;min-height:36px}
 button.daha{width:100%}
-.aciklama{font-size:15px;color:var(--ink2);margin-top:28px;max-width:80ch}.aciklama h2{font-size:18px;color:var(--ink);margin:0 0 8px}
-.aciklama p{margin:0 0 10px}
+.aciklama{font-size:14px;color:var(--ink2);margin-top:24px;max-width:80ch}
+.aciklama summary{cursor:pointer;color:var(--link);min-height:44px;display:flex;align-items:center;font-size:15px}
+.aciklama p{margin:0 0 10px;line-height:1.6}
 .sol{display:flex;flex-direction:column;gap:2px}
 label.sec{display:flex;align-items:center;gap:6px;min-height:40px;font-size:14px;color:var(--ink2);cursor:pointer}
 label.sec input{width:20px;height:20px;accent-color:var(--acc);margin:0;flex:none}
@@ -191,11 +189,9 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <div class="bolum-ic"><label><span class="sr">Mahalle veya kelime ara</span>
 <input id="ara" type="search" enterkeyhint="search" autocomplete="off" placeholder="Suadiye, Kozyatağı, eşyalı…"></label></div></details>
 <details class="bolum"><summary>Puanlama<span class="deger" id="d_puan"></span></summary>
-<div class="bolum-ic"><p class="alt" style="margin:0 0 4px;font-size:13px">Her başlığın puandaki payı; toplam hep %100. Birini artırınca diğerleri kendi paylarına göre azalır. Varsayılan: kat %20, bina yeniliği %18, bölge %17, kira %16, site içinde %15, net m² %14.</p>
-<div class="agr" id="agr"></div>
+<div class="bolum-ic"><div class="agr" id="agr"></div>
 <button type="button" class="metin" id="agsifir" style="font-size:14px">Varsayılana dön</button></div></details>
-<div class="paylas-satir"><button type="button" class="metin" id="paylas">Aramayı paylaş</button>
-<span>Süzgeçler ve puanlama bağlantıyla birlikte gider.</span></div>
+<div class="paylas-satir"><button type="button" class="metin" id="paylas">Aramayı paylaş</button></div>
 </div>
 <div class="panel-alt"><button type="button" class="d ana" id="goster">İlanları göster</button>
 <button type="button" class="d" id="temizle">Temizle</button></div>
@@ -209,8 +205,6 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <option value="yeni">Yeni ilanlar</option><option value="m2">Büyük olan</option></select></label>
 </div>
 <div class="aktif" id="aktif" aria-label="Seçili süzgeçler" hidden></div>
-<p class="ipucu" id="ipucu" hidden>Bütçenizi girmediniz; bu yüzden en üstte geniş ve pahalı daireler var.
-<button type="button" class="metin" id="butce">En çok kirayı yazın</button></p>
 <p id="say" role="status" aria-live="polite">İlanlar yükleniyor…</p>
 <ol class="ilanlar" id="liste" aria-label="İlanlar"></ol>
 <button type="button" class="d daha" id="daha" hidden></button>
@@ -221,26 +215,13 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <span class="secdug"><button type="button" class="d" id="secpaylas">Seçilenleri paylaş</button>
 <button type="button" class="d ana" id="pdf">PDF oluştur</button></span></div>
 
-<section class="aciklama" aria-labelledby="nasil">
-<h2 id="nasil">Puan nasıl hesaplanıyor?</h2>
-<p>Her ilan altı başlıkta 0 ile 100 arasında puan alır. İlanın puanı bunların ağırlıklı ortalamasıdır. Bilgisi
-girilmemiş başlık 35 sayılır; bilgiyi boş bırakmak puan kazandırmaz. Her kartın altındaki çubuklar
-başlık başlık puanı gösterir.</p>
-<p><b>Kat.</b> 2. kat ve üstü, en üst kat değilse 100. Giriş, yüksek giriş, bahçe, zemin, bodrum ve 1. kat ile en
-üst kat (çatı katı dahil) 0. Kat, binanın kat sayısından bir eksikse 50: ilan sahibi giriş katını da saydıysa bu ev
-en üst kattadır. İlan başlığında "ara kat" ya da "çatı katı" yazıyorsa ona göre düzeltilir.</p>
-<p><b>Bina yeniliği.</b> Sıfır bina 100, 35 yaş ve üstü 0. Yaş aralık olarak verilmişse ortası alınır.</p>
-<p><b>Bölge.</b> Mahallenin İstanbul Üniversitesi "Mahallem İstanbul" araştırmasındaki 2016 sosyo-ekonomik sınıfı
-(A+ en yüksek, E en düşük; İBB Açık Veri). Mahalle bu araştırmada yoksa ilçenin 2022 sosyo-ekonomik gelişmişlik
-(SEGE) sırası. Bölge puanı fiyata bakmaz.</p>
-<p><b>Kira.</b> İlanın aylık kirası: bütün ilanlar arasında kirası düşük olan yüksek puan alır. Süzgeç değişince
-aynı ilanın puanı değişmez. Kirası mahallesine göre gerçek dışı düşük olan ya da birden %30'dan fazla düşen
-ilanlar ucuzluktan puan almaz ve kartta "ilanı kontrol edin" notu çıkar.</p>
-<p><b>Net m².</b> Bütün ilanlar arasında metrekaresi büyük olan yüksek puan alır.</p>
-<p><b>Site içinde.</b> Evet ise 100, değilse 0.</p>
-<p>İlçesi, mahallesi, oda sayısı, net m²'si, katı, bina yaşı aynı ve kiraları arasında en çok %5 fark olan ilanlar
-aynı ev sayılır, en ucuzu gösterilir. Aylık 5.000 TL altındaki ve metrekaresi gerçek dışı görünen ilanlar listede yoktur.</p>
-</section>
+<details class="aciklama"><summary>Puan nasıl hesaplanıyor?</summary>
+<p><b>Kat:</b> 2. kat ve üstü, en üst kat değilse tam puan; giriş katı, 1. kat ve en üst kat sıfır.
+<b>Bina yeniliği:</b> sıfır bina tam puan, 35 yaş ve üstü sıfır.
+<b>Bölge:</b> mahallenin sosyo-ekonomik sınıfı (İBB, 2016); yoksa ilçenin gelişmişlik puanı (2022).
+<b>Kira:</b> kirası düşük olan yüksek puan alır. <b>Net m²:</b> büyük olan yüksek puan alır.
+<b>Site içinde:</b> evet ise tam puan. Bilgisi girilmemiş başlık 35 sayılır.</p>
+</details>
 </main>
 </div>
 <div id="yazdir" aria-hidden="true"></div>
@@ -398,7 +379,7 @@ function ozet(){degerYaz();var e=etiketler(),el=$('aktif');
  el.onclick=function(ev){var b=ev.target.closest('button');if(!b)return;e[+b.dataset.i][1]();kaydet();arayuzYaz();ciz()};
  $('acsayi').textContent=e.length||'';$('acsayi').hidden=!e.length}
 
-function ciz(){SON=hesap();GOSTER=20;liste();ozet();$('ipucu').hidden=S.max!==''||S.sira!=='puan'||!!S.yalnizSecili}
+function ciz(){SON=hesap();GOSTER=20;liste();ozet()}
 // --- secim (cihazda kalir; suzgec temizlemek silmez) ve PDF (tarayicinin yazdirma ozelligiyle)
 var SEC=[];try{SEC=JSON.parse(localStorage.getItem('evbul_secili')||'[]')}catch(e){}
 var SEC_URL=new URLSearchParams(location.search).get('sec');
@@ -500,8 +481,7 @@ function kur(){
   c.closest('li').classList.toggle('secili',c.checked);secKaydet();secCubuk()});
  $('yalniz').onclick=function(){S.yalnizSecili=!S.yalnizSecili;ciz();window.scrollTo(0,$('sonuclar').offsetTop-8)};
  $('secsil').onclick=function(){if(!confirm(SEC.length+' ilanın seçimi kaldırılsın mı?'))return;SEC=[];S.yalnizSecili=false;secKaydet();ciz()};
- $('pdf').onclick=pdf;
- $('butce').onclick=function(){var d=$('max').closest('details');if(d)d.open=true;if(!GENIS.matches)panelAc();setTimeout(function(){$('max').focus()},80)};$('secpaylas').onclick=secPaylas;
+ $('pdf').onclick=pdf;$('secpaylas').onclick=secPaylas;
  $('paylas').onclick=function(){var u=urlYap(),b=$('paylas');
   if(navigator.share){navigator.share({title:document.title,url:u}).catch(function(){});return}
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
