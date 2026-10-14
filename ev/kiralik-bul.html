@@ -141,9 +141,13 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
  #yazdir{display:block!important}
  #yazdir h1{font-size:16pt;margin:0 0 2mm}
  .p-ust{font-size:9.5pt;color:#333;margin:0 0 4mm;border-bottom:1px solid #999;padding-bottom:3mm}
- .p-ilan{display:grid;grid-template-columns:40mm 1fr;gap:4mm;padding:3mm 0;border-bottom:1px solid #ccc;break-inside:avoid;page-break-inside:avoid}
+ .p-ilan{display:grid;grid-template-columns:40mm 1fr;gap:4mm;padding:2.5mm 0;border-bottom:1px solid #ddd;break-inside:avoid;page-break-inside:avoid}
  .p-ilan img,.p-bos{width:40mm;height:30mm;object-fit:cover;border-radius:2mm;background:#eee;display:block}
- .p-ilan h2{font-size:11.5pt;margin:0 0 1mm}.p-ilan a{color:#0b4f8a;text-decoration:none}
+ .p-ilce>h2{font-size:14pt;margin:6mm 0 0;padding:0 0 1.5mm;border-bottom:1.5px solid #000;break-after:avoid;page-break-after:avoid}
+ .p-ilce:first-of-type>h2{margin-top:2mm}
+ .p-mah>h3{font-size:11.5pt;margin:3.5mm 0 0;color:#333;break-after:avoid;page-break-after:avoid}
+ .p-ilce h2 span,.p-mah h3 span{font-weight:400;color:#555;font-size:.85em}
+ .p-ilan h4{font-size:11pt;margin:0 0 1mm}.p-ilan a{color:#0b4f8a;text-decoration:none}
  .p-ilan p{margin:0 0 1mm;color:#222}.p-fiyat{font-size:11pt}.p-ay,.p-link{font-size:8.5pt;color:#444!important}
 }
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
@@ -388,14 +392,25 @@ function pdf(){
  var tarih=$('guncel').textContent;
  $('yazdir').innerHTML='<h1>Seçilen kiralık ilanlar</h1><p class="p-ust">'+rs.length+' ilan · İstanbul Anadolu Yakası · sahibinden.com · '+esc(tarih)+' verisi'
   +(et?'<br>Süzgeçler: '+esc(et):'')+'<br>Puan ağırlıkları: '+esc(ag)+'</p>'
-  +rs.map(function(x,i){var r=x.r,b=bilgi(r);
+  +pdfGruplar(rs);
+ var eski=document.title;document.title='Kiralık ilanlar '+tarih;
+ pdfYazdir(eski)}
+function pdfGruplar(rs){var no=0,ilceler={};
+ rs.forEach(function(x){var il=D.ilce[x.r[F.ilce]],m=D.mah[x.r[F.mah]]||'Mahallesi bilinmeyen';
+  ((ilceler[il]=ilceler[il]||{})[m]=ilceler[il][m]||[]).push(x)});
+ var tr=function(a,b){return a.localeCompare(b,'tr')};
+ return Object.keys(ilceler).sort(tr).map(function(il){var ms=ilceler[il],n=0;Object.keys(ms).forEach(function(m){n+=ms[m].length});
+  return'<section class="p-ilce"><h2>'+esc(il)+' <span>· '+n+' ilan</span></h2>'+Object.keys(ms).sort(tr).map(function(m){
+   return'<section class="p-mah"><h3>'+esc(m)+' <span>· '+ms[m].length+' ilan</span></h3>'
+    +ms[m].sort(function(a,b){return b.t-a.t}).map(function(x){no++;return pdfIlan(x,no)}).join('')+'</section>'}).join('')+'</section>'}).join('')}
+function pdfIlan(x,no){var r=x.r,b=bilgi(r);
    return'<div class="p-ilan">'+(b.foto?'<img src="'+b.foto+'" alt="" referrerpolicy="no-referrer">':'<span class="p-bos"></span>')
-    +'<div><h2>'+(i+1)+'. <a href="'+b.link+'">'+esc(b.baslik)+'</a></h2><p>'+esc(b.yer)+'<br>'+esc(b.satir)+(b.oz?'<br>'+esc(b.oz):'')+'</p>'
+    +'<div><h4>'+no+'. <a href="'+b.link+'">'+esc(b.baslik)+'</a></h4><p>'+esc(b.yer)+'<br>'+esc(b.satir)+(b.oz?'<br>'+esc(b.oz):'')+'</p>'
     +'<p class="p-fiyat"><b>'+tl(r[F.fiyat])+' TL</b>'+(r[F.eski]?' (önceki '+tl(r[F.eski])+' TL)':'')+' · Puan <b>'+Math.round(x.t)+'</b></p>'
     +'<p class="p-ay">'+AG.map(function(a){return a[2]+' '+Math.round(x.p[a[0]])}).join(' · ')
     +(KAT_NOT[r[F.katN]]?' · '+KAT_NOT[r[F.katN]]:'')+(r[F.ses]?' · mahallenin 2016 sınıfı '+esc(r[F.ses]):'')+'</p>'
-    +'<p class="p-link">İlan no '+r[F.no]+' · <a href="'+b.link+'">'+esc(b.link.replace(/^https:\/\/www\./,''))+'</a></p></div></div>'}).join('');
- var eski=document.title;document.title='Kiralık ilanlar '+tarih;
+    +'<p class="p-link">İlan no '+r[F.no]+' · <a href="'+b.link+'">'+esc(b.link.replace(/^https:\/\/www\./,''))+'</a></p></div></div>'}
+function pdfYazdir(eski){
  // fotograflar yuklenince yazdir (en cok 3 sn bekle)
  var imgs=[].slice.call($('yazdir').querySelectorAll('img')),kalan=imgs.length,bitti=false;
  function yaz(){if(bitti)return;bitti=true;window.print();setTimeout(function(){document.title=eski},500)}
