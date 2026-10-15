@@ -223,7 +223,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 var AG=[["kat", 20, "Kat"], ["yas", 18, "Bina yeniliği"], ["bolge", 17, "Bölge"], ["fiyat", 16, "Kira"], ["site", 15, "Site içinde"], ["m2", 14, "Net m²"]],YAS_TAVAN=35,BIL=35,VERI_GUN=new Date('2026-10-14'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
 var F={no:0,bas:1,link:2,foto:3,fiyat:4,net:5,brut:6,oda:7,ilce:8,mah:9,kat:10,katS:11,katP:12,katN:13,yas:14,bolge:15,
  ses:16,site:17,asan:18,otop:19,isit:20,balk:21,yeni:22,eski:23,es:24,suph:25,tarih:26,kiraP:27,m2P:28,
- bek:29,bekA:30,bekU:31};
+ bek:29,bekA:30,bekU:31,bekB:32};
 var KAT_NOT=['','giriş katı veya 1. kat','en üst kat','en üst kat olabilir',''];
 // "apart" tek kelime olarak (aile apartmani gizlenmez); "ogrenci" yalniz oda/ev/yurt ile ("ogrenciye uygun 3+1" gizlenmez)
 var GIZLE=/günlük|gunluk|haftalık|paylaşımlı|oda kiralık|kiralık oda|öğrenciye oda|öğrenci evi|öğrenci yurdu|ev arkadaşı|(^|[^a-zçğıöşü])apart([^a-zçğıöşü]|$)|apart daire|yurt/;
@@ -332,7 +332,7 @@ function bilgi(r){
 // beklenen kira (kira_model): kiranin beklenene gore yuzdesi. Guveni dusuk / modelde olmayan ilanda bos.
 function bekMetin(r){if(!r[F.bek])return'';var f=Math.round((r[F.fiyat]/r[F.bek]-1)*100),
   y=Math.abs(f)<2?'Beklenen kiraya yakın':'Beklenen kiradan <b>%'+Math.abs(f)+' '+(f<0?'ucuz':'pahalı')+'</b>',
-  d=r[F.fiyat]<r[F.bekA]?' (benzerlerine göre belirgin ucuz)':(r[F.fiyat]>r[F.bekU]?' (benzerlerine göre belirgin pahalı)':'');
+  d=r[F.bekB]?' (tahmin belirsiz)':(r[F.fiyat]<r[F.bekA]?' (benzerlerine göre belirgin ucuz)':(r[F.fiyat]>r[F.bekU]?' (benzerlerine göre belirgin pahalı)':''));
  return y+d+' · beklenen ~'+bin(Math.round(r[F.bek]/1000)*1000)+' TL'}
 function kart(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
  var foto=(b.foto?'<img class="ft" src="'+b.foto+'" alt="" width="80" height="60" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'ft bos\',textContent:\'Fotoğraf yok\'}))">':'<span class="ft bos">Fotoğraf yok</span>')
@@ -485,7 +485,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=202610141121').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=58da16577c').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
