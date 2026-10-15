@@ -36,8 +36,9 @@ background-position:calc(100% - 16px) 50%,calc(100% - 11px) 50%;background-size:
 .panel{background:var(--yuzey);display:flex;flex-direction:column}
 .panel-bas{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--cizgi)}
 .panel-bas b{font-size:17px}
-.panel-ic{padding:0 14px 6px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
-.panel-alt{padding:10px 14px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--cizgi);display:flex;gap:8px}
+.bas-dug{display:flex;gap:14px}.bas-dug .metin{font-size:14px}
+.panel-ic{padding:0 14px 6px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;flex:1}
+.panel-alt{padding:10px 14px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--cizgi);display:flex;gap:8px;align-items:center}
 .panel-alt .ana{flex:1}
 .bolum{border-bottom:1px solid var(--cizgi)}
 .bolum:last-child{border-bottom:0}
@@ -62,7 +63,8 @@ background:var(--yuzey);cursor:pointer}
 .tek{display:flex;align-items:center;gap:8px;min-height:36px;font-size:13px;color:var(--ink2);cursor:pointer;margin-top:6px}
 .tek input{width:18px;height:18px;accent-color:var(--acc);flex:none;margin:0}
 /* fare ile kullanilan ekranda kutular da kucuk; dokunmatikte 16 px (iOS yakinlastirmasin) */
-@media(pointer:fine){.panel input[type=number],.panel input[type=search],.panel select{font-size:14px;min-height:34px;padding:4px 9px}}
+@media(pointer:fine){.panel input[type=number],.panel input[type=search],.panel select{font-size:14px;min-height:34px;padding:4px 9px}
+ .bolum>summary{min-height:38px}}
 @media(pointer:coarse){.cipler button{min-height:34px;font-size:13px}}
 .agr{display:grid;grid-template-columns:6.8em 1fr 2.6em;gap:0 8px;align-items:center;font-size:13px}
 .agr input{width:100%;accent-color:var(--acc);min-height:36px;margin:0}
@@ -75,73 +77,83 @@ button.d.ana{background:var(--acc);border-color:var(--acc);color:var(--acc-yazi)
 button.metin{border:0;background:none;color:var(--link);cursor:pointer;min-height:40px;padding:0 4px;font-size:15px}
 #perde{position:fixed;inset:0;background:var(--perde);z-index:9}
 
-/* telefon: soldan kayan panel */
+/* telefon: soldan kayan panel; ust bant sabit */
 @media(max-width:899px){
+ .ust-blok{position:sticky;top:0;z-index:5;background:var(--zemin);margin:calc(-1 * max(12px,env(safe-area-inset-top))) -16px 0;
+  padding:max(6px,env(safe-area-inset-top)) 16px 6px;box-shadow:0 1px 0 var(--cizgi)}
  .panel{position:fixed;z-index:10;top:0;bottom:0;left:0;width:min(88vw,360px);transform:translateX(-102%);
   visibility:hidden;transition:transform .22s ease,visibility 0s linear .22s;box-shadow:2px 0 16px rgba(0,0,0,.18);padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left)}
  .panel.acik{transform:none;visibility:visible;transition:transform .22s ease}
- .arac{position:sticky;top:0;z-index:5;background:var(--zemin);margin:0 -16px;padding:8px 16px}
 }
 /* genis ekran: sabit sol sutun */
 @media(min-width:900px){
  body{padding:20px 28px 40px}
  .duzen{display:grid;grid-template-columns:290px minmax(0,1fr);gap:24px;align-items:start}
  .panel{position:sticky;top:12px;max-height:calc(100vh - 24px);border-radius:12px;overflow:hidden}
- .ust-blok{position:sticky;top:0;z-index:4;background:var(--zemin);margin-top:-20px;padding:20px 0 2px}
+ .ust-blok{position:sticky;top:0;z-index:4;background:var(--zemin);margin:-20px 0 8px;padding:14px 0 8px;box-shadow:0 1px 0 var(--cizgi)}
  .arac #ac,#kapat,#goster{display:none}
  .panel-alt{justify-content:flex-start}
  #perde{display:none!important}
 }
 /* cok genis ekran: ilanlar sutunlara yayilir */
-@media(min-width:1280px){ol.ilanlar{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:12px}
+@media(min-width:1280px){ol.ilanlar{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:6px}
  ol.ilanlar>li{margin:0}}
 @media(prefers-reduced-motion:reduce){.panel{transition:none}}
 
 /* --- sonuclar */
-.arac{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.arac select{width:auto;flex:none}
+.bas-satir{display:flex;align-items:baseline;gap:10px}
+.bas-satir h1{font-size:18px;margin:0}
+.arac{display:flex;align-items:center;gap:6px;margin-top:6px}
+.arac select{width:auto;flex:none;min-height:34px;padding-top:3px;padding-bottom:3px}
+.arac button.d{min-height:34px;padding:3px 10px;font-size:14px;flex:none}
 .arac .bosluk{flex:1}
 #ac{display:inline-flex;align-items:center;gap:6px}
 #ac .sayi{background:var(--secili);color:var(--zemin);border-radius:10px;font-size:13px;padding:0 7px;line-height:20px}
 .paylas-satir{padding:10px 0 4px;display:flex;flex-direction:column;align-items:flex-start;gap:0}
-.aktif{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0}
-.aktif button{font-size:14px;min-height:34px;padding:2px 6px 2px 12px;border-radius:17px;border:1px solid var(--cizgi);
-background:var(--yuzey);cursor:pointer;display:inline-flex;align-items:center;gap:4px}
-.aktif button span{font-size:18px;line-height:1;color:var(--ink3);padding:0 4px}
-#say{font-weight:600;margin:10px 0 8px}
+.aktif{display:flex;flex-wrap:nowrap;gap:4px;margin:0;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+.aktif::-webkit-scrollbar{display:none}
+.aktif button{font-size:12.5px;min-height:30px;padding:0 3px 0 9px;border-radius:15px;border:1px solid var(--cizgi);flex:none;white-space:nowrap;
+background:var(--yuzey);cursor:pointer;display:inline-flex;align-items:center;gap:2px}
+.aktif button span{font-size:16px;line-height:1;color:var(--ink3);padding:0 4px}
+#say{font-weight:600;font-size:13px;color:var(--ink3);margin:0}
 ol.ilanlar{list-style:none;margin:0;padding:0}
-ol.ilanlar>li{background:var(--yuzey);border-radius:12px;padding:10px 12px;margin-bottom:8px}
-.ilan{display:grid;grid-template-columns:80px minmax(0,1fr);gap:12px}
-.ilan .ft{width:80px;height:60px;object-fit:cover;border-radius:7px;background:var(--bar-zemin);display:block}
-.ilan h2{font-size:15px;line-height:1.3;margin:0;font-weight:600;overflow-wrap:anywhere;
+ol.ilanlar>li{background:var(--yuzey);border-radius:10px;padding:6px 10px;margin-bottom:4px}
+.ilan{display:grid;grid-template-columns:56px minmax(0,1fr);gap:10px;align-items:start}
+.ilan .ft{width:56px;height:42px;object-fit:cover;border-radius:6px;background:var(--bar-zemin);display:block;margin-top:2px}
+.s1{display:flex;align-items:flex-start;gap:6px}
+.ilan h2{font-size:14px;line-height:1.35;margin:0;font-weight:600;flex:1;min-width:0;
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s2{font-size:12px;line-height:1.35;color:var(--ink3);margin:1px 0 0;overflow-wrap:anywhere;
 display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.s2 .yeni{color:var(--acc);font-weight:600}
+.s3{display:flex;align-items:center;gap:2px 10px;margin-top:1px;flex-wrap:wrap}
+.s3 .u{font-size:12px;color:var(--uyari)}
+.s3 .puan{margin-left:auto}
+button.ayb{border:0;background:none;color:var(--link);font-size:12.5px;padding:0 2px;min-height:30px;cursor:pointer}
+button.ayb::after{content:"";display:inline-block;width:5px;height:5px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;
+transform:rotate(45deg);margin:0 0 3px 6px}
+button.ayb[aria-expanded=true]::after{transform:rotate(-135deg);margin-bottom:0}
+.ayrinti{font-size:12.5px;line-height:1.5;color:var(--ink3);margin:2px 0 4px}
+.ayrinti p{margin:0 0 3px}
 .ilan h2 a{text-decoration:none;color:var(--ink)}.ilan h2 a:hover,.ilan h2 a:focus-visible{text-decoration:underline}
-.ilan .ft.bos{display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--ink3);text-align:center}
-.ayr{font-size:12.5px;line-height:1.45;color:var(--ink3);margin:3px 0 0}.ayr a{color:var(--link)}
-details.ay{margin-top:2px}
-details.ay>summary{cursor:pointer;color:var(--link);font-size:13px;min-height:32px;display:inline-flex;align-items:center}
-.dok{font-size:12.5px;line-height:1.5;color:var(--ink3);margin:2px 0 4px}
+.dok{margin:0 0 3px}
 .dok b{font-weight:600;color:var(--ink2);font-variant-numeric:tabular-nums}
-.ilan{position:relative}
-.ilan h2.bekli{padding-right:64px}
-.fark{position:absolute;top:0;right:0;font-size:15px;font-weight:700;line-height:1;padding:5px 8px;border-radius:8px;
+.fark{flex:none;font-size:12.5px;font-weight:700;line-height:1;padding:3px 6px;border-radius:6px;margin-top:1px;
 font-variant-numeric:tabular-nums;background:var(--f0);color:var(--f0y)}
 .fark.u1{background:var(--u1);color:var(--uy)}.fark.u2{background:var(--u2);color:var(--uy)}
 .fark.p1{background:var(--p1);color:var(--py)}.fark.p2{background:var(--p2);color:var(--py)}
 .fark.belirsiz{opacity:.55}
-.fiyat-satir{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:5px;flex-wrap:wrap}
-.kira{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
-.kira del{font-size:12.5px;font-weight:400;color:var(--ink3);margin-left:6px}
-.puan{font-size:13px;color:var(--ink3);white-space:nowrap}.puan b{font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums}
+.kira{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kira del{font-size:12px;font-weight:400;color:var(--ink3);margin-left:5px}
+.puan{font-size:12px;color:var(--ink3);white-space:nowrap}.puan b{font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
 .not{font-size:12.5px;color:var(--ink3);margin:3px 0 0}.not .u{color:var(--uyari)}
-.diger{font-size:12.5px;margin:3px 0 0}.diger a{margin-right:14px;display:inline-flex;align-items:center;min-height:36px}
+.diger{margin:0 0 3px}.diger a{margin-right:14px;display:inline-flex;align-items:center;min-height:30px}
 button.daha{width:100%}
 .aciklama{font-size:14px;color:var(--ink2);margin-top:24px;max-width:80ch}
 .aciklama summary{cursor:pointer;color:var(--link);min-height:44px;display:flex;align-items:center;font-size:15px}
 .aciklama p{margin:0 0 10px;line-height:1.6}
-.sol{display:flex;flex-direction:column;gap:2px}
-label.sec{display:flex;align-items:center;gap:6px;min-height:36px;font-size:13px;color:var(--ink3);cursor:pointer}
-label.sec input{width:18px;height:18px;accent-color:var(--acc);margin:0;flex:none}
+label.sec{display:flex;align-items:center;gap:4px;min-height:30px;font-size:12.5px;color:var(--ink3);cursor:pointer}
+label.sec input{width:16px;height:16px;accent-color:var(--acc);margin:0;flex:none}
 ol.ilanlar>li.secili{box-shadow:0 0 0 2px var(--acc)}
 .secbar{position:fixed;z-index:6;left:0;right:0;bottom:0;background:var(--yuzey);border-top:1px solid var(--cizgi);
 display:flex;align-items:center;gap:4px 12px;flex-wrap:wrap;padding:8px max(16px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
@@ -167,36 +179,37 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
  .p-ilan p{margin:0 0 1mm;color:#222}.p-uyari{font-size:9pt;color:#8a3200!important}.p-fiyat{font-size:11pt}.p-ay,.p-link{font-size:8.5pt;color:#444!important}
 }
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
-@media(max-width:389px){.ilan{grid-template-columns:68px minmax(0,1fr);gap:10px}.ilan .ft{width:68px;height:51px}h1{font-size:22px}}
+@media(max-width:389px){.ilan{grid-template-columns:48px minmax(0,1fr);gap:8px}.ilan .ft{width:48px;height:36px}}
 </style></head><body>
 <span id="guncel" hidden>15 Ekim 2026</span>
 <div class="duzen">
 
 <aside class="panel" id="panel" aria-labelledby="panel-baslik">
-<div class="panel-bas"><b id="panel-baslik">Süzgeçler</b><button type="button" class="metin" id="kapat">Kapat</button></div>
+<div class="panel-bas"><b id="panel-baslik">Süzgeçler</b><span class="bas-dug"><button type="button" class="metin" id="paylas">Aramayı paylaş</button>
+<button type="button" class="metin" id="kapat">Kapat</button></span></div>
 <div class="panel-ic">
-<details class="bolum" open><summary id="b_kira">Aylık kira<span class="deger" id="d_kira"></span></summary>
+<details class="bolum" name="suz"><summary id="b_kira">Aylık kira<span class="deger" id="d_kira"></span></summary>
 <div class="bolum-ic" role="group" aria-labelledby="b_kira"><div class="iki">
 <label><span class="sr">En az aylık kira</span><input id="min" type="number" inputmode="numeric" min="0" step="1000" placeholder="En az TL"></label>
 <label><span class="sr">En çok aylık kira</span><input id="max" type="number" inputmode="numeric" min="0" step="1000" placeholder="En çok TL"></label></div></div></details>
-<details class="bolum" open><summary id="b_oda">Oda<span class="deger" id="d_oda"></span></summary>
+<details class="bolum" name="suz"><summary id="b_oda">Oda<span class="deger" id="d_oda"></span></summary>
 <div class="bolum-ic"><div class="cipler" id="oda" role="group" aria-labelledby="b_oda"></div></div></details>
-<details class="bolum"><summary id="b_boyut">Net m² ve bina yaşı<span class="deger" id="d_boyut"></span></summary>
+<details class="bolum" name="suz"><summary id="b_boyut">Net m² ve bina yaşı<span class="deger" id="d_boyut"></span></summary>
 <div class="bolum-ic" role="group" aria-labelledby="b_boyut"><div class="iki">
 <label><span class="sr">En az net metrekare</span><input id="m2" type="number" inputmode="numeric" min="0" placeholder="En az m²"></label>
 <label><span class="sr">Bina yaşı</span><select id="yas"><option value="">Her yaş</option>
 <option value="0">Sıfır bina</option><option value="5">En çok 5</option><option value="10">En çok 10</option>
 <option value="15">En çok 15</option><option value="20">En çok 20</option><option value="30">En çok 30</option></select></label></div></div></details>
-<details class="bolum"><summary id="b_oz">Olsun<span class="deger" id="d_oz"></span></summary>
+<details class="bolum" name="suz"><summary id="b_oz">Olsun<span class="deger" id="d_oz"></span></summary>
 <div class="bolum-ic"><div class="cipler" id="ozellik" role="group" aria-labelledby="b_oz"></div>
 <label class="tek"><input type="checkbox" id="gizle">Günlük, oda, öğrenci, apart ilanlarını gizle</label></div></details>
-<details class="bolum"><summary id="b_ilce">İlçe<span class="deger" id="d_ilce"></span></summary>
+<details class="bolum" name="suz"><summary id="b_ilce">İlçe<span class="deger" id="d_ilce"></span></summary>
 <div class="bolum-ic"><div class="cipler" id="ilceler" role="group" aria-labelledby="b_ilce"></div></div></details>
-<details class="bolum"><summary id="b_mah">Mahalle<span class="deger" id="d_mah"></span></summary>
+<details class="bolum" name="suz"><summary id="b_mah">Mahalle<span class="deger" id="d_mah"></span></summary>
 <div class="bolum-ic"><label><span class="sr">Mahalle adı ara</span>
 <input id="mahara" type="search" enterkeyhint="search" autocomplete="off" placeholder="Mahalle adı yazın"></label>
 <div class="cipler mah-liste" id="mahliste" role="group" aria-labelledby="b_mah"></div><p class="mah-not" id="mahnot"></p></div></details>
-<details class="bolum"><summary id="b_hedef">Hedef konum<span class="deger" id="d_hedef"></span></summary>
+<details class="bolum" name="suz"><summary id="b_hedef">Hedef konum<span class="deger" id="d_hedef"></span></summary>
 <div class="bolum-ic hedef" role="group" aria-labelledby="b_hedef">
 <label><span class="sr">Hedef ilçe (iş, okul ya da yakın olmak istediğiniz yer)</span><select id="hi"></select></label>
 <label><span class="sr">Hedef mahalle</span><select id="hm"></select></label>
@@ -204,13 +217,12 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <option value="3">En çok 3 km</option><option value="5">En çok 5 km</option><option value="10">En çok 10 km</option>
 <option value="15">En çok 15 km</option><option value="20">En çok 20 km</option></select></label>
 <p class="mah-not">Puandaki payı Puanlama bölümündeki "Hedef konum" ile ayarlanır.</p></div></details>
-<details class="bolum"><summary>Kelime ara<span class="deger" id="d_ara"></span></summary>
+<details class="bolum" name="suz"><summary>Kelime ara<span class="deger" id="d_ara"></span></summary>
 <div class="bolum-ic"><label><span class="sr">İlan başlığında kelime ara</span>
 <input id="ara" type="search" enterkeyhint="search" autocomplete="off" placeholder="Site adı, eşyalı, metro…"></label></div></details>
-<details class="bolum"><summary>Puanlama<span class="deger" id="d_puan"></span></summary>
+<details class="bolum" name="suz"><summary>Puanlama<span class="deger" id="d_puan"></span></summary>
 <div class="bolum-ic"><div class="agr" id="agr"></div><p class="mah-not" id="agkalan" aria-live="polite"></p>
 <button type="button" class="metin" id="agsifir" style="font-size:14px">Varsayılana dön</button></div></details>
-<div class="paylas-satir"><button type="button" class="metin" id="paylas">Aramayı paylaş</button></div>
 </div>
 <div class="panel-alt"><button type="button" class="d ana" id="goster">İlanları göster</button>
 <button type="button" class="d" id="temizle">Temizle</button></div>
@@ -219,14 +231,13 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 
 <main id="sonuclar">
 <div class="ust-blok">
-<h1>Kiralık evler</h1>
+<div class="bas-satir"><h1>Kiralık evler</h1><p id="say" role="status" aria-live="polite">İlanlar yükleniyor…</p></div>
 <div class="arac">
 <button type="button" class="d" id="ac" aria-controls="panel" aria-expanded="false">Süzgeçler <span class="sayi" id="acsayi" hidden></span></button>
 <label><span class="sr">Sıralama</span><select id="sira"><option value="puan">Puana göre</option><option value="ucuz">Kirası düşük</option>
 <option value="yeni">Yeni ilanlar</option><option value="m2">Büyük olan</option><option value="yakin">Hedefe yakın</option></select></label>
-</div>
 <div class="aktif" id="aktif" aria-label="Seçili süzgeçler" hidden></div>
-<p id="say" role="status" aria-live="polite">İlanlar yükleniyor…</p>
+</div>
 </div>
 <ol class="ilanlar" id="liste" aria-label="İlanlar"></ol>
 <button type="button" class="d daha" id="daha" hidden></button>
@@ -380,7 +391,10 @@ function bilgi(r){
  var kn=parseInt(r[F.kat],10);if(r[F.asan]===0&&kn>=3)notlar.push('asansörsüz '+kn+'. kat');
  if(r[F.suph]===1)notlar.push('kira mahallesine göre çok düşük, ilanı kontrol edin');
  if(r[F.suph]===2)notlar.push('kira birden %'+Math.round((1-r[F.fiyat]/r[F.eski])*100)+' düştü, ilanı kontrol edin');
- return{link:tamLink(r[F.no],r[F.link]),foto:tamFoto(r[F.no],r[F.foto]),yer:D.ilce[r[F.ilce]]+', '+D.mah[r[F.mah]],
+ var kisa=[r[F.oda],r[F.net]?r[F.net]+' m²':(r[F.brut]?Math.round(r[F.brut])+' m² brüt':''),
+  r[F.kat]?(/^\d/.test(r[F.kat])?ks(r[F.kat])+(r[F.katS]?'/'+ks(r[F.katS]):'')+' kat':kucuk(r[F.kat])):'',
+  r[F.yas]===null?'':(r[F.yas]===0?'sıfır bina':(r[F.yas]>=YAS_TAVAN?'31+ yaş':'~'+r[F.yas]+' yaş'))].filter(Boolean).join(' · ');
+ return{link:tamLink(r[F.no],r[F.link]),foto:tamFoto(r[F.no],r[F.foto]),yer:D.ilce[r[F.ilce]]+', '+D.mah[r[F.mah]],kisa:kisa,
   satir:[r[F.oda],m2,kat,yas].filter(Boolean).join(' · '),ozler:oz,oz:oz.join(' · '),baslik:baslik(r[F.bas])||r[F.no],
   yayin:gun===null?'':(gun===0?'bugün yayınlandı':gun+' gündür yayında'),uyari:notlar,
   harita:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(D.mah[r[F.mah]]+' Mahallesi, '+D.ilce[r[F.ilce]]+', İstanbul')}}
@@ -402,23 +416,27 @@ function farkRozet(r){if(!r[F.bek])return'';var f=Math.round((r[F.fiyat]/r[F.bek
  var acik=bekMetin(r).replace(/<\/?b>/g,'');
  return'<span class="fark '+sinif+'" title="'+esc(acik)+'"><span aria-hidden="true">'+yazi+'</span><span class="sr">'+esc(acik)+'</span></span>'}
 function kart(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
- var foto=(b.foto?'<img class="ft" src="'+b.foto+'" alt="" width="80" height="60" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'ft bos\',textContent:\'Fotoğraf yok\'}))">':'<span class="ft bos">Fotoğraf yok</span>')
-  +'<label class="sec"><input type="checkbox" data-no="'+r[F.no]+'"'+(sec?' checked':'')+'><span>Seç</span><span class="sr"> '+esc(b.baslik)+'</span></label>';
+ var foto=b.foto?'<img class="ft" src="'+b.foto+'" alt="" width="56" height="42" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'ft bos\'}))">':'<span class="ft bos"></span>';
  var not=b.uyari.map(function(u){return'<span class="u">'+esc(u)+'</span>'});
- if(r[F.yeni])not.push('yeni ilan');if(r[F.es].length)not.push('aynı ev '+(r[F.es].length+1)+' ilanda');
+ if(r[F.es].length)not.push('aynı ev '+(r[F.es].length+1)+' ilanda');
  var dok=AG.filter(function(a){return x.p[a[0]]!==undefined}).map(function(a){return a[2]+(a[0]==='bolge'&&r[F.ses]?' ('+esc(r[F.ses])+')':'')+' <b>'+(x.u[a[0]]?'bilinmiyor':Math.round(x.p[a[0]]))+'</b>'}).join(' · ');
- var bek=bekRakam(r);
- var rz=farkRozet(r);
+ var bek=bekRakam(r),rz=farkRozet(r);
  var es=r[F.es].length?'<p class="diger">Aynı evin diğer ilanları: '+r[F.es].map(function(e,i){
   return'<a href="'+tamLink(e[0],e[1])+'" target="_blank" rel="noopener">'+(i+2)+'. ilan</a>'}).join('')+'</p>':'';
- return'<li'+(sec?' class="secili"':'')+'><article class="ilan"><div class="sol">'+foto+'</div><div class="orta">'
-  +rz+'<h2'+(rz?' class="bekli"':'')+'><a href="'+b.link+'" target="_blank" rel="noopener">'+esc(b.baslik)+'</a></h2>'
-  +'<p class="ayr">'+esc(b.yer)+(x.km!==null&&x.km!==undefined?' · hedefe '+kmYaz(x.km):'')+(b.yayin?' · '+b.yayin:'')+' · <a href="'+b.harita+'" target="_blank" rel="noopener">harita</a><br>'
-  +esc(b.satir)+(b.oz?'<br>'+esc(b.oz):'')+'</p>'
-  +'<div class="fiyat-satir"><span class="kira">'+tl(r[F.fiyat])+' TL'+(r[F.eski]?'<del><span class="sr">, önceki kira </span>'+tl(r[F.eski])+' TL</del>':'')+'</span>'
-  +'<span class="puan">Puan <b>'+Math.round(x.t)+'</b></span></div>'
+ var km=x.km!==null&&x.km!==undefined?' · '+kmYaz(x.km):'';
+ return'<li'+(sec?' class="secili"':'')+'><article class="ilan">'+foto+'<div class="orta">'
+  +'<div class="s1"><h2><a href="'+b.link+'" target="_blank" rel="noopener">'+esc(b.baslik)+'</a></h2>'+rz+'</div>'
+  +'<p class="s2">'+(r[F.yeni]?'<b class="yeni">yeni</b> · ':'')+esc(b.yer)+esc(km)+' · '+esc(b.kisa)+'</p>'
+  +'<div class="s3"><span class="kira">'+tl(r[F.fiyat])+' TL'+(r[F.eski]?'<del><span class="sr">, önceki kira </span>'+tl(r[F.eski])+'</del>':'')+'</span>'
+  +(r[F.suph]?'<span class="u">fiyatı kontrol edin</span>':'')
+  +'<span class="puan">Puan <b>'+Math.round(x.t)+'</b></span>'
+  +'<button type="button" class="ayb" aria-expanded="false">Ayrıntı<span class="sr"> '+esc(b.baslik)+'</span></button>'
+  +'<label class="sec"><input type="checkbox" data-no="'+r[F.no]+'"'+(sec?' checked':'')+'><span>Seç</span><span class="sr"> '+esc(b.baslik)+'</span></label></div>'
+  +'<div class="ayrinti" hidden>'
+  +(b.oz?'<p>'+esc(b.oz)+'</p>':'')
+  +'<p>'+(b.yayin?esc(b.yayin)+' · ':'')+'<a href="'+b.harita+'" target="_blank" rel="noopener">haritada aç</a></p>'
   +(not.length?'<p class="not">'+not.join(' · ')+'</p>':'')+es
-  +'<details class="ay"><summary>Puan ayrıntısı</summary><p class="dok">'+dok+'</p>'+(bek?'<p class="dok">'+bek+'</p>':'')+'</details></div>'
+  +'<p class="dok">'+dok+'</p>'+(bek?'<p class="dok">'+bek+'</p>':'')+'</div></div>'
   +'</article></li>'}
 
 // secili suzgecler: listenin ustunde, dokununca kalkar
@@ -576,6 +594,8 @@ function kur(){
  document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;
   if($('panel').classList.contains('acik'))panelKapat()});
  GENIS.addEventListener?GENIS.addEventListener('change',genislik):GENIS.addListener(genislik);genislik();
+ $('liste').addEventListener('click',function(e){var b=e.target.closest('button.ayb');if(!b)return;
+  var ac=b.getAttribute('aria-expanded')!=='true';b.setAttribute('aria-expanded',ac);b.closest('.orta').querySelector('.ayrinti').hidden=!ac});
  $('liste').addEventListener('change',function(e){var c=e.target;if(!c.dataset||!c.dataset.no)return;
   var i=SEC.indexOf(c.dataset.no);if(c.checked&&i<0)SEC.push(c.dataset.no);if(!c.checked&&i>=0)SEC.splice(i,1);
   c.closest('li').classList.toggle('secili',c.checked);secKaydet();secCubuk()});
