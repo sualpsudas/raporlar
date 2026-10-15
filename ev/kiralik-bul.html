@@ -49,6 +49,8 @@ transform:rotate(45deg);margin:-4px 3px 0 0}
 .bolum .deger{margin-left:auto;font-weight:400;color:var(--ink3);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62%}
 .bolum-ic{padding:0 0 12px}
 .iki{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.hedef>label{display:block;margin-bottom:6px}
+select:disabled{opacity:.5}
 .cipler{display:flex;flex-wrap:wrap;gap:4px}
 .cipler button{font-size:12px;min-height:28px;padding:2px 9px;border-radius:14px;border:1px solid var(--cizgi);
 background:var(--yuzey);cursor:pointer}
@@ -192,6 +194,15 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <div class="bolum-ic"><label><span class="sr">Mahalle adı ara</span>
 <input id="mahara" type="search" enterkeyhint="search" autocomplete="off" placeholder="Mahalle adı yazın"></label>
 <div class="cipler mah-liste" id="mahliste" role="group" aria-labelledby="b_mah"></div><p class="mah-not" id="mahnot"></p></div></details>
+<details class="bolum"><summary id="b_hedef">Hedef konum<span class="deger" id="d_hedef"></span></summary>
+<div class="bolum-ic hedef" role="group" aria-labelledby="b_hedef">
+<label><span class="sr">Hedef ilçe (iş, okul ya da yakın olmak istediğiniz yer)</span><select id="hi"></select></label>
+<label><span class="sr">Hedef mahalle</span><select id="hm"></select></label>
+<div class="iki"><label><span class="sr">Hedefin puandaki önemi</span><select id="hk"><option value="az">Önemi az</option>
+<option value="orta">Önemi orta</option><option value="cok">Önemi çok</option></select></label>
+<label><span class="sr">Hedefe en çok uzaklık</span><select id="hu"><option value="">Sınır yok</option>
+<option value="3">En çok 3 km</option><option value="5">En çok 5 km</option><option value="10">En çok 10 km</option>
+<option value="15">En çok 15 km</option><option value="20">En çok 20 km</option></select></label></div></div></details>
 <details class="bolum"><summary>Kelime ara<span class="deger" id="d_ara"></span></summary>
 <div class="bolum-ic"><label><span class="sr">İlan başlığında kelime ara</span>
 <input id="ara" type="search" enterkeyhint="search" autocomplete="off" placeholder="Site adı, eşyalı, metro…"></label></div></details>
@@ -211,7 +222,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <div class="arac">
 <button type="button" class="d" id="ac" aria-controls="panel" aria-expanded="false">Süzgeçler <span class="sayi" id="acsayi" hidden></span></button>
 <label><span class="sr">Sıralama</span><select id="sira"><option value="puan">Puana göre</option><option value="ucuz">Kirası düşük</option>
-<option value="yeni">Yeni ilanlar</option><option value="m2">Büyük olan</option></select></label>
+<option value="yeni">Yeni ilanlar</option><option value="m2">Büyük olan</option><option value="yakin">Hedefe yakın</option></select></label>
 </div>
 <div class="aktif" id="aktif" aria-label="Seçili süzgeçler" hidden></div>
 <p id="say" role="status" aria-live="polite">İlanlar yükleniyor…</p>
@@ -234,6 +245,9 @@ giriş / bahçe katı 20, bodrum ve kot sıfır. Asansörsüz binada 3. kat 10, 
 <b>Bölge:</b> mahallenin sosyo-ekonomik sınıfı (İBB, 2016); yoksa ilçenin gelişmişlik puanı (2022).
 <b>Net m²:</b> büyük olan yüksek puan alır. Bilgisi girilmemiş başlık ortalama (50) sayılır.
 Sağ üstteki yüzde (beklenen kiraya göre) puana girmez.</p>
+<p><b>Hedef konum</b> seçilirse ilanın mahallesi ile hedef arasındaki kuş uçuşu uzaklık puana katılır: 2 km'ye kadar tam puan,
+5 km yaklaşık 65, 10 km 32, 20 km 8. Boğaz'ın öbür yakası için 5 km eklenir. Önemi az, orta ya da çok seçilince puanın
+%15, %30 ya da %50'si buradan gelir; diğer başlıkların ağırlıkları değişmez. Uzaklık mahalle merkezinden ölçülür, kabadır.</p>
 </details>
 </main>
 </div>
@@ -243,7 +257,18 @@ Sağ üstteki yüzde (beklenen kiraya göre) puana girmez.</p>
 var AG=[["kat", 20, "Kat"], ["yas", 18, "Bina yeniliği"], ["fiyat", 17, "Kira"], ["site", 16, "Site içinde"], ["bolge", 15, "Bölge"], ["m2", 14, "Net m²"]],YAS_TAVAN=35,YAS_EGRI=[[0, 100], [3, 92], [8, 78], [13, 64], [18, 46], [23, 24], [28, 10], [35, 0]],BIL=50,VERI_GUN=new Date('2026-10-15'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
 var F={no:0,bas:1,link:2,foto:3,fiyat:4,net:5,brut:6,oda:7,ilce:8,mah:9,kat:10,katS:11,katP:12,katN:13,yas:14,bolge:15,
  ses:16,site:17,asan:18,otop:19,isit:20,balk:21,yeni:22,eski:23,es:24,suph:25,tarih:26,kiraP:27,m2P:28,
- bek:29,bekA:30,bekU:31,bekB:32};
+ bek:29,bekA:30,bekU:31,bekB:32,kn:33};
+// hedef konum: ilanin mahalle noktasi (D.kn) ile hedef arasi kus ucusu km; Bogaz'in obur yakasina KOPRU km eklenir.
+// Konum puani: KONUM_TAM km'ye kadar 100, sonra her KONUM_OLCEK km'de ~e kati azalir (5 km 65, 10 km 32, 20 km 8).
+// Puana karisma orani (onem): az/orta/cok; diger 6 basligin agirliklarina dokunmaz.
+var ANADOLU=['Adalar','Ataşehir','Beykoz','Çekmeköy','Kadıköy','Kartal','Maltepe','Pendik','Sancaktepe','Sultanbeyli','Şile','Tuzla','Ümraniye','Üsküdar'];
+var KONUM_ONEM={az:15,orta:30,cok:50},KOPRU=5,KONUM_TAM=2,KONUM_OLCEK=7;
+function konumPuan(km){return km<=KONUM_TAM?100:100*Math.exp(-(km-KONUM_TAM)/KONUM_OLCEK)}
+function hedef(){if(!D||!S.hi)return null;for(var i=0;i<D.kn.length;i++){var k=D.kn[i];if(k[0]===S.hi&&k[1]===S.hm)return k}return null}
+function uzaklik(r,h){var i=r[F.kn];if(i===null||i===undefined||!h)return null;var k=D.kn[i],R=Math.PI/180;
+ var a=Math.pow(Math.sin((h[2]-k[2])*R/2),2)+Math.cos(k[2]*R)*Math.cos(h[2]*R)*Math.pow(Math.sin((h[3]-k[3])*R/2),2);
+ return 12742*Math.asin(Math.sqrt(a))+((ANADOLU.indexOf(k[0])>=0)!==(ANADOLU.indexOf(h[0])>=0)?KOPRU:0)}
+function kmYaz(km){return km<1?'1 km\'den yakın':'~'+(km<10?(Math.round(km*10)/10).toLocaleString('tr-TR'):Math.round(km))+' km'}
 var KAT_NOT=['','giriş / bahçe katı','en üst kat','en üst kat olabilir','','1. kat','bodrum / kot katı','çatı katı'];
 // bina yeniligi: YAS_EGRI (yas, puan) noktalari arasinda dogrusal
 function yasPuan(y){if(y===null)return null;for(var i=1;i<YAS_EGRI.length;i++){var a=YAS_EGRI[i-1],b=YAS_EGRI[i];
@@ -252,10 +277,10 @@ function yasPuan(y){if(y===null)return null;for(var i=1;i<YAS_EGRI.length;i++){v
 var GIZLE=/günlük|gunluk|haftalık|paylaşımlı|oda kiralık|kiralık oda|öğrenciye oda|öğrenci evi|öğrenci yurdu|ev arkadaşı|(^|[^a-zçğıöşü])apart([^a-zçğıöşü]|$)|apart daire|yurt/;
 // olmazsa olmazlar (dugme) + gizle (onay kutusu)
 var OZ=[['asansor','Asansör'],['otopark','Otopark'],['site','Site içi'],['balkon','Balkon'],['uygunkat','Ara kat']];
-var KUTU=OZ.map(function(o){return o[0]}).concat(['gizle']),ALAN=['min','max','m2','yas','ara','sira'];
+var KUTU=OZ.map(function(o){return o[0]}).concat(['gizle']),ALAN=['min','max','m2','yas','ara','sira','hi','hm','hk','hu'];
 var ODALAR=['Stüdyo','1+1','2+1','3+1','4+'];
 var BOS={min:'',max:'',m2:'',yas:'',oda:[],ilce:[],mah:[],ara:'',asansor:false,otopark:false,site:false,balkon:false,
- uygunkat:false,gizle:true,sira:'puan',w:{},yalnizSecili:false};
+ uygunkat:false,gizle:true,sira:'puan',w:{},yalnizSecili:false,hi:'',hm:'',hk:'orta',hu:''};
 AG.forEach(function(a){BOS.w[a[0]]=a[1]});
 function kopya(o){return JSON.parse(JSON.stringify(o))}
 var S=kopya(BOS),D=null,SON=[],GOSTER=20,$=function(id){return document.getElementById(id)};
@@ -271,6 +296,7 @@ function urlden(){var p=new URLSearchParams(location.search);if(!p.toString())re
 function urlYap(){var p=new URLSearchParams();
  ['min','max','m2','yas','ara'].forEach(function(k){if(S[k]!=='')p.set(k,S[k])});
  if(S.sira!=='puan')p.set('sira',S.sira);
+ if(S.hi){p.set('hi',S.hi);if(S.hm)p.set('hm',S.hm);if(S.hk!=='orta')p.set('hk',S.hk);if(S.hu!=='')p.set('hu',S.hu)}
  ['oda','ilce','mah'].forEach(function(k){if(S[k].length)p.set(k,S[k].join(','))});
  p.set('f',KUTU.filter(function(k){return S[k]}).join(','));
  if(AG.some(function(a){return S.w[a[0]]!==a[1]}))p.set('w',AG.map(function(a){return S.w[a[0]]}).join(','));
@@ -332,16 +358,23 @@ var PUANLA=null;
 function hesap(){
  var rs=D.satir.filter(suz);
  var top=0;AG.forEach(function(a){top+=+S.w[a[0]]});top=top||1;
+ var H=hedef(),K=H?(KONUM_ONEM[S.hk]||KONUM_ONEM.orta)/100:0;
  PUANLA=function(r){var p={kat:r[F.katP],yas:r[F.yas]===null?BIL:yasPuan(r[F.yas]),
   bolge:r[F.bolge]===null?BIL:r[F.bolge],fiyat:r[F.kiraP],site:r[F.site]===null?BIL:r[F.site]*100,m2:r[F.m2P]},t=0;
   // bilinmeyen basliklar (notr puan alir, ayrintida "bilinmiyor" yazar)
   var u={kat:r[F.katN]===4&&r[F.katP]===BIL,yas:r[F.yas]===null,bolge:r[F.bolge]===null,fiyat:!!r[F.suph],
    site:r[F.site]===null,m2:!r[F.net]};
-  AG.forEach(function(a){t+=p[a[0]]*S.w[a[0]]});return{r:r,p:p,u:u,t:t/top}};
+  AG.forEach(function(a){t+=p[a[0]]*S.w[a[0]]});t=t/top;
+  var km=H?uzaklik(r,H):null;
+  if(H){p.konum=km===null?BIL:konumPuan(km);u.konum=km===null;t=(1-K)*t+K*p.konum}
+  return{r:r,p:p,u:u,t:t,km:km}};
  if(S.yalnizSecili)rs=D.satir.filter(function(r){return SEC.indexOf(r[F.no])>=0});
  rs=rs.map(PUANLA);
+ if(H&&S.hu!=='')rs=rs.filter(function(x){return x.km!==null&&x.km<=+S.hu});
  var so={puan:function(a,b){return b.t-a.t},ucuz:function(a,b){return a.r[F.fiyat]-b.r[F.fiyat]},
-  yeni:function(a,b){return(b.r[F.yeni]-a.r[F.yeni])||(b.t-a.t)},m2:function(a,b){return(b.r[F.net]||0)-(a.r[F.net]||0)}};
+  yeni:function(a,b){return(b.r[F.yeni]-a.r[F.yeni])||(b.t-a.t)},m2:function(a,b){return(b.r[F.net]||0)-(a.r[F.net]||0)},
+  yakin:function(a,b){return((a.km===null?1e9:a.km)-(b.km===null?1e9:b.km))||(b.t-a.t)}};
+ if(S.sira==='yakin'&&!H)return rs.sort(so.puan);
  return rs.sort(so[S.sira]||so.puan)}
 
 function bilgi(r){
@@ -384,13 +417,14 @@ function kart(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
  var not=b.uyari.map(function(u){return'<span class="u">'+esc(u)+'</span>'});
  if(r[F.yeni])not.push('yeni ilan');if(r[F.es].length)not.push('aynı ev '+(r[F.es].length+1)+' ilanda');
  var dok=AG.map(function(a){return a[2]+(a[0]==='bolge'&&r[F.ses]?' ('+esc(r[F.ses])+')':'')+' <b>'+(x.u[a[0]]?'bilinmiyor':Math.round(x.p[a[0]]))+'</b>'}).join(' · ');
+ if(x.p.konum!==undefined)dok+=' · Hedef konum <b>'+(x.u.konum?'bilinmiyor':Math.round(x.p.konum))+'</b>';
  var bek=bekRakam(r);
  var rz=farkRozet(r);
  var es=r[F.es].length?'<p class="diger">Aynı evin diğer ilanları: '+r[F.es].map(function(e,i){
   return'<a href="'+tamLink(e[0],e[1])+'" target="_blank" rel="noopener">'+(i+2)+'. ilan</a>'}).join('')+'</p>':'';
  return'<li'+(sec?' class="secili"':'')+'><article class="ilan"><div class="sol">'+foto+'</div><div class="orta">'
   +rz+'<h2'+(rz?' class="bekli"':'')+'><a href="'+b.link+'" target="_blank" rel="noopener">'+esc(b.baslik)+'</a></h2>'
-  +'<p class="ayr">'+esc(b.yer)+(b.yayin?' · '+b.yayin:'')+' · <a href="'+b.harita+'" target="_blank" rel="noopener">harita</a><br>'
+  +'<p class="ayr">'+esc(b.yer)+(x.km!==null&&x.km!==undefined?' · hedefe '+kmYaz(x.km):'')+(b.yayin?' · '+b.yayin:'')+' · <a href="'+b.harita+'" target="_blank" rel="noopener">harita</a><br>'
   +esc(b.satir)+(b.oz?'<br>'+esc(b.oz):'')+'</p>'
   +'<div class="fiyat-satir"><span class="kira">'+tl(r[F.fiyat])+' TL'+(r[F.eski]?'<del><span class="sr">, önceki kira </span>'+tl(r[F.eski])+' TL</del>':'')+'</span>'
   +'<span class="puan">Puan <b>'+Math.round(x.t)+'</b></span></div>'
@@ -408,6 +442,8 @@ function etiketler(){var e=[];
  if(S.yas!=='')e.push([S.yas==='0'?'sıfır bina':'en çok '+S.yas+' yaş',function(){S.yas=''}]);
  OZ.forEach(function(o){if(S[o[0]])e.push([o[1],function(){S[o[0]]=false}])});
  if(S.ara.trim())e.push(['"'+S.ara.trim()+'"',function(){S.ara=''}]);
+ if(hedef()){e.push(['hedef: '+(S.hm||S.hi),function(){S.hi='';S.hm='';S.hu=''}]);
+  if(S.hu!=='')e.push(['hedefe en çok '+S.hu+' km',function(){S.hu=''}])}
  return e}
 function degerYaz(){var d=function(id,v){$(id).textContent=v};
  d('d_kira',S.min!==''||S.max!==''?(S.min!==''?bin(S.min):'0')+' – '+(S.max!==''?bin(S.max):'…')+' TL':'Hepsi');
@@ -417,6 +453,7 @@ function degerYaz(){var d=function(id,v){$(id).textContent=v};
  d('d_ilce',!S.ilce.length?'Hepsi':(S.ilce.length<=2?S.ilce.join(', '):S.ilce.length+' ilçe'));
  d('d_mah',!S.mah.length?'Hepsi':(S.mah.length<=2?S.mah.map(function(m){return m.split('|')[1]}).join(', '):S.mah.length+' mahalle'));
  d('d_ara',S.ara.trim());
+ d('d_hedef',hedef()?(S.hm?S.hm+', ':'')+S.hi:'Yok');
  d('d_puan',AG.some(function(a){return S.w[a[0]]!==a[1]})?'Değiştirildi':'Varsayılan')}
 function ozet(){degerYaz();var e=etiketler(),el=$('aktif');
  el.innerHTML=e.map(function(x,i){return'<button type="button" data-i="'+i+'" aria-label="'+esc(x[0])+' süzgecini kaldır">'+esc(x[0])+'<span aria-hidden="true">×</span></button>'}).join('');
@@ -497,7 +534,17 @@ function mahCiz(){if(!D)return;if(!MAH_SAY){MAH_SAY={};D.satir.forEach(function(
    +(tek?'':'<small>'+esc(p[0])+'</small>')+'<small>'+MAH_SAY[k]+'</small></button>'}).join('');
  $('mahnot').textContent=ks.length>EN?(ks.length-EN)+' mahalle daha: ilçe seçin ya da adını yazın':(ks.length?'':'Uyan mahalle yok')}
 function aCik(alan){return function(v){var i=S[alan].indexOf(v);if(i>=0)S[alan].splice(i,1);else S[alan].push(v)}}
-function arayuzYaz(){ALAN.forEach(function(id){if(document.activeElement!==$(id))$(id).value=S[id]});$('gizle').checked=S.gizle;
+// hedef konum kutulari: ilce (Anadolu / Avrupa yakasi gruplari) -> mahalle (ilcenin geneli + mahalleler)
+function hedefCiz(){if(!D)return;var tr=function(a,b){return a.localeCompare(b,'tr')},hi=$('hi'),hm=$('hm');
+ if(hi.dataset.dolu!=='1'){var il=D.kn.filter(function(k){return!k[1]}).map(function(k){return k[0]}).sort(tr);
+  var grup=function(ad,ls){return'<optgroup label="'+ad+'">'+ls.map(function(i){return'<option>'+esc(i)+'</option>'}).join('')+'</optgroup>'};
+  hi.innerHTML='<option value="">Hedef yok</option>'+grup('Anadolu Yakası',il.filter(function(i){return ANADOLU.indexOf(i)>=0}))
+   +grup('Avrupa Yakası',il.filter(function(i){return ANADOLU.indexOf(i)<0}));hi.dataset.dolu='1'}
+ if(S.hi&&!hedef())S.hm='';if(S.hi&&!hedef())S.hi='';
+ if(hm.dataset.ilce!==S.hi){var ms=D.kn.filter(function(k){return k[0]===S.hi&&k[1]}).map(function(k){return k[1]}).sort(tr);
+  hm.innerHTML='<option value="">İlçenin geneli</option>'+ms.map(function(m){return'<option>'+esc(m)+'</option>'}).join('');hm.dataset.ilce=S.hi}
+ ['hm','hk','hu'].forEach(function(id){$(id).disabled=!S.hi})}
+function arayuzYaz(){hedefCiz();ALAN.forEach(function(id){if(document.activeElement!==$(id))$(id).value=S[id]});$('gizle').checked=S.gizle;
  ['oda','ilceler','ozellik'].forEach(function(id){$(id)._boya()});mahCiz();agCiz()}
 function agCiz(){$('agr').innerHTML=AG.map(function(a){return'<label for="w_'+a[0]+'">'+a[2]+'</label><input id="w_'+a[0]+'" type="range" min="0" max="100" step="1" data-k="'+a[0]+'" value="'+S.w[a[0]]+'" aria-valuetext="yüzde '+S.w[a[0]]+'"><output for="w_'+a[0]+'">%'+S.w[a[0]]+'</output>'}).join('');
  var zam;$('agr').querySelectorAll('input').forEach(function(i){i.oninput=function(){agDegis(i.dataset.k,+i.value);agYaz();
@@ -523,12 +570,13 @@ function kur(){
  arayuzYaz();var zam;
  ALAN.forEach(function(id){var el=$(id);
   el.addEventListener(el.tagName==='SELECT'?'change':'input',function(){S[id]=el.value;clearTimeout(zam);zam=setTimeout(function(){kaydet();ciz()},250)})});
+ $('hi').addEventListener('change',function(){S.hi=$('hi').value;S.hm='';hedefCiz();$('hm').value=''});
  $('gizle').addEventListener('change',function(){S.gizle=$('gizle').checked;kaydet();ciz()});
  $('mahara').addEventListener('input',mahCiz);
  $('mahliste').onclick=function(e){var b=e.target.closest('button');if(!b)return;var k=b.dataset.v,i=S.mah.indexOf(k);
   if(i>=0)S.mah.splice(i,1);else S.mah.push(k);kaydet();arayuzYaz();ciz()};
  $('agsifir').onclick=function(){agAktif=null;AG.forEach(function(a){S.w[a[0]]=a[1]});kaydet();agCiz();ciz()};
- $('temizle').onclick=function(){var w=S.w,sr=S.sira;S=kopya(BOS);S.w=w;S.sira=sr;kaydet();arayuzYaz();ciz()};
+ $('temizle').onclick=function(){var w=S.w,sr=S.sira,h=[S.hi,S.hm,S.hk];S=kopya(BOS);S.w=w;S.sira=sr;S.hi=h[0];S.hm=h[1];S.hk=h[2];kaydet();arayuzYaz();ciz()};
  $('daha').onclick=function(){var ilk=GOSTER;GOSTER+=20;liste();var li=$('liste').children[ilk];if(li){var a=li.querySelector('h2 a');if(a)a.focus()}};
  $('ac').onclick=panelAc;$('kapat').onclick=panelKapat;$('perde').onclick=panelKapat;
  $('goster').onclick=function(){panelKapat();window.scrollTo(0,$('sonuclar').offsetTop-8)};
@@ -546,7 +594,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=89788d912e').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=8c55691150').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
