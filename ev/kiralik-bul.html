@@ -67,6 +67,8 @@ background:var(--yuzey);cursor:pointer}
 .agr{display:grid;grid-template-columns:6.8em 1fr 2.6em;gap:0 8px;align-items:center;font-size:13px}
 .agr input{width:100%;accent-color:var(--acc);min-height:36px;margin:0}
 .agr output{text-align:right;font-variant-numeric:tabular-nums}
+.agr label small{display:block;font-size:11px;color:var(--ink3)}
+.agr .pasif{opacity:.55}
 button.d{font-size:15px;min-height:42px;padding:6px 14px;border-radius:9px;border:1px solid var(--cizgi);
 background:var(--yuzey);cursor:pointer}
 button.d.ana{background:var(--acc);border-color:var(--acc);color:var(--acc-yazi);font-weight:600}
@@ -198,16 +200,15 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <div class="bolum-ic hedef" role="group" aria-labelledby="b_hedef">
 <label><span class="sr">Hedef ilçe (iş, okul ya da yakın olmak istediğiniz yer)</span><select id="hi"></select></label>
 <label><span class="sr">Hedef mahalle</span><select id="hm"></select></label>
-<div class="iki"><label><span class="sr">Hedefin puandaki önemi</span><select id="hk"><option value="az">Önemi az</option>
-<option value="orta">Önemi orta</option><option value="cok">Önemi çok</option></select></label>
-<label><span class="sr">Hedefe en çok uzaklık</span><select id="hu"><option value="">Sınır yok</option>
+<label><span class="sr">Hedefe en çok uzaklık</span><select id="hu"><option value="">Uzaklık sınırı yok</option>
 <option value="3">En çok 3 km</option><option value="5">En çok 5 km</option><option value="10">En çok 10 km</option>
-<option value="15">En çok 15 km</option><option value="20">En çok 20 km</option></select></label></div></div></details>
+<option value="15">En çok 15 km</option><option value="20">En çok 20 km</option></select></label>
+<p class="mah-not">Puandaki payı Puanlama bölümündeki "Hedef konum" ile ayarlanır.</p></div></details>
 <details class="bolum"><summary>Kelime ara<span class="deger" id="d_ara"></span></summary>
 <div class="bolum-ic"><label><span class="sr">İlan başlığında kelime ara</span>
 <input id="ara" type="search" enterkeyhint="search" autocomplete="off" placeholder="Site adı, eşyalı, metro…"></label></div></details>
 <details class="bolum"><summary>Puanlama<span class="deger" id="d_puan"></span></summary>
-<div class="bolum-ic"><div class="agr" id="agr"></div>
+<div class="bolum-ic"><div class="agr" id="agr"></div><p class="mah-not" id="agkalan" aria-live="polite"></p>
 <button type="button" class="metin" id="agsifir" style="font-size:14px">Varsayılana dön</button></div></details>
 <div class="paylas-satir"><button type="button" class="metin" id="paylas">Aramayı paylaş</button></div>
 </div>
@@ -246,23 +247,23 @@ giriş / bahçe katı 20, bodrum ve kot sıfır. Asansörsüz binada 3. kat 10, 
 <b>Net m²:</b> büyük olan yüksek puan alır. Bilgisi girilmemiş başlık ortalama (50) sayılır.
 Sağ üstteki yüzde (beklenen kiraya göre) puana girmez.</p>
 <p><b>Hedef konum</b> seçilirse ilanın mahallesi ile hedef arasındaki kuş uçuşu uzaklık puana katılır: 2 km'ye kadar tam puan,
-5 km yaklaşık 65, 10 km 32, 20 km 8. Boğaz'ın öbür yakası için 5 km eklenir. Önemi az, orta ya da çok seçilince puanın
-%15, %30 ya da %50'si buradan gelir; diğer başlıkların ağırlıkları değişmez. Uzaklık mahalle merkezinden ölçülür, kabadır.</p>
+5 km yaklaşık 65, 10 km 32, 20 km 8. Boğaz'ın öbür yakası için 5 km eklenir. Puandaki payı Puanlama bölümündeki
+"Hedef konum" sürgüsüyle ayarlanır; hedef seçilmemişse bu başlık hesaba girmez. Uzaklık mahalle merkezinden ölçülür, kabadır.</p>
 </details>
 </main>
 </div>
 <div id="yazdir" aria-hidden="true"></div>
 <script>
 (function(){
-var AG=[["kat", 20, "Kat"], ["yas", 18, "Bina yeniliği"], ["fiyat", 17, "Kira"], ["site", 16, "Site içinde"], ["bolge", 15, "Bölge"], ["m2", 14, "Net m²"]],YAS_TAVAN=35,YAS_EGRI=[[0, 100], [3, 92], [8, 78], [13, 64], [18, 46], [23, 24], [28, 10], [35, 0]],BIL=50,VERI_GUN=new Date('2026-10-15'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
+var AG=[["kat", 16, "Kat"], ["yas", 15, "Bina yeniliği"], ["fiyat", 14, "Kira"], ["site", 13, "Site içinde"], ["bolge", 12, "Bölge"], ["m2", 10, "Net m²"], ["konum", 20, "Hedef konum"]],YAS_TAVAN=35,YAS_EGRI=[[0, 100], [3, 92], [8, 78], [13, 64], [18, 46], [23, 24], [28, 10], [35, 0]],BIL=50,VERI_GUN=new Date('2026-10-15'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
 var F={no:0,bas:1,link:2,foto:3,fiyat:4,net:5,brut:6,oda:7,ilce:8,mah:9,kat:10,katS:11,katP:12,katN:13,yas:14,bolge:15,
  ses:16,site:17,asan:18,otop:19,isit:20,balk:21,yeni:22,eski:23,es:24,suph:25,tarih:26,kiraP:27,m2P:28,
  bek:29,bekA:30,bekU:31,bekB:32,kn:33};
 // hedef konum: ilanin mahalle noktasi (D.kn) ile hedef arasi kus ucusu km; Bogaz'in obur yakasina KOPRU km eklenir.
 // Konum puani: KONUM_TAM km'ye kadar 100, sonra her KONUM_OLCEK km'de ~e kati azalir (5 km 65, 10 km 32, 20 km 8).
-// Puana karisma orani (onem): az/orta/cok; diger 6 basligin agirliklarina dokunmaz.
+// Puanlamada 7. surgu ("konum"); hedef secilmemisse hesaba girmez.
 var ANADOLU=['Adalar','Ataşehir','Beykoz','Çekmeköy','Kadıköy','Kartal','Maltepe','Pendik','Sancaktepe','Sultanbeyli','Şile','Tuzla','Ümraniye','Üsküdar'];
-var KONUM_ONEM={az:15,orta:30,cok:50},KOPRU=5,KONUM_TAM=2,KONUM_OLCEK=7;
+var KOPRU=5,KONUM_TAM=2,KONUM_OLCEK=7;
 function konumPuan(km){return km<=KONUM_TAM?100:100*Math.exp(-(km-KONUM_TAM)/KONUM_OLCEK)}
 function hedef(){if(!D||!S.hi)return null;for(var i=0;i<D.kn.length;i++){var k=D.kn[i];if(k[0]===S.hi&&k[1]===S.hm)return k}return null}
 function uzaklik(r,h){var i=r[F.kn];if(i===null||i===undefined||!h)return null;var k=D.kn[i],R=Math.PI/180;
@@ -277,10 +278,10 @@ function yasPuan(y){if(y===null)return null;for(var i=1;i<YAS_EGRI.length;i++){v
 var GIZLE=/günlük|gunluk|haftalık|paylaşımlı|oda kiralık|kiralık oda|öğrenciye oda|öğrenci evi|öğrenci yurdu|ev arkadaşı|(^|[^a-zçğıöşü])apart([^a-zçğıöşü]|$)|apart daire|yurt/;
 // olmazsa olmazlar (dugme) + gizle (onay kutusu)
 var OZ=[['asansor','Asansör'],['otopark','Otopark'],['site','Site içi'],['balkon','Balkon'],['uygunkat','Ara kat']];
-var KUTU=OZ.map(function(o){return o[0]}).concat(['gizle']),ALAN=['min','max','m2','yas','ara','sira','hi','hm','hk','hu'];
+var KUTU=OZ.map(function(o){return o[0]}).concat(['gizle']),ALAN=['min','max','m2','yas','ara','sira','hi','hm','hu'];
 var ODALAR=['Stüdyo','1+1','2+1','3+1','4+'];
 var BOS={min:'',max:'',m2:'',yas:'',oda:[],ilce:[],mah:[],ara:'',asansor:false,otopark:false,site:false,balkon:false,
- uygunkat:false,gizle:true,sira:'puan',w:{},yalnizSecili:false,hi:'',hm:'',hk:'orta',hu:''};
+ uygunkat:false,gizle:true,sira:'puan',w:{},yalnizSecili:false,hi:'',hm:'',hu:''};
 AG.forEach(function(a){BOS.w[a[0]]=a[1]});
 function kopya(o){return JSON.parse(JSON.stringify(o))}
 var S=kopya(BOS),D=null,SON=[],GOSTER=20,$=function(id){return document.getElementById(id)};
@@ -296,34 +297,24 @@ function urlden(){var p=new URLSearchParams(location.search);if(!p.toString())re
 function urlYap(){var p=new URLSearchParams();
  ['min','max','m2','yas','ara'].forEach(function(k){if(S[k]!=='')p.set(k,S[k])});
  if(S.sira!=='puan')p.set('sira',S.sira);
- if(S.hi){p.set('hi',S.hi);if(S.hm)p.set('hm',S.hm);if(S.hk!=='orta')p.set('hk',S.hk);if(S.hu!=='')p.set('hu',S.hu)}
+ if(S.hi){p.set('hi',S.hi);if(S.hm)p.set('hm',S.hm);if(S.hu!=='')p.set('hu',S.hu)}
  ['oda','ilce','mah'].forEach(function(k){if(S[k].length)p.set(k,S[k].join(','))});
  p.set('f',KUTU.filter(function(k){return S[k]}).join(','));
  if(AG.some(function(a){return S.w[a[0]]!==a[1]}))p.set('w',AG.map(function(a){return S.w[a[0]]}).join(','));
  return location.origin+location.pathname+'?'+p.toString()}
 var AGV=AG.map(function(a){return a[0]+a[1]}).join(',');
 try{var k=urlden()||JSON.parse(localStorage.getItem('evbul')||'null');
- if(k){for(var x in BOS)if(x in k)S[x]=k[x];AG.forEach(function(a){if(typeof S.w[a[0]]!=='number')S.w[a[0]]=a[1]});S.w=yuzde(S.w)
+ if(k){for(var x in BOS)if(x in k)S[x]=k[x];AG.forEach(function(a){if(typeof S.w[a[0]]!=='number')S.w[a[0]]=a[1]});S.w=sinirla(S.w)
   // varsayilan agirliklar degistiyse (sayfa guncellendi) cihazda kalan eski agirliklar yeni varsayilana doner
   if(k.wv!==AGV&&!new URLSearchParams(location.search).get('w'))AG.forEach(function(a){S.w[a[0]]=a[1]})}}catch(e){}
 S.wv=AGV;
-// agirliklar hep toplami 100 olan tam sayilar (yuzde). Birini degistirince fark digerlerinden
-// mevcut paylariyla orantili alinir / onlara verilir (en buyuk kalan yontemiyle yuvarlanir).
-function dagit(oran,toplam){var top=0,ks=Object.keys(oran);ks.forEach(function(k){top+=oran[k]});
- var sonuc={},kalan=toplam,parca=ks.map(function(k){var x=top>0?oran[k]/top*toplam:toplam/ks.length;
-  sonuc[k]=Math.floor(x);kalan-=sonuc[k];return[k,x-sonuc[k]]});
- parca.sort(function(a,b){return b[1]-a[1]});for(var i=0;i<kalan;i++)sonuc[parca[i%parca.length][0]]++;return sonuc}
-function yuzde(w){var o={};AG.forEach(function(a){o[a[0]]=Math.max(0,+w[a[0]]||0)});return dagit(o,100)}
-// Diger basliklarin orani, bu surguye dokunuldugu andaki degerlerden alinir (taban). Her adimda
-// guncel degerden alinsaydi: %100'den surukleyerek inerken ilk bosalan 1 puan tek basliga gider,
-// sonraki adimlarda hep ona giderdi. Taban baska bir surguye gecince ya da sifirlaninca yenilenir.
-var agAktif=null,agTaban=null;
-function agDegis(k,v){v=Math.max(0,Math.min(100,Math.round(v)));
- if(k!==agAktif){agAktif=k;agTaban=kopya(S.w)}
- var diger={},top=0;AG.forEach(function(a){if(a[0]!==k){diger[a[0]]=agTaban[a[0]];top+=agTaban[a[0]]}});
- // digerleri hep 0'sa (biri %100'e cekilmisti) varsayilan oncelik oranlari kullanilir
- if(!top)AG.forEach(function(a){if(a[0]!==k)diger[a[0]]=a[1]});
- var w=dagit(diger,100-v);w[k]=v;S.w=w}
+// agirliklar tam sayi yuzde, toplam en cok 100 (2026-10-15 gece, kullanici: "surguler birbiriyle artip
+// azalmasin"). Bir surgu digerlerini degistirmez; yalniz 100 - (digerlerinin toplami)'nin otesine gidemez.
+// sinirla: disaridan gelen (kayitli / baglanti) agirliklari sirayla bu kurala uydurur (fazlasi sondan kirpilir).
+function sinirla(w){var o={},kal=100;AG.forEach(function(a){var v=Math.max(0,Math.min(kal,Math.round(+w[a[0]]||0)));
+ o[a[0]]=v;kal-=v});return o}
+function agToplam(){var t=0;AG.forEach(function(a){t+=S.w[a[0]]});return t}
+function agDegis(k,v){var diger=agToplam()-S.w[k];S.w[k]=Math.max(0,Math.min(100-diger,Math.round(v)))}
 function kaydet(){S.wv=AGV;try{localStorage.setItem('evbul',JSON.stringify(S))}catch(e){}
  try{history.replaceState(null,'',urlYap())}catch(e){}}
 
@@ -357,16 +348,15 @@ function suz(r){
 var PUANLA=null;
 function hesap(){
  var rs=D.satir.filter(suz);
- var top=0;AG.forEach(function(a){top+=+S.w[a[0]]});top=top||1;
- var H=hedef(),K=H?(KONUM_ONEM[S.hk]||KONUM_ONEM.orta)/100:0;
+ var H=hedef(),top=0;AG.forEach(function(a){if(a[0]!=='konum'||H)top+=+S.w[a[0]]});top=top||1;
  PUANLA=function(r){var p={kat:r[F.katP],yas:r[F.yas]===null?BIL:yasPuan(r[F.yas]),
   bolge:r[F.bolge]===null?BIL:r[F.bolge],fiyat:r[F.kiraP],site:r[F.site]===null?BIL:r[F.site]*100,m2:r[F.m2P]},t=0;
   // bilinmeyen basliklar (notr puan alir, ayrintida "bilinmiyor" yazar)
   var u={kat:r[F.katN]===4&&r[F.katP]===BIL,yas:r[F.yas]===null,bolge:r[F.bolge]===null,fiyat:!!r[F.suph],
    site:r[F.site]===null,m2:!r[F.net]};
-  AG.forEach(function(a){t+=p[a[0]]*S.w[a[0]]});t=t/top;
   var km=H?uzaklik(r,H):null;
-  if(H){p.konum=km===null?BIL:konumPuan(km);u.konum=km===null;t=(1-K)*t+K*p.konum}
+  if(H){p.konum=km===null?BIL:konumPuan(km);u.konum=km===null}
+  AG.forEach(function(a){if(p[a[0]]!==undefined)t+=p[a[0]]*S.w[a[0]]});t=t/top;
   return{r:r,p:p,u:u,t:t,km:km}};
  if(S.yalnizSecili)rs=D.satir.filter(function(r){return SEC.indexOf(r[F.no])>=0});
  rs=rs.map(PUANLA);
@@ -416,8 +406,7 @@ function kart(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
   +'<label class="sec"><input type="checkbox" data-no="'+r[F.no]+'"'+(sec?' checked':'')+'><span>Seç</span><span class="sr"> '+esc(b.baslik)+'</span></label>';
  var not=b.uyari.map(function(u){return'<span class="u">'+esc(u)+'</span>'});
  if(r[F.yeni])not.push('yeni ilan');if(r[F.es].length)not.push('aynı ev '+(r[F.es].length+1)+' ilanda');
- var dok=AG.map(function(a){return a[2]+(a[0]==='bolge'&&r[F.ses]?' ('+esc(r[F.ses])+')':'')+' <b>'+(x.u[a[0]]?'bilinmiyor':Math.round(x.p[a[0]]))+'</b>'}).join(' · ');
- if(x.p.konum!==undefined)dok+=' · Hedef konum <b>'+(x.u.konum?'bilinmiyor':Math.round(x.p.konum))+'</b>';
+ var dok=AG.filter(function(a){return x.p[a[0]]!==undefined}).map(function(a){return a[2]+(a[0]==='bolge'&&r[F.ses]?' ('+esc(r[F.ses])+')':'')+' <b>'+(x.u[a[0]]?'bilinmiyor':Math.round(x.p[a[0]]))+'</b>'}).join(' · ');
  var bek=bekRakam(r);
  var rz=farkRozet(r);
  var es=r[F.es].length?'<p class="diger">Aynı evin diğer ilanları: '+r[F.es].map(function(e,i){
@@ -543,15 +532,19 @@ function hedefCiz(){if(!D)return;var tr=function(a,b){return a.localeCompare(b,'
  if(S.hi&&!hedef())S.hm='';if(S.hi&&!hedef())S.hi='';
  if(hm.dataset.ilce!==S.hi){var ms=D.kn.filter(function(k){return k[0]===S.hi&&k[1]}).map(function(k){return k[1]}).sort(tr);
   hm.innerHTML='<option value="">İlçenin geneli</option>'+ms.map(function(m){return'<option>'+esc(m)+'</option>'}).join('');hm.dataset.ilce=S.hi}
- ['hm','hk','hu'].forEach(function(id){$(id).disabled=!S.hi})}
+ ['hm','hu'].forEach(function(id){$(id).disabled=!S.hi})}
 function arayuzYaz(){hedefCiz();ALAN.forEach(function(id){if(document.activeElement!==$(id))$(id).value=S[id]});$('gizle').checked=S.gizle;
  ['oda','ilceler','ozellik'].forEach(function(id){$(id)._boya()});mahCiz();agCiz()}
-function agCiz(){$('agr').innerHTML=AG.map(function(a){return'<label for="w_'+a[0]+'">'+a[2]+'</label><input id="w_'+a[0]+'" type="range" min="0" max="100" step="1" data-k="'+a[0]+'" value="'+S.w[a[0]]+'" aria-valuetext="yüzde '+S.w[a[0]]+'"><output for="w_'+a[0]+'">%'+S.w[a[0]]+'</output>'}).join('');
+// hedef konum surgusu hedef secilmemisse soluk (degeri durur, hesaba girmez)
+function agCiz(){var H=hedef();$('agr').innerHTML=AG.map(function(a){var pas=a[0]==='konum'&&!H;
+  return'<label for="w_'+a[0]+'"'+(pas?' class="pasif"':'')+'>'+a[2]+(pas?'<small>hedef seçilince</small>':'')+'</label><input id="w_'+a[0]+'" type="range" min="0" max="100" step="1" data-k="'+a[0]+'" value="'+S.w[a[0]]+'" aria-valuetext="yüzde '+S.w[a[0]]+'"'+(pas?' class="pasif"':'')+'><output for="w_'+a[0]+'">%'+S.w[a[0]]+'</output>'}).join('');
+ agKalan();
  var zam;$('agr').querySelectorAll('input').forEach(function(i){i.oninput=function(){agDegis(i.dataset.k,+i.value);agYaz();
   clearTimeout(zam);zam=setTimeout(function(){kaydet();ciz()},120)}})}
 // surukleme sirasinda yeniden cizmeden yalniz degerleri guncelle (odak surgude kalsin)
 function agYaz(){$('agr').querySelectorAll('input').forEach(function(i){var v=S.w[i.dataset.k];if(+i.value!==v)i.value=v;
- i.setAttribute('aria-valuetext','yüzde '+v);i.nextElementSibling.textContent='%'+v})}
+ i.setAttribute('aria-valuetext','yüzde '+v);i.nextElementSibling.textContent='%'+v});agKalan()}
+function agKalan(){var k=100-agToplam();$('agkalan').textContent=k>0?'Dağıtılmamış %'+k+' (başka bir başlığa verebilirsiniz)':'Toplam %100'}
 
 // telefon: soldan kayan panel
 var sonOdak=null;
@@ -570,13 +563,13 @@ function kur(){
  arayuzYaz();var zam;
  ALAN.forEach(function(id){var el=$(id);
   el.addEventListener(el.tagName==='SELECT'?'change':'input',function(){S[id]=el.value;clearTimeout(zam);zam=setTimeout(function(){kaydet();ciz()},250)})});
- $('hi').addEventListener('change',function(){S.hi=$('hi').value;S.hm='';hedefCiz();$('hm').value=''});
+ $('hi').addEventListener('change',function(){S.hi=$('hi').value;S.hm='';hedefCiz();$('hm').value='';agCiz()});
  $('gizle').addEventListener('change',function(){S.gizle=$('gizle').checked;kaydet();ciz()});
  $('mahara').addEventListener('input',mahCiz);
  $('mahliste').onclick=function(e){var b=e.target.closest('button');if(!b)return;var k=b.dataset.v,i=S.mah.indexOf(k);
   if(i>=0)S.mah.splice(i,1);else S.mah.push(k);kaydet();arayuzYaz();ciz()};
- $('agsifir').onclick=function(){agAktif=null;AG.forEach(function(a){S.w[a[0]]=a[1]});kaydet();agCiz();ciz()};
- $('temizle').onclick=function(){var w=S.w,sr=S.sira,h=[S.hi,S.hm,S.hk];S=kopya(BOS);S.w=w;S.sira=sr;S.hi=h[0];S.hm=h[1];S.hk=h[2];kaydet();arayuzYaz();ciz()};
+ $('agsifir').onclick=function(){AG.forEach(function(a){S.w[a[0]]=a[1]});kaydet();agCiz();ciz()};
+ $('temizle').onclick=function(){var w=S.w,sr=S.sira,h=[S.hi,S.hm];S=kopya(BOS);S.w=w;S.sira=sr;S.hi=h[0];S.hm=h[1];kaydet();arayuzYaz();ciz()};
  $('daha').onclick=function(){var ilk=GOSTER;GOSTER+=20;liste();var li=$('liste').children[ilk];if(li){var a=li.querySelector('h2 a');if(a)a.focus()}};
  $('ac').onclick=panelAc;$('kapat').onclick=panelKapat;$('perde').onclick=panelKapat;
  $('goster').onclick=function(){panelKapat();window.scrollTo(0,$('sonuclar').offsetTop-8)};
