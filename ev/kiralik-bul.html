@@ -227,11 +227,12 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 
 <details class="aciklama"><summary>Puan nasıl hesaplanıyor?</summary>
 <p>Öncelik sırası: kat, bina yeniliği, kira, site içinde, bölge, net m² (ağırlıklar Puanlama bölümünde).
-<b>Kat:</b> 2. kat ve üstü, en üst kat değilse tam puan; giriş katı, 1. kat ve en üst kat sıfır.
-<b>Bina yeniliği:</b> sıfır bina tam puan, 35 yaş ve üstü sıfır.
+<b>Kat:</b> ara kat tam puan; en üst kat olabilecek kat 70, 1. kat 50, en üst kat 40, çatı katı 30,
+giriş / bahçe katı 20, bodrum ve kot sıfır. Asansörsüz binada 3. kat 10, 4. kat 25, daha yukarısı 40 puan kaybeder.
+<b>Bina yeniliği:</b> sıfır bina tam puan; yaş arttıkça düşüş hızlanır (yaklaşık 10 yaş 72, 20 yaş 37), 35 yaş ve üstü sıfır.
 <b>Kira:</b> kirası düşük olan yüksek puan alır. <b>Site içinde:</b> evet ise tam puan.
 <b>Bölge:</b> mahallenin sosyo-ekonomik sınıfı (İBB, 2016); yoksa ilçenin gelişmişlik puanı (2022).
-<b>Net m²:</b> büyük olan yüksek puan alır. Bilgisi girilmemiş başlık 35 sayılır.
+<b>Net m²:</b> büyük olan yüksek puan alır. Bilgisi girilmemiş başlık ortalama (50) sayılır.
 Sağ üstteki yüzde (beklenen kiraya göre) puana girmez.</p>
 </details>
 </main>
@@ -239,11 +240,14 @@ Sağ üstteki yüzde (beklenen kiraya göre) puana girmez.</p>
 <div id="yazdir" aria-hidden="true"></div>
 <script>
 (function(){
-var AG=[["kat", 20, "Kat"], ["yas", 18, "Bina yeniliği"], ["fiyat", 17, "Kira"], ["site", 16, "Site içinde"], ["bolge", 15, "Bölge"], ["m2", 14, "Net m²"]],YAS_TAVAN=35,BIL=35,VERI_GUN=new Date('2026-10-15'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
+var AG=[["kat", 20, "Kat"], ["yas", 18, "Bina yeniliği"], ["fiyat", 17, "Kira"], ["site", 16, "Site içinde"], ["bolge", 15, "Bölge"], ["m2", 14, "Net m²"]],YAS_TAVAN=35,YAS_EGRI=[[0, 100], [3, 92], [8, 78], [13, 64], [18, 46], [23, 24], [28, 10], [35, 0]],BIL=50,VERI_GUN=new Date('2026-10-15'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
 var F={no:0,bas:1,link:2,foto:3,fiyat:4,net:5,brut:6,oda:7,ilce:8,mah:9,kat:10,katS:11,katP:12,katN:13,yas:14,bolge:15,
  ses:16,site:17,asan:18,otop:19,isit:20,balk:21,yeni:22,eski:23,es:24,suph:25,tarih:26,kiraP:27,m2P:28,
  bek:29,bekA:30,bekU:31,bekB:32};
-var KAT_NOT=['','giriş katı veya 1. kat','en üst kat','en üst kat olabilir',''];
+var KAT_NOT=['','giriş / bahçe katı','en üst kat','en üst kat olabilir','','1. kat','bodrum / kot katı','çatı katı'];
+// bina yeniligi: YAS_EGRI (yas, puan) noktalari arasinda dogrusal
+function yasPuan(y){if(y===null)return null;for(var i=1;i<YAS_EGRI.length;i++){var a=YAS_EGRI[i-1],b=YAS_EGRI[i];
+ if(y<=b[0])return a[1]+(b[1]-a[1])*(y-a[0])/(b[0]-a[0])}return 0}
 // "apart" tek kelime olarak (aile apartmani gizlenmez); "ogrenci" yalniz oda/ev/yurt ile ("ogrenciye uygun 3+1" gizlenmez)
 var GIZLE=/günlük|gunluk|haftalık|paylaşımlı|oda kiralık|kiralık oda|öğrenciye oda|öğrenci evi|öğrenci yurdu|ev arkadaşı|(^|[^a-zçğıöşü])apart([^a-zçğıöşü]|$)|apart daire|yurt/;
 // olmazsa olmazlar (dugme) + gizle (onay kutusu)
@@ -328,9 +332,12 @@ var PUANLA=null;
 function hesap(){
  var rs=D.satir.filter(suz);
  var top=0;AG.forEach(function(a){top+=+S.w[a[0]]});top=top||1;
- PUANLA=function(r){var p={kat:r[F.katP],yas:r[F.yas]===null?BIL:Math.max(0,100*(1-r[F.yas]/YAS_TAVAN)),
+ PUANLA=function(r){var p={kat:r[F.katP],yas:r[F.yas]===null?BIL:yasPuan(r[F.yas]),
   bolge:r[F.bolge]===null?BIL:r[F.bolge],fiyat:r[F.kiraP],site:r[F.site]===null?BIL:r[F.site]*100,m2:r[F.m2P]},t=0;
-  AG.forEach(function(a){t+=p[a[0]]*S.w[a[0]]});return{r:r,p:p,t:t/top}};
+  // bilinmeyen basliklar (notr puan alir, ayrintida "bilinmiyor" yazar)
+  var u={kat:r[F.katN]===4&&r[F.katP]===BIL,yas:r[F.yas]===null,bolge:r[F.bolge]===null,fiyat:!!r[F.suph],
+   site:r[F.site]===null,m2:!r[F.net]};
+  AG.forEach(function(a){t+=p[a[0]]*S.w[a[0]]});return{r:r,p:p,u:u,t:t/top}};
  if(S.yalnizSecili)rs=D.satir.filter(function(r){return SEC.indexOf(r[F.no])>=0});
  rs=rs.map(PUANLA);
  var so={puan:function(a,b){return b.t-a.t},ucuz:function(a,b){return a.r[F.fiyat]-b.r[F.fiyat]},
@@ -347,6 +354,7 @@ function bilgi(r){
  if(r[F.balk]===1)oz.push('balkonlu');
  var gun=r[F.tarih]?Math.max(0,Math.round((VERI_GUN-new Date(r[F.tarih]))/864e5)):null;
  var notlar=[];if(KAT_NOT[r[F.katN]])notlar.push(KAT_NOT[r[F.katN]]);
+ var kn=parseInt(r[F.kat],10);if(r[F.asan]===0&&kn>=3)notlar.push('asansörsüz '+kn+'. kat');
  if(r[F.suph]===1)notlar.push('kira mahallesine göre çok düşük, ilanı kontrol edin');
  if(r[F.suph]===2)notlar.push('kira birden %'+Math.round((1-r[F.fiyat]/r[F.eski])*100)+' düştü, ilanı kontrol edin');
  return{link:tamLink(r[F.no],r[F.link]),foto:tamFoto(r[F.no],r[F.foto]),yer:D.ilce[r[F.ilce]]+', '+D.mah[r[F.mah]],
@@ -358,6 +366,10 @@ function bekMetin(r){if(!r[F.bek])return'';var f=Math.round((r[F.fiyat]/r[F.bek]
   y=Math.abs(f)<2?'Beklenen kiraya yakın':'Beklenen kiradan <b>%'+Math.abs(f)+' '+(f<0?'ucuz':'pahalı')+'</b>',
   d=r[F.bekB]?' (tahmin belirsiz)':(r[F.fiyat]<r[F.bekA]?' (benzerlerine göre belirgin ucuz)':(r[F.fiyat]>r[F.bekU]?' (benzerlerine göre belirgin pahalı)':''));
  return y+d+' · beklenen ~'+bin(Math.round(r[F.bek]/1000)*1000)+' TL'}
+// puan ayrintisinda acik rakamlar: ilan / beklenen / olasi aralik (kira_model %80 araligi)
+function bekRakam(r){if(!r[F.bek])return'';var k=function(v){return bin(Math.round(v/1000))};
+ return'Beklenen kira ~'+k(r[F.bek])+' bin TL'+(r[F.bekB]?' (tahmin belirsiz)':' · olası aralık '+k(r[F.bekA])+'–'+k(r[F.bekU])+' bin TL')
+  +' · ilan '+bekMetin(r).split(' · ')[0].replace('Beklenen kiradan ','beklenenden ').replace('Beklenen kiraya yakın','beklenene yakın')}
 // kart sag ustu: beklenen kiraya gore yuzde. Yesil = ucuz, kirmizi = pahali; koyu ton = araligin disinda
 // (belirgin). Tahmin belirsizse soluk. Uzerine gelince / ekran okuyucuda aciklama.
 function farkRozet(r){if(!r[F.bek])return'';var f=Math.round((r[F.fiyat]/r[F.bek]-1)*100),sinif='',yazi;
@@ -371,7 +383,8 @@ function kart(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
   +'<label class="sec"><input type="checkbox" data-no="'+r[F.no]+'"'+(sec?' checked':'')+'><span>Seç</span><span class="sr"> '+esc(b.baslik)+'</span></label>';
  var not=b.uyari.map(function(u){return'<span class="u">'+esc(u)+'</span>'});
  if(r[F.yeni])not.push('yeni ilan');if(r[F.es].length)not.push('aynı ev '+(r[F.es].length+1)+' ilanda');
- var dok=AG.map(function(a){return a[2]+(a[0]==='bolge'&&r[F.ses]?' ('+esc(r[F.ses])+')':'')+' <b>'+Math.round(x.p[a[0]])+'</b>'}).join(' · ');
+ var dok=AG.map(function(a){return a[2]+(a[0]==='bolge'&&r[F.ses]?' ('+esc(r[F.ses])+')':'')+' <b>'+(x.u[a[0]]?'bilinmiyor':Math.round(x.p[a[0]]))+'</b>'}).join(' · ');
+ var bek=bekRakam(r);
  var rz=farkRozet(r);
  var es=r[F.es].length?'<p class="diger">Aynı evin diğer ilanları: '+r[F.es].map(function(e,i){
   return'<a href="'+tamLink(e[0],e[1])+'" target="_blank" rel="noopener">'+(i+2)+'. ilan</a>'}).join('')+'</p>':'';
@@ -382,7 +395,7 @@ function kart(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
   +'<div class="fiyat-satir"><span class="kira">'+tl(r[F.fiyat])+' TL'+(r[F.eski]?'<del><span class="sr">, önceki kira </span>'+tl(r[F.eski])+' TL</del>':'')+'</span>'
   +'<span class="puan">Puan <b>'+Math.round(x.t)+'</b></span></div>'
   +(not.length?'<p class="not">'+not.join(' · ')+'</p>':'')+es
-  +'<details class="ay"><summary>Puan ayrıntısı</summary><p class="dok">'+dok+'</p></details></div>'
+  +'<details class="ay"><summary>Puan ayrıntısı</summary><p class="dok">'+dok+'</p>'+(bek?'<p class="dok">'+bek+'</p>':'')+'</details></div>'
   +'</article></li>'}
 
 // secili suzgecler: listenin ustunde, dokununca kalkar
@@ -533,7 +546,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=d180aa41fd').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=89788d912e').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
