@@ -238,7 +238,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <button type="button" class="d ana" id="pdf">PDF oluştur</button></span></div>
 
 <details class="aciklama"><summary>Puan nasıl hesaplanıyor?</summary>
-<p>Öncelik sırası: kat, bina yeniliği, kira, site içinde, bölge, net m² (ağırlıklar Puanlama bölümünde).
+<p>Öncelik sırası: kat, bina yeniliği, kira, hedef konum (seçildiyse), site içinde, bölge, net m² (ağırlıklar Puanlama bölümünde).
 <b>Kat:</b> ara kat tam puan; en üst kat olabilecek kat 70, 1. kat 50, en üst kat 40, çatı katı 30,
 giriş / bahçe katı 20, bodrum ve kot sıfır. Asansörsüz binada 3. kat 10, 4. kat 25, daha yukarısı 40 puan kaybeder.
 <b>Bina yeniliği:</b> sıfır bina tam puan; yaş arttıkça düşüş hızlanır (yaklaşık 10 yaş 72, 20 yaş 37), 35 yaş ve üstü sıfır.
@@ -255,7 +255,7 @@ Sağ üstteki yüzde (beklenen kiraya göre) puana girmez.</p>
 <div id="yazdir" aria-hidden="true"></div>
 <script>
 (function(){
-var AG=[["kat", 16, "Kat"], ["yas", 15, "Bina yeniliği"], ["fiyat", 14, "Kira"], ["site", 13, "Site içinde"], ["bolge", 12, "Bölge"], ["m2", 10, "Net m²"], ["konum", 20, "Hedef konum"]],YAS_TAVAN=35,YAS_EGRI=[[0, 100], [3, 92], [8, 78], [13, 64], [18, 46], [23, 24], [28, 10], [35, 0]],BIL=50,VERI_GUN=new Date('2026-10-15'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
+var AG=[["kat", 18, "Kat"], ["yas", 17, "Bina yeniliği"], ["fiyat", 15, "Kira"], ["konum", 14, "Hedef konum"], ["site", 13, "Site içinde"], ["bolge", 12, "Bölge"], ["m2", 11, "Net m²"]],YAS_TAVAN=35,YAS_EGRI=[[0, 100], [3, 92], [8, 78], [13, 64], [18, 46], [23, 24], [28, 10], [35, 0]],BIL=50,VERI_GUN=new Date('2026-10-15'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
 var F={no:0,bas:1,link:2,foto:3,fiyat:4,net:5,brut:6,oda:7,ilce:8,mah:9,kat:10,katS:11,katP:12,katN:13,yas:14,bolge:15,
  ses:16,site:17,asan:18,otop:19,isit:20,balk:21,yeni:22,eski:23,es:24,suph:25,tarih:26,kiraP:27,m2P:28,
  bek:29,bekA:30,bekU:31,bekB:32,kn:33};
