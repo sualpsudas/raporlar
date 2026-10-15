@@ -4,13 +4,15 @@
 <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="description" content="İstanbul Anadolu Yakası kiralık daire ilanları: süzgeçle, puana göre sırala.">
-<title>Kiralık Ev Bul</title><style>
+<title>Kiralık Evler</title><style>
 :root{color-scheme:light dark;--zemin:#f5f5f7;--yuzey:#fff;--ink:#1d1d1f;--ink2:#48484d;--ink3:#6a6a70;
 --cizgi:#c9c9cf;--acc:#1f6f4a;--acc-yazi:#fff;--link:#0b57a4;--uyari:#9a3b0c;--bar:#1f6f4a;--bar-zemin:#e3e3e8;
---secili:#1d1d1f;--perde:rgba(0,0,0,.35)}
+--secili:#1d1d1f;--perde:rgba(0,0,0,.35);
+--f0:#ececf0;--f0y:#48484d;--u1:#e6f4ec;--u2:#cdebd9;--uy:#17603d;--p1:#fbebe7;--p2:#f6d5cd;--py:#9b2f1c}
 @media(prefers-color-scheme:dark){:root{--zemin:#000;--yuzey:#1c1c1e;--ink:#f5f5f7;--ink2:#d1d1d6;--ink3:#a8a8ad;
 --cizgi:#48484a;--acc:#4cc38a;--acc-yazi:#000;--link:#6cb4ff;--uyari:#ffa06e;--bar:#4cc38a;--bar-zemin:#3a3a3c;
---secili:#f5f5f7;--perde:rgba(0,0,0,.6)}}
+--secili:#f5f5f7;--perde:rgba(0,0,0,.6);
+--f0:#2c2c2e;--f0y:#d1d1d6;--u1:#17362a;--u2:#1e4a37;--uy:#8fe0b4;--p1:#3d221d;--p2:#552c24;--py:#ffb4a3}}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{margin:0;background:var(--zemin);color:var(--ink);
@@ -22,8 +24,7 @@ a{color:var(--link)}
 .ust-nav{display:flex;gap:4px 18px;flex-wrap:wrap;font-size:15px;margin:0 0 8px}
 .ust-nav a{display:inline-flex;align-items:center;min-height:36px}
 .ust-nav a[aria-current]{color:var(--ink);font-weight:600;text-decoration:none}
-h1{font-size:24px;line-height:1.2;margin:0 0 2px;font-weight:700}
-.alt{color:var(--ink3);font-size:14px;margin:0 0 12px}
+h1{font-size:22px;line-height:1.2;margin:0 0 8px;font-weight:700}
 button{font:inherit;color:inherit}
 input[type=number],input[type=search],select{font:inherit;font-size:16px;width:100%;min-height:40px;padding:6px 10px;
 border:1px solid var(--cizgi);border-radius:9px;background:var(--yuzey);color:var(--ink);-webkit-appearance:none;appearance:none}
@@ -48,15 +49,19 @@ transform:rotate(45deg);margin:-4px 3px 0 0}
 .bolum .deger{margin-left:auto;font-weight:400;color:var(--ink3);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62%}
 .bolum-ic{padding:0 0 12px}
 .iki{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.cipler{display:flex;flex-wrap:wrap;gap:5px}
-.cipler button{font-size:13px;min-height:32px;padding:3px 11px;border-radius:16px;border:1px solid var(--cizgi);
+.cipler{display:flex;flex-wrap:wrap;gap:4px}
+.cipler button{font-size:12px;min-height:28px;padding:2px 9px;border-radius:14px;border:1px solid var(--cizgi);
 background:var(--yuzey);cursor:pointer}
+.mah-liste{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;max-height:220px;overflow-y:auto}
+.mah-liste button small{color:var(--ink3);margin-left:3px}
+.mah-liste button[aria-pressed=true] small{color:inherit}
+.mah-not{font-size:12px;color:var(--ink3);margin:6px 0 0}
 .cipler button[aria-pressed=true]{background:var(--secili);border-color:var(--secili);color:var(--zemin)}
 .tek{display:flex;align-items:center;gap:8px;min-height:36px;font-size:13px;color:var(--ink2);cursor:pointer;margin-top:6px}
 .tek input{width:18px;height:18px;accent-color:var(--acc);flex:none;margin:0}
 /* fare ile kullanilan ekranda kutular da kucuk; dokunmatikte 16 px (iOS yakinlastirmasin) */
 @media(pointer:fine){.panel input[type=number],.panel input[type=search],.panel select{font-size:14px;min-height:34px;padding:4px 9px}}
-@media(pointer:coarse){.cipler button{min-height:36px;font-size:14px}}
+@media(pointer:coarse){.cipler button{min-height:34px;font-size:13px}}
 .agr{display:grid;grid-template-columns:6.8em 1fr 2.6em;gap:0 8px;align-items:center;font-size:13px}
 .agr input{width:100%;accent-color:var(--acc);min-height:36px;margin:0}
 .agr output{text-align:right;font-variant-numeric:tabular-nums}
@@ -78,6 +83,7 @@ button.metin{border:0;background:none;color:var(--link);cursor:pointer;min-heigh
  body{padding:20px 28px 40px}
  .duzen{display:grid;grid-template-columns:290px minmax(0,1fr);gap:24px;align-items:start}
  .panel{position:sticky;top:12px;max-height:calc(100vh - 24px);border-radius:12px;overflow:hidden}
+ .ust-blok{position:sticky;top:0;z-index:4;background:var(--zemin);margin-top:-20px;padding:20px 0 2px}
  .arac #ac,#kapat,#goster{display:none}
  .panel-alt{justify-content:flex-start}
  #perde{display:none!important}
@@ -112,7 +118,13 @@ details.ay{margin-top:2px}
 details.ay>summary{cursor:pointer;color:var(--link);font-size:13px;min-height:32px;display:inline-flex;align-items:center}
 .dok{font-size:12.5px;line-height:1.5;color:var(--ink3);margin:2px 0 4px}
 .dok b{font-weight:600;color:var(--ink2);font-variant-numeric:tabular-nums}
-.bek{font-size:13px;color:var(--ink2);margin:3px 0 0}.bek b{font-variant-numeric:tabular-nums}
+.ilan{position:relative}
+.ilan h2.bekli{padding-right:64px}
+.fark{position:absolute;top:0;right:0;font-size:15px;font-weight:700;line-height:1;padding:5px 8px;border-radius:8px;
+font-variant-numeric:tabular-nums;background:var(--f0);color:var(--f0y)}
+.fark.u1{background:var(--u1);color:var(--uy)}.fark.u2{background:var(--u2);color:var(--uy)}
+.fark.p1{background:var(--p1);color:var(--py)}.fark.p2{background:var(--p2);color:var(--py)}
+.fark.belirsiz{opacity:.55}
 .fiyat-satir{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:5px;flex-wrap:wrap}
 .kira{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
 .kira del{font-size:12.5px;font-weight:400;color:var(--ink3);margin-left:6px}
@@ -153,9 +165,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
 @media(max-width:389px){.ilan{grid-template-columns:68px minmax(0,1fr);gap:10px}.ilan .ft{width:68px;height:51px}h1{font-size:22px}}
 </style></head><body>
-<nav class="ust-nav" aria-label="Sayfalar"><a href="../">Raporlar</a><a href="kiralik.html">Kiralık piyasa raporu</a><a href="kiralik-bul.html" aria-current="page">Kiralık ev bul</a></nav>
-<h1>Kiralık ev bul</h1>
-<p class="alt">İstanbul Anadolu Yakası · sahibinden.com ilanları · <span id="guncel">14 Ekim 2026</span> güncellendi</p>
+<span id="guncel" hidden>14 Ekim 2026</span>
 <div class="duzen">
 
 <aside class="panel" id="panel" aria-labelledby="panel-baslik">
@@ -178,9 +188,13 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <label class="tek"><input type="checkbox" id="gizle">Günlük, oda, öğrenci, apart ilanlarını gizle</label></div></details>
 <details class="bolum"><summary id="b_ilce">İlçe<span class="deger" id="d_ilce"></span></summary>
 <div class="bolum-ic"><div class="cipler" id="ilceler" role="group" aria-labelledby="b_ilce"></div></div></details>
-<details class="bolum"><summary>Mahalle veya kelime<span class="deger" id="d_ara"></span></summary>
-<div class="bolum-ic"><label><span class="sr">Mahalle veya kelime ara</span>
-<input id="ara" type="search" enterkeyhint="search" autocomplete="off" placeholder="Suadiye, Kozyatağı, eşyalı…"></label></div></details>
+<details class="bolum"><summary id="b_mah">Mahalle<span class="deger" id="d_mah"></span></summary>
+<div class="bolum-ic"><label><span class="sr">Mahalle adı ara</span>
+<input id="mahara" type="search" enterkeyhint="search" autocomplete="off" placeholder="Mahalle adı yazın"></label>
+<div class="cipler mah-liste" id="mahliste" role="group" aria-labelledby="b_mah"></div><p class="mah-not" id="mahnot"></p></div></details>
+<details class="bolum"><summary>Kelime ara<span class="deger" id="d_ara"></span></summary>
+<div class="bolum-ic"><label><span class="sr">İlan başlığında kelime ara</span>
+<input id="ara" type="search" enterkeyhint="search" autocomplete="off" placeholder="Site adı, eşyalı, metro…"></label></div></details>
 <details class="bolum"><summary>Puanlama<span class="deger" id="d_puan"></span></summary>
 <div class="bolum-ic"><div class="agr" id="agr"></div>
 <button type="button" class="metin" id="agsifir" style="font-size:14px">Varsayılana dön</button></div></details>
@@ -192,6 +206,8 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <div id="perde" hidden></div>
 
 <main id="sonuclar">
+<div class="ust-blok">
+<h1>Kiralık evler</h1>
 <div class="arac">
 <button type="button" class="d" id="ac" aria-controls="panel" aria-expanded="false">Süzgeçler <span class="sayi" id="acsayi" hidden></span></button>
 <label><span class="sr">Sıralama</span><select id="sira"><option value="puan">Puana göre</option><option value="ucuz">Kirası düşük</option>
@@ -199,6 +215,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 </div>
 <div class="aktif" id="aktif" aria-label="Seçili süzgeçler" hidden></div>
 <p id="say" role="status" aria-live="polite">İlanlar yükleniyor…</p>
+</div>
 <ol class="ilanlar" id="liste" aria-label="İlanlar"></ol>
 <button type="button" class="d daha" id="daha" hidden></button>
 <div class="secbar" id="secbar" hidden role="region" aria-label="Seçilen ilanlar">
@@ -231,7 +248,7 @@ var GIZLE=/günlük|gunluk|haftalık|paylaşımlı|oda kiralık|kiralık oda|ö�
 var OZ=[['asansor','Asansör'],['otopark','Otopark'],['site','Site içi'],['balkon','Balkon'],['uygunkat','Ara kat']];
 var KUTU=OZ.map(function(o){return o[0]}).concat(['gizle']),ALAN=['min','max','m2','yas','ara','sira'];
 var ODALAR=['Stüdyo','1+1','2+1','3+1','4+'];
-var BOS={min:'',max:'',m2:'',yas:'',oda:[],ilce:[],ara:'',asansor:false,otopark:false,site:false,balkon:false,
+var BOS={min:'',max:'',m2:'',yas:'',oda:[],ilce:[],mah:[],ara:'',asansor:false,otopark:false,site:false,balkon:false,
  uygunkat:false,gizle:true,sira:'puan',w:{},yalnizSecili:false};
 AG.forEach(function(a){BOS.w[a[0]]=a[1]});
 function kopya(o){return JSON.parse(JSON.stringify(o))}
@@ -241,14 +258,14 @@ var GENIS=window.matchMedia('(min-width:900px)');
 // secimler: once baglantidaki (paylasilan arama), yoksa bu cihazda kayitli olan
 function urlden(){var p=new URLSearchParams(location.search);if(!p.toString())return null;var s=kopya(BOS);
  ALAN.forEach(function(k){if(p.has(k))s[k]=p.get(k)});
- ['oda','ilce'].forEach(function(k){if(p.get(k))s[k]=p.get(k).split(',')});
+ ['oda','ilce','mah'].forEach(function(k){if(p.get(k))s[k]=p.get(k).split(',')});
  if(p.has('f')){var f=p.get('f').split(',');KUTU.forEach(function(k){s[k]=f.indexOf(k)>=0})}
  if(p.get('w')){var w=p.get('w').split(',');AG.forEach(function(a,i){if(w[i])s.w[a[0]]=+w[i]})}
  return s}
 function urlYap(){var p=new URLSearchParams();
  ['min','max','m2','yas','ara'].forEach(function(k){if(S[k]!=='')p.set(k,S[k])});
  if(S.sira!=='puan')p.set('sira',S.sira);
- ['oda','ilce'].forEach(function(k){if(S[k].length)p.set(k,S[k].join(','))});
+ ['oda','ilce','mah'].forEach(function(k){if(S[k].length)p.set(k,S[k].join(','))});
  p.set('f',KUTU.filter(function(k){return S[k]}).join(','));
  if(AG.some(function(a){return S.w[a[0]]!==a[1]}))p.set('w',AG.map(function(a){return S.w[a[0]]}).join(','));
  return location.origin+location.pathname+'?'+p.toString()}
@@ -292,6 +309,7 @@ function suz(r){
  if(S.yas!==''&&!(r[F.yas]!==null&&r[F.yas]<=+S.yas))return false;
  if(S.oda.length&&S.oda.indexOf(odaGrup(r[F.oda]))<0)return false;
  if(S.ilce.length&&S.ilce.indexOf(D.ilce[r[F.ilce]])<0)return false;
+ if(S.mah.length&&S.mah.indexOf(D.ilce[r[F.ilce]]+'|'+D.mah[r[F.mah]])<0)return false;
  if(S.asansor&&r[F.asan]!==1)return false;if(S.site&&r[F.site]!==1)return false;
  if(S.balkon&&r[F.balk]!==1)return false;if(S.uygunkat&&r[F.katN]!==0)return false;
  if(S.otopark&&!/Otopark/.test(D.otopark[r[F.otop]]))return false;
@@ -334,22 +352,29 @@ function bekMetin(r){if(!r[F.bek])return'';var f=Math.round((r[F.fiyat]/r[F.bek]
   y=Math.abs(f)<2?'Beklenen kiraya yakın':'Beklenen kiradan <b>%'+Math.abs(f)+' '+(f<0?'ucuz':'pahalı')+'</b>',
   d=r[F.bekB]?' (tahmin belirsiz)':(r[F.fiyat]<r[F.bekA]?' (benzerlerine göre belirgin ucuz)':(r[F.fiyat]>r[F.bekU]?' (benzerlerine göre belirgin pahalı)':''));
  return y+d+' · beklenen ~'+bin(Math.round(r[F.bek]/1000)*1000)+' TL'}
+// kart sag ustu: beklenen kiraya gore yuzde. Yesil = ucuz, kirmizi = pahali; koyu ton = araligin disinda
+// (belirgin). Tahmin belirsizse soluk. Uzerine gelince / ekran okuyucuda aciklama.
+function farkRozet(r){if(!r[F.bek])return'';var f=Math.round((r[F.fiyat]/r[F.bek]-1)*100),sinif='',yazi;
+ if(Math.abs(f)<2){yazi='%0'}else{yazi=(f<0?'−':'+')+'%'+Math.abs(f);
+  sinif=f<0?(r[F.fiyat]<r[F.bekA]&&!r[F.bekB]?'u2':'u1'):(r[F.fiyat]>r[F.bekU]&&!r[F.bekB]?'p2':'p1')}
+ if(r[F.bekB])sinif+=' belirsiz';
+ var acik=bekMetin(r).replace(/<\/?b>/g,'');
+ return'<span class="fark '+sinif+'" title="'+esc(acik)+'"><span aria-hidden="true">'+yazi+'</span><span class="sr">'+esc(acik)+'</span></span>'}
 function kart(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
  var foto=(b.foto?'<img class="ft" src="'+b.foto+'" alt="" width="80" height="60" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'ft bos\',textContent:\'Fotoğraf yok\'}))">':'<span class="ft bos">Fotoğraf yok</span>')
   +'<label class="sec"><input type="checkbox" data-no="'+r[F.no]+'"'+(sec?' checked':'')+'><span>Seç</span><span class="sr"> '+esc(b.baslik)+'</span></label>';
  var not=b.uyari.map(function(u){return'<span class="u">'+esc(u)+'</span>'});
  if(r[F.yeni])not.push('yeni ilan');if(r[F.es].length)not.push('aynı ev '+(r[F.es].length+1)+' ilanda');
  var dok=AG.map(function(a){return a[2]+(a[0]==='bolge'&&r[F.ses]?' ('+esc(r[F.ses])+')':'')+' <b>'+Math.round(x.p[a[0]])+'</b>'}).join(' · ');
- var bm=bekMetin(r);
+ var rz=farkRozet(r);
  var es=r[F.es].length?'<p class="diger">Aynı evin diğer ilanları: '+r[F.es].map(function(e,i){
   return'<a href="'+tamLink(e[0],e[1])+'" target="_blank" rel="noopener">'+(i+2)+'. ilan</a>'}).join('')+'</p>':'';
  return'<li'+(sec?' class="secili"':'')+'><article class="ilan"><div class="sol">'+foto+'</div><div class="orta">'
-  +'<h2><a href="'+b.link+'" target="_blank" rel="noopener">'+esc(b.baslik)+'</a></h2>'
+  +rz+'<h2'+(rz?' class="bekli"':'')+'><a href="'+b.link+'" target="_blank" rel="noopener">'+esc(b.baslik)+'</a></h2>'
   +'<p class="ayr">'+esc(b.yer)+(b.yayin?' · '+b.yayin:'')+' · <a href="'+b.harita+'" target="_blank" rel="noopener">harita</a><br>'
   +esc(b.satir)+(b.oz?'<br>'+esc(b.oz):'')+'</p>'
   +'<div class="fiyat-satir"><span class="kira">'+tl(r[F.fiyat])+' TL'+(r[F.eski]?'<del><span class="sr">, önceki kira </span>'+tl(r[F.eski])+' TL</del>':'')+'</span>'
   +'<span class="puan">Puan <b>'+Math.round(x.t)+'</b></span></div>'
-  +(bm?'<p class="bek">'+bm+'</p>':'')
   +(not.length?'<p class="not">'+not.join(' · ')+'</p>':'')+es
   +'<details class="ay"><summary>Puan ayrıntısı</summary><p class="dok">'+dok+'</p></details></div>'
   +'</article></li>'}
@@ -359,6 +384,7 @@ function etiketler(){var e=[];
  if(S.min!==''||S.max!=='')e.push([S.min!==''&&S.max!==''?bin(S.min)+' – '+bin(S.max)+' TL':(S.min!==''?'en az '+bin(S.min)+' TL':'en çok '+bin(S.max)+' TL'),function(){S.min=S.max=''}]);
  S.oda.forEach(function(o){e.push([o,function(){S.oda.splice(S.oda.indexOf(o),1)}])});
  S.ilce.forEach(function(o){e.push([o,function(){S.ilce.splice(S.ilce.indexOf(o),1)}])});
+ S.mah.forEach(function(o){e.push([o.split('|')[1],function(){S.mah.splice(S.mah.indexOf(o),1)}])});
  if(S.m2!=='')e.push(['en az '+S.m2+' m²',function(){S.m2=''}]);
  if(S.yas!=='')e.push([S.yas==='0'?'sıfır bina':'en çok '+S.yas+' yaş',function(){S.yas=''}]);
  OZ.forEach(function(o){if(S[o[0]])e.push([o[1],function(){S[o[0]]=false}])});
@@ -370,6 +396,7 @@ function degerYaz(){var d=function(id,v){$(id).textContent=v};
  d('d_boyut',[S.m2!==''?'en az '+S.m2+' m²':'',S.yas!==''?(S.yas==='0'?'sıfır bina':'en çok '+S.yas+' yaş'):''].filter(Boolean).join(', ')||'Hepsi');
  var oz=OZ.filter(function(o){return S[o[0]]}).map(function(o){return o[1]});d('d_oz',oz.length?oz.join(', '):'Fark etmez');
  d('d_ilce',!S.ilce.length?'Hepsi':(S.ilce.length<=2?S.ilce.join(', '):S.ilce.length+' ilçe'));
+ d('d_mah',!S.mah.length?'Hepsi':(S.mah.length<=2?S.mah.map(function(m){return m.split('|')[1]}).join(', '):S.mah.length+' mahalle'));
  d('d_ara',S.ara.trim());
  d('d_puan',AG.some(function(a){return S.w[a[0]]!==a[1]})?'Değiştirildi':'Varsayılan')}
 function ozet(){degerYaz();var e=etiketler(),el=$('aktif');
@@ -438,9 +465,21 @@ function cipler(id,ls,secili,degis){var el=$(id);
  el.innerHTML=ls.map(function(v){var d=Array.isArray(v)?v:[v,v];return'<button type="button" aria-pressed="false" data-v="'+esc(d[0])+'">'+esc(d[1])+'</button>'}).join('');
  el.onclick=function(e){var b=e.target.closest('button');if(!b)return;degis(b.dataset.v);kaydet();arayuzYaz();ciz()};
  el._boya=function(){el.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',secili(b.dataset.v))})}}
+var MAH_SAY=null;
+function mahCiz(){if(!D)return;if(!MAH_SAY){MAH_SAY={};D.satir.forEach(function(r){var m=D.mah[r[F.mah]];if(!m)return;
+  var k=D.ilce[r[F.ilce]]+'|'+m;MAH_SAY[k]=(MAH_SAY[k]||0)+1})}
+ var q=kucuk(($('mahara').value||'').trim()),tr=function(a,b){return a.localeCompare(b,'tr')};
+ var ks=Object.keys(MAH_SAY).filter(function(k){var il=k.split('|')[0];
+  return S.mah.indexOf(k)>=0||((!S.ilce.length||S.ilce.indexOf(il)>=0)&&(!q||kucuk(k.split('|')[1]).indexOf(q)>=0))});
+ ks.sort(function(a,b){var sa=S.mah.indexOf(a)>=0,sb=S.mah.indexOf(b)>=0;return(sb-sa)||tr(a.split('|')[1],b.split('|')[1])});
+ var tek=S.ilce.length===1,EN=150,el=$('mahliste');
+ el.innerHTML=ks.slice(0,EN).map(function(k){var p=k.split('|');
+  return'<button type="button" aria-pressed="'+(S.mah.indexOf(k)>=0)+'" data-v="'+esc(k)+'">'+esc(p[1])
+   +(tek?'':'<small>'+esc(p[0])+'</small>')+'<small>'+MAH_SAY[k]+'</small></button>'}).join('');
+ $('mahnot').textContent=ks.length>EN?(ks.length-EN)+' mahalle daha: ilçe seçin ya da adını yazın':(ks.length?'':'Uyan mahalle yok')}
 function aCik(alan){return function(v){var i=S[alan].indexOf(v);if(i>=0)S[alan].splice(i,1);else S[alan].push(v)}}
 function arayuzYaz(){ALAN.forEach(function(id){if(document.activeElement!==$(id))$(id).value=S[id]});$('gizle').checked=S.gizle;
- ['oda','ilceler','ozellik'].forEach(function(id){$(id)._boya()});agCiz()}
+ ['oda','ilceler','ozellik'].forEach(function(id){$(id)._boya()});mahCiz();agCiz()}
 function agCiz(){$('agr').innerHTML=AG.map(function(a){return'<label for="w_'+a[0]+'">'+a[2]+'</label><input id="w_'+a[0]+'" type="range" min="0" max="100" step="1" data-k="'+a[0]+'" value="'+S.w[a[0]]+'" aria-valuetext="yüzde '+S.w[a[0]]+'"><output for="w_'+a[0]+'">%'+S.w[a[0]]+'</output>'}).join('');
  var zam;$('agr').querySelectorAll('input').forEach(function(i){i.oninput=function(){agDegis(i.dataset.k,+i.value);agYaz();
   clearTimeout(zam);zam=setTimeout(function(){kaydet();ciz()},120)}})}
@@ -466,6 +505,9 @@ function kur(){
  ALAN.forEach(function(id){var el=$(id);
   el.addEventListener(el.tagName==='SELECT'?'change':'input',function(){S[id]=el.value;clearTimeout(zam);zam=setTimeout(function(){kaydet();ciz()},250)})});
  $('gizle').addEventListener('change',function(){S.gizle=$('gizle').checked;kaydet();ciz()});
+ $('mahara').addEventListener('input',mahCiz);
+ $('mahliste').onclick=function(e){var b=e.target.closest('button');if(!b)return;var k=b.dataset.v,i=S.mah.indexOf(k);
+  if(i>=0)S.mah.splice(i,1);else S.mah.push(k);kaydet();arayuzYaz();ciz()};
  $('agsifir').onclick=function(){agAktif=null;AG.forEach(function(a){S.w[a[0]]=a[1]});kaydet();agCiz();ciz()};
  $('temizle').onclick=function(){var w=S.w,sr=S.sira;S=kopya(BOS);S.w=w;S.sira=sr;kaydet();arayuzYaz();ciz()};
  $('daha').onclick=function(){var ilk=GOSTER;GOSTER+=20;liste();var li=$('liste').children[ilk];if(li){var a=li.querySelector('h2 a');if(a)a.focus()}};
@@ -485,7 +527,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=58da16577c').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=4f96870d8d').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
