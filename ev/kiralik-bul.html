@@ -165,7 +165,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
 @media(max-width:389px){.ilan{grid-template-columns:68px minmax(0,1fr);gap:10px}.ilan .ft{width:68px;height:51px}h1{font-size:22px}}
 </style></head><body>
-<span id="guncel" hidden>14 Ekim 2026</span>
+<span id="guncel" hidden>15 Ekim 2026</span>
 <div class="duzen">
 
 <aside class="panel" id="panel" aria-labelledby="panel-baslik">
@@ -239,7 +239,7 @@ Sağ üstteki yüzde (beklenen kiraya göre) puana girmez.</p>
 <div id="yazdir" aria-hidden="true"></div>
 <script>
 (function(){
-var AG=[["kat", 20, "Kat"], ["yas", 18, "Bina yeniliği"], ["fiyat", 17, "Kira"], ["site", 16, "Site içinde"], ["bolge", 15, "Bölge"], ["m2", 14, "Net m²"]],YAS_TAVAN=35,BIL=35,VERI_GUN=new Date('2026-10-14'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
+var AG=[["kat", 20, "Kat"], ["yas", 18, "Bina yeniliği"], ["fiyat", 17, "Kira"], ["site", 16, "Site içinde"], ["bolge", 15, "Bölge"], ["m2", 14, "Net m²"]],YAS_TAVAN=35,BIL=35,VERI_GUN=new Date('2026-10-15'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
 var F={no:0,bas:1,link:2,foto:3,fiyat:4,net:5,brut:6,oda:7,ilce:8,mah:9,kat:10,katS:11,katP:12,katN:13,yas:14,bolge:15,
  ses:16,site:17,asan:18,otop:19,isit:20,balk:21,yeni:22,eski:23,es:24,suph:25,tarih:26,kiraP:27,m2P:28,
  bek:29,bekA:30,bekU:31,bekB:32};
@@ -533,7 +533,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=6f1858db9e').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=d180aa41fd').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
