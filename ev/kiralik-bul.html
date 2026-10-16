@@ -40,15 +40,15 @@ background-position:calc(100% - 16px) 50%,calc(100% - 11px) 50%;background-size:
 .panel-ic{padding:0 14px 6px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;flex:1}
 .panel-alt{padding:10px 14px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--cizgi);display:flex;gap:8px;align-items:center}
 .panel-alt .ana{flex:1}
-.bolum{border-bottom:1px solid var(--cizgi)}
+.bolum{border-bottom:1px solid var(--f0)}
 .bolum:last-child{border-bottom:0}
-.bolum>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:44px;font-size:14px;font-weight:600}
+.bolum>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:50px;font-size:15px;font-weight:600}
 .bolum>summary::-webkit-details-marker{display:none}
 .bolum>summary::after{content:"";flex:none;width:7px;height:7px;border-right:1.5px solid var(--ink3);border-bottom:1.5px solid var(--ink3);
 transform:rotate(45deg);margin:-4px 3px 0 0}
 .bolum[open]>summary::after{transform:rotate(-135deg);margin-top:4px}
 .bolum .deger{margin-left:auto;font-weight:400;color:var(--ink3);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62%}
-.bolum-ic{padding:0 0 12px}
+.bolum-ic{padding:2px 0 16px}
 .iki{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .hedef>label{display:block;margin-bottom:6px}
 select:disabled{opacity:.5}
@@ -64,7 +64,7 @@ background:var(--yuzey);cursor:pointer}
 .tek input{width:18px;height:18px;accent-color:var(--acc);flex:none;margin:0}
 /* fare ile kullanilan ekranda kutular da kucuk; dokunmatikte 16 px (iOS yakinlastirmasin) */
 @media(pointer:fine){.panel input[type=number],.panel input[type=search],.panel select{font-size:14px;min-height:34px;padding:4px 9px}
- .bolum>summary{min-height:38px}}
+ .bolum>summary{min-height:44px}}
 @media(pointer:coarse){.cipler button{min-height:34px;font-size:13px}}
 .agr{display:grid;grid-template-columns:6.8em 1fr 2.6em;gap:0 8px;align-items:center;font-size:13px}
 .agr input{width:100%;accent-color:var(--acc);min-height:36px;margin:0}
@@ -101,8 +101,8 @@ button.metin{border:0;background:none;color:var(--link);cursor:pointer;min-heigh
 @media(prefers-reduced-motion:reduce){.panel{transition:none}}
 
 /* --- sonuclar */
-.bas-satir{display:flex;align-items:baseline;gap:10px}
-.bas-satir h1{font-size:18px;margin:0}
+.bas-satir h1{font-size:24px;line-height:1.15;margin:0}
+.alt-bas{font-size:13px;color:var(--ink3);margin:1px 0 0}
 .arac{display:flex;align-items:center;gap:6px;margin-top:6px}
 .arac select{width:auto;flex:none;min-height:34px;padding-top:3px;padding-bottom:3px}
 .arac button.d{min-height:34px;padding:3px 10px;font-size:14px;flex:none}
@@ -115,37 +115,41 @@ button.metin{border:0;background:none;color:var(--link);cursor:pointer;min-heigh
 .aktif button{font-size:12.5px;min-height:30px;padding:0 3px 0 9px;border-radius:15px;border:1px solid var(--cizgi);flex:none;white-space:nowrap;
 background:var(--yuzey);cursor:pointer;display:inline-flex;align-items:center;gap:2px}
 .aktif button span{font-size:16px;line-height:1;color:var(--ink3);padding:0 4px}
-#say{font-weight:600;font-size:13px;color:var(--ink3);margin:0}
+#say{font-weight:600}
 ol.ilanlar{list-style:none;margin:0;padding:0}
-ol.ilanlar>li{background:var(--yuzey);border-radius:10px;padding:6px 10px;margin-bottom:4px}
-.ilan{display:grid;grid-template-columns:56px minmax(0,1fr);gap:10px;align-items:start}
-.ilan .ft{width:56px;height:42px;object-fit:cover;border-radius:6px;background:var(--bar-zemin);display:block;margin-top:2px}
-.s1{display:flex;align-items:flex-start;gap:6px}
-.ilan h2{font-size:14px;line-height:1.35;margin:0;font-weight:600;flex:1;min-width:0;
-white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.s2{font-size:12px;line-height:1.35;color:var(--ink3);margin:1px 0 0;overflow-wrap:anywhere;
+ol.ilanlar>li{background:var(--yuzey);border-radius:12px;padding:12px 12px 4px;margin-bottom:10px}
+/* kart (2026-10-16): buyuk fotograf, one cikan kira, konum ayri satir, islemler ayri satir */
+.ilan{display:grid;grid-template-columns:132px minmax(0,1fr);gap:0 12px;align-items:start}
+.ilan .ft{width:132px;height:99px;object-fit:cover;border-radius:8px;background:var(--bar-zemin);display:block}
+.s1{display:flex;align-items:flex-start;gap:8px}
+.ilan h2{font-size:15px;line-height:1.3;margin:0;font-weight:600;flex:1;min-width:0;overflow-wrap:anywhere;
 display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.s2 .yeni{color:var(--acc);font-weight:600}
-.s3{display:flex;align-items:center;gap:2px 10px;margin-top:1px;flex-wrap:wrap}
-.s3 .u{font-size:12px;color:var(--uyari)}
-.s3 .puan{margin-left:auto}
-button.ayb{border:0;background:none;color:var(--link);font-size:12.5px;padding:0 2px;min-height:30px;cursor:pointer}
+.yer{font-size:14px;line-height:1.35;color:var(--ink);margin:4px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yer .yeni{color:var(--acc);font-weight:600}
+.s2{font-size:14px;line-height:1.35;color:var(--ink2);margin:2px 0 0;overflow-wrap:anywhere}
+.s3{display:flex;align-items:baseline;gap:2px 10px;margin-top:6px;flex-wrap:wrap}
+.s3 .fark{margin:0}
+.s4{grid-column:1/-1;display:flex;align-items:center;gap:4px 16px;margin-top:8px;border-top:1px solid var(--f0);padding-top:2px}
+.s4 .u{font-size:13px;color:var(--uyari)}
+.s4 .ayb{margin-left:auto}
+.ilan .ayrinti{grid-column:1/-1}
+button.ayb{border:0;background:none;color:var(--link);font-size:14px;padding:0 4px;min-height:40px;cursor:pointer}
 button.ayb::after{content:"";display:inline-block;width:5px;height:5px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;
 transform:rotate(45deg);margin:0 0 3px 6px}
 button.ayb[aria-expanded=true]::after{transform:rotate(-135deg);margin-bottom:0}
-.ayrinti{font-size:12.5px;line-height:1.5;color:var(--ink3);margin:2px 0 4px}
+.ayrinti{font-size:14px;line-height:1.5;color:var(--ink2);margin:2px 0 8px}
 .ayrinti p{margin:0 0 3px}
 .ilan h2 a{text-decoration:none;color:var(--ink)}.ilan h2 a:hover,.ilan h2 a:focus-visible{text-decoration:underline}
 .dok{margin:0 0 3px}
 .dok b{font-weight:600;color:var(--ink2);font-variant-numeric:tabular-nums}
-.fark{flex:none;font-size:12.5px;font-weight:700;line-height:1;padding:3px 6px;border-radius:6px;margin-top:1px;
+.fark{flex:none;font-size:12.5px;font-weight:600;line-height:1;padding:4px 7px;border-radius:6px;margin-top:1px;white-space:nowrap;
 font-variant-numeric:tabular-nums;background:var(--f0);color:var(--f0y)}
-.fark.u1{background:var(--u1);color:var(--uy)}.fark.u2{background:var(--u2);color:var(--uy)}
-.fark.p1{background:var(--p1);color:var(--py)}.fark.p2{background:var(--p2);color:var(--py)}
+.fark.u1,.fark.u2{background:var(--u1);color:var(--uy)}.fark.u2{font-weight:700}
+.fark.p1,.fark.p2{background:var(--p1);color:var(--py)}.fark.p2{font-weight:700}
 .fark.belirsiz{opacity:.55}
-.kira{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
-.kira del{font-size:12px;font-weight:400;color:var(--ink3);margin-left:5px}
-.puan{font-size:12px;color:var(--ink3);white-space:nowrap}.puan b{font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
+.kira{font-size:20px;line-height:1.2;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kira del{font-size:13px;font-weight:400;color:var(--ink3);margin-left:5px}
+.puan{font-size:13px;color:var(--ink3);white-space:nowrap}.puan b{font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums}
 .not{font-size:12.5px;color:var(--ink3);margin:3px 0 0}.not .u{color:var(--uyari)}
 .diger{margin:0 0 3px}.diger a{margin-right:14px;display:inline-flex;align-items:center;min-height:30px}
 button.daha{width:100%}
@@ -181,8 +185,8 @@ button.tsat[aria-expanded=true]{background:var(--f0);border-radius:6px 6px 0 0}
 .aciklama{font-size:14px;color:var(--ink2);margin-top:24px;max-width:80ch}
 .aciklama summary{cursor:pointer;color:var(--link);min-height:44px;display:flex;align-items:center;font-size:15px}
 .aciklama p{margin:0 0 10px;line-height:1.6}
-label.sec{display:flex;align-items:center;gap:4px;min-height:30px;font-size:12.5px;color:var(--ink3);cursor:pointer}
-label.sec input{width:16px;height:16px;accent-color:var(--acc);margin:0;flex:none}
+label.sec{display:flex;align-items:center;gap:6px;min-height:40px;font-size:14px;color:var(--ink2);cursor:pointer}
+label.sec input{width:18px;height:18px;accent-color:var(--acc);margin:0;flex:none}
 ol.ilanlar>li.secili{box-shadow:0 0 0 2px var(--acc)}
 .secbar{position:fixed;z-index:6;left:0;right:0;bottom:0;background:var(--yuzey);border-top:1px solid var(--cizgi);
 display:flex;align-items:center;gap:4px 12px;flex-wrap:wrap;padding:8px max(16px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
@@ -208,7 +212,8 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
  .p-ilan p{margin:0 0 1mm;color:#222}.p-uyari{font-size:9pt;color:#8a3200!important}.p-fiyat{font-size:11pt}.p-ay,.p-link{font-size:8.5pt;color:#444!important}
 }
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
-@media(max-width:389px){.ilan{grid-template-columns:48px minmax(0,1fr);gap:8px}.ilan .ft{width:48px;height:36px}}
+@media(max-width:389px){.ilan{grid-template-columns:112px minmax(0,1fr);gap:0 10px}.ilan .ft{width:112px;height:84px}}
+@media(min-width:600px){.ilan{grid-template-columns:176px minmax(0,1fr);gap:0 16px}.ilan .ft{width:176px;height:132px}}
 </style></head><body>
 <span id="guncel" hidden>15 Ekim 2026</span>
 <div class="duzen">
@@ -229,7 +234,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <label><span class="sr">Bina yaşı</span><select id="yas"><option value="">Her yaş</option>
 <option value="0">Sıfır bina</option><option value="5">En çok 5</option><option value="10">En çok 10</option>
 <option value="15">En çok 15</option><option value="20">En çok 20</option><option value="30">En çok 30</option></select></label></div></div></details>
-<details class="bolum" name="suz"><summary id="b_oz">Olsun<span class="deger" id="d_oz"></span></summary>
+<details class="bolum" name="suz"><summary id="b_oz">Ev özellikleri<span class="deger" id="d_oz"></span></summary>
 <div class="bolum-ic"><div class="cipler" id="ozellik" role="group" aria-labelledby="b_oz"></div>
 <label class="tek"><input type="checkbox" id="gizle">Günlük, oda, öğrenci, apart ilanlarını gizle</label></div></details>
 <details class="bolum" name="suz"><summary id="b_ilce">İlçe<span class="deger" id="d_ilce"></span></summary>
@@ -260,7 +265,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 
 <main id="sonuclar">
 <div class="ust-blok">
-<div class="bas-satir"><h1>Kiralık evler</h1><p id="say" role="status" aria-live="polite">İlanlar yükleniyor…</p></div>
+<div class="bas-satir"><h1>Kiralık evler</h1><p class="alt-bas">İstanbul · Anadolu Yakası · <span id="say" role="status" aria-live="polite">İlanlar yükleniyor…</span></p></div>
 <div class="arac">
 <button type="button" class="d" id="ac" aria-controls="panel" aria-expanded="false">Süzgeçler <span class="sayi" id="acsayi" hidden></span></button>
 <label><span class="sr">Sıralama</span><select id="sira"><option value="puan">Puana göre</option><option value="ucuz">Kirası düşük</option>
@@ -454,16 +459,18 @@ function bekMetin(r){if(!r[F.bek])return'';var f=Math.round((r[F.fiyat]/r[F.bek]
 function bekRakam(r){if(!r[F.bek])return'';var k=function(v){return bin(Math.round(v/1000))};
  return'Beklenen kira ~'+k(r[F.bek])+' bin TL'+(r[F.bekB]?' (tahmin belirsiz)':' · olası aralık '+k(r[F.bekA])+'–'+k(r[F.bekU])+' bin TL')
   +' · ilan '+bekMetin(r).split(' · ')[0].replace('Beklenen kiradan ','beklenenden ').replace('Beklenen kiraya yakın','beklenene yakın')}
-// kart sag ustu: beklenen kiraya gore yuzde. Yesil = ucuz, kirmizi = pahali; koyu ton = araligin disinda
+// kartta kiranin yaninda: beklenen kiraya gore yuzde ("%18 ucuz"). Yesil = ucuz, kirmizi = pahali; koyu ton = araligin disinda
 // (belirgin). Tahmin belirsizse soluk. Uzerine gelince / ekran okuyucuda aciklama.
 function farkRozet(r){if(!r[F.bek])return'';var f=Math.round((r[F.fiyat]/r[F.bek]-1)*100),sinif='',yazi;
- if(Math.abs(f)<2){yazi='%0'}else{yazi=(f<0?'−':'+')+'%'+Math.abs(f);
+ if(Math.abs(f)<2){yazi='benzerleri gibi'}else{yazi='%'+Math.abs(f)+(f<0?' ucuz':' pahalı');
   sinif=f<0?(r[F.fiyat]<r[F.bekA]&&!r[F.bekB]?'u2':'u1'):(r[F.fiyat]>r[F.bekU]&&!r[F.bekB]?'p2':'p1')}
  if(r[F.bekB])sinif+=' belirsiz';
  var acik=bekMetin(r).replace(/<\/?b>/g,'');
  return'<span class="fark '+sinif+'" title="'+esc(acik)+'"><span aria-hidden="true">'+yazi+'</span><span class="sr">'+esc(acik)+'</span></span>'}
 function kart(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
- var foto=b.foto?'<img class="ft" src="'+b.foto+'" alt="" width="56" height="42" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'ft bos\'}))">':'<span class="ft bos"></span>';
+ // kartta buyuk fotograf (x5_ 528x396); tablo ayrintisi kucuk (lthmb_ 200x150) kalir
+ var fs=b.foto?b.foto.replace('/lthmb_','/x5_'):'';
+ var foto=fs?'<img class="ft" src="'+fs+'" alt="" width="132" height="99" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'ft bos\'}))">':'<span class="ft bos"></span>';
  var not=b.uyari.map(function(u){return'<span class="u">'+esc(u)+'</span>'});
  if(r[F.es].length)not.push('aynı ev '+(r[F.es].length+1)+' ilanda');
  var dok=AG.filter(function(a){return x.p[a[0]]!==undefined}).map(function(a){return a[2]+(a[0]==='bolge'&&r[F.ses]?' ('+esc(r[F.ses])+')':'')+' <b>'+(x.u[a[0]]?'bilinmiyor':Math.round(x.p[a[0]]))+'</b>'}).join(' · ');
@@ -472,18 +479,19 @@ function kart(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
   return'<a href="'+tamLink(e[0],e[1])+'" target="_blank" rel="noopener">'+(i+2)+'. ilan</a>'}).join('')+'</p>':'';
  var km=x.km!==null&&x.km!==undefined?' · '+kmYaz(x.km):'';
  return'<li'+(sec?' class="secili"':'')+'><article class="ilan">'+foto+'<div class="orta">'
-  +'<div class="s1"><h2><a href="'+b.link+'" target="_blank" rel="noopener">'+esc(b.baslik)+'</a></h2>'+rz+'</div>'
-  +'<p class="s2">'+(r[F.yeni]?'<b class="yeni">yeni</b> · ':'')+esc(b.yer)+esc(km)+' · '+esc(b.kisa)+'</p>'
-  +'<div class="s3"><span class="kira">'+tl(r[F.fiyat])+' TL'+(r[F.eski]?'<del><span class="sr">, önceki kira </span>'+tl(r[F.eski])+'</del>':'')+'</span>'
-  +(r[F.suph]?'<span class="u">fiyatı kontrol edin</span>':'')
-  +'<span class="puan">Puan <b>'+Math.round(x.t)+'</b></span>'
+  +'<div class="s1"><h2><a href="'+b.link+'" target="_blank" rel="noopener">'+esc(b.baslik)+'</a></h2></div>'
+  +'<p class="yer">'+(r[F.yeni]?'<b class="yeni">yeni</b> · ':'')+esc(b.yer)+esc(km)+'</p>'
+  +'<p class="s2">'+esc(b.kisa)+'</p>'
+  +'<div class="s3"><span class="kira">'+tl(r[F.fiyat])+' TL'+(r[F.eski]?'<del><span class="sr">, önceki kira </span>'+tl(r[F.eski])+'</del>':'')+'</span>'+rz+'</div></div>'
+  // islem satiri: fotografin altindan baslar, tum genislik
+  +'<div class="s4"><span class="puan">Puan <b>'+Math.round(x.t)+'</b></span>'+(r[F.suph]?'<span class="u">fiyatı kontrol edin</span>':'')
   +'<button type="button" class="ayb" aria-expanded="false">Ayrıntı<span class="sr"> '+esc(b.baslik)+'</span></button>'
   +'<label class="sec"><input type="checkbox" data-no="'+r[F.no]+'"'+(sec?' checked':'')+'><span>Seç</span><span class="sr"> '+esc(b.baslik)+'</span></label></div>'
   +'<div class="ayrinti" hidden>'
   +(b.oz?'<p>'+esc(b.oz)+'</p>':'')
   +'<p>'+(b.yayin?esc(b.yayin)+' · ':'')+'<a href="'+b.harita+'" target="_blank" rel="noopener">haritada aç</a></p>'
   +(not.length?'<p class="not">'+not.join(' · ')+'</p>':'')+es
-  +'<p class="dok">'+dok+'</p>'+(bek?'<p class="dok">'+bek+'</p>':'')+'</div></div>'
+  +'<p class="dok">'+dok+'</p>'+(bek?'<p class="dok">'+bek+'</p>':'')+'</div>'
   +'</article></li>'}
 
 // tablo satiri: tek dokunusla acilir (fotograf, ilan baglantisi, sec, tum ayrintilar)
@@ -681,7 +689,7 @@ function kur(){
  GENIS.addEventListener?GENIS.addEventListener('change',genislik):GENIS.addListener(genislik);genislik();
  $('liste').addEventListener('click',function(e){var b=e.target.closest('button.ayb,button.tsat');if(!b)return;
   var ac=b.getAttribute('aria-expanded')!=='true';b.setAttribute('aria-expanded',ac);
-  (b.classList.contains('tsat')?b.nextElementSibling:b.closest('.orta').querySelector('.ayrinti')).hidden=!ac});
+  (b.classList.contains('tsat')?b.nextElementSibling:b.closest('.ilan').querySelector('.ayrinti')).hidden=!ac});
  $('liste').addEventListener('change',function(e){var c=e.target;if(!c.dataset||!c.dataset.no)return;
   var i=SEC.indexOf(c.dataset.no);if(c.checked&&i<0)SEC.push(c.dataset.no);if(!c.checked&&i>=0)SEC.splice(i,1);
   c.closest('li').classList.toggle('secili',c.checked);secKaydet();secCubuk()});
@@ -693,7 +701,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=d740bb3334').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=4200223789').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
