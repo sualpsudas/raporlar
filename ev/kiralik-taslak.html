@@ -175,47 +175,61 @@ footer { color: var(--soluk); font-size: 13px; padding: 12px 0 28px; }
 .karo-koyu { filter: grayscale(1) invert(1) brightness(.8) contrast(.9); }
 .leaflet-tooltip { font-size: 14px; }
 @media (min-width: 720px) { .kpi { grid-template-columns: repeat(4, 1fr); } }
-/* harita sekmesi: tek ekran, sayfa kaymaz */
-:root { --k1: #d9480f; --k2: #5f3dc4; --k3: #0ca678; --k4: #a61e4d; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --k1: #e8590c; --k2: #845ef7; --k3: #0ca678; --k4: #c2255c; } }
-:root[data-theme="dark"] { --k1: #e8590c; --k2: #845ef7; --k3: #0ca678; --k4: #c2255c; }
+/* harita sekmesi: tam ekran harita; ustte ve altta yuzen katmanlar */
+:root { --k1: #d9480f; --k2: #5f3dc4; --k3: #0ca678; --k4: #a61e4d;
+  --hov: #ffc98b; --ilce: #33434e; --mhc: rgb(255 255 255 / .55); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --k1: #e8590c; --k2: #845ef7; --k3: #0ca678; --k4: #c2255c; --hov: #ffb35c; --ilce: #e4e3dc; --mhc: rgb(17 17 16 / .5); } }
+:root[data-theme="dark"] { --k1: #e8590c; --k2: #845ef7; --k3: #0ca678; --k4: #c2255c; --hov: #ffb35c; --ilce: #e4e3dc; --mhc: rgb(17 17 16 / .5); }
 body.tam { height: 100svh; overflow: hidden; }
-body.tam .sayfa { height: 100svh; display: flex; flex-direction: column; }
+body.tam .sayfa { position: relative; z-index: 500; pointer-events: none; }
+body.tam main, body.tam #p-harita, body.tam .harita-kart { pointer-events: none; }
+body.tam header, body.tam .suzgec-cubuk, body.tam [role="tablist"], body.tam .olcu, body.tam .lejant, body.tam .kutular { pointer-events: auto; }
+body.tam .sayfa::before { content: ""; position: fixed; left: 0; right: 0; top: 0; height: var(--ust, 170px); z-index: 1; pointer-events: none;
+  background: color-mix(in srgb, var(--bg) 84%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  box-shadow: 0 1px 0 var(--cizgi); }
+body.tam .harita-kart #harita { position: fixed !important; inset: 0; height: auto; margin: 0; border-radius: 0; z-index: 0; pointer-events: auto; }
+body.tam header, body.tam .suzgec-cubuk, body.tam [role="tablist"], body.tam .harita-kart .olcu, body.tam .lejant { position: relative; z-index: 2; }
 body.tam header { padding: 8px 0 0; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 12px; }
 body.tam h1 { font-size: 19px; }
 body.tam .alt { font-size: 14px; margin: 0; }
 body.tam nav.ust { margin: 0 0 0 auto; font-size: 14px; gap: 12px; }
 body.tam nav.ust a { padding: 6px 0; }
-body.tam .suzgec-cubuk { padding: 4px 0; }
-body.tam [role="tablist"] { margin: 4px 0; }
-body.tam main { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-body.tam #p-harita { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-body.tam .harita-kart { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 0 0 4px; margin-bottom: 6px; }
-body.tam .harita-kart #harita { flex: 1; height: auto; min-height: 180px; margin-bottom: 4px; }
-body.tam .harita-kart .olcu { margin: 0 auto 6px; }
-body.tam .lejant { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; font-size: 12px; gap: 8px; }
+body.tam .suzgec-cubuk { position: relative; z-index: 2; background: none; border-bottom: 0; padding: 4px 0; }
+body.tam [role="tablist"] { margin: 2px 0 4px; }
+body.tam .harita-kart { margin: 0; padding: 0; background: none; border: 0; }
+body.tam .harita-kart > :not(#harita) { padding-inline: 0; }
+body.tam .harita-kart .olcu { margin: 0 0 4px; max-width: 440px !important; }
+body.tam .lejant { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; font-size: 12px; gap: 8px; padding-bottom: 4px; }
 body.tam .lejant span { white-space: nowrap; }
 body.tam footer { display: none; }
-.kutular { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
-@media (min-width: 720px) { .kutular { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; } }
-.kutu { position: relative; background: var(--kart); border: 1px solid var(--cizgi); border-top: 4px solid var(--kr); border-radius: 12px;
-  padding: 6px 8px 6px 10px; min-width: 0; display: grid; grid-template-columns: 1fr auto; gap: 0 6px; align-items: start; }
-.kutu.hedef { box-shadow: 0 0 0 2px var(--kr); }
-.kutu .ad { all: unset; cursor: pointer; min-width: 0; display: block; }
-.kutu .ad:focus-visible { outline: 2px solid var(--vurgu); outline-offset: 2px; border-radius: 4px; }
-.kutu .ad b { display: block; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.kutu .ad small { display: block; color: var(--yazi2); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.kutu .deger { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.01em; line-height: 1.2; }
-.kutu .deger small { font-size: 12px; font-weight: 400; color: var(--yazi2); }
-.kutu .alt2 { font-size: 12px; color: var(--yazi2); font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.kutu .fark { font-weight: 600; color: var(--yazi); }
-.kutu .sec { min-height: 36px; min-width: 44px; padding: 0 8px; border-radius: 8px; border: 1px solid var(--cizgi); background: var(--bg);
-  font-size: 13px; cursor: pointer; color: var(--yazi); }
+body.tam .leaflet-top { top: var(--ust, 0px); }
+body.tam .leaflet-bottom { bottom: var(--alt, 0px); }
+.kutular { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+body.tam .kutular { position: fixed; left: 0; right: 0; bottom: 0; z-index: 500;
+  padding: 8px max(8px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); }
+@media (min-width: 720px) { body.tam .kutular { gap: 10px; padding-inline: max(16px, env(safe-area-inset-left)); } }
+.kutu { position: relative; min-width: 0; min-height: 136px; display: flex; flex-direction: column; gap: 2px; padding: 8px;
+  background: color-mix(in srgb, var(--kart) 93%, transparent); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  border: 1px solid var(--cizgi); border-top: 4px solid var(--kr); border-radius: 12px; box-shadow: 0 2px 10px rgb(0 0 0 / .12); }
+@media (min-width: 720px) { .kutu { min-height: 156px; padding: 10px 12px; } }
+.kutu.hedef { box-shadow: 0 0 0 2px var(--kr), 0 2px 10px rgb(0 0 0 / .12); }
+.kutu .kb { display: flex; justify-content: space-between; align-items: center; gap: 4px; min-height: 30px; }
+.kutu-no { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--kr);
+  color: #fff; font-size: 12px; font-weight: 700; flex: none; }
+.kutu .sec { min-height: 30px; padding: 0 8px; border-radius: 8px; border: 1px solid var(--cizgi); background: var(--bg);
+  font-size: 12px; cursor: pointer; color: var(--yazi); white-space: nowrap; }
 .kutu.hedef .sec { background: var(--kr); border-color: var(--kr); color: #fff; }
-.kutu .bos { grid-column: 1 / -1; font-size: 13px; color: var(--yazi2); line-height: 1.3; }
-.kutu .ic { grid-column: 1 / -1; min-width: 0; }
-.kutu-no { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--kr);
-  color: #fff; font-size: 11px; font-weight: 700; vertical-align: 1px; }
+.kutu .ad { all: unset; cursor: pointer; min-width: 0; display: block; margin-top: 2px; }
+.kutu .ad:focus-visible { outline: 2px solid var(--vurgu); outline-offset: 2px; border-radius: 4px; }
+.kutu .ad b { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 14px; line-height: 1.2; }
+.kutu .ad small { display: block; color: var(--yazi2); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kutu .deger { margin-top: auto; font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.01em; line-height: 1.15; }
+.kutu .deger small { display: block; font-size: 11px; font-weight: 400; color: var(--yazi2); letter-spacing: 0; }
+.kutu .alt2 { font-size: 12px; color: var(--yazi2); font-variant-numeric: tabular-nums; }
+.kutu .fark { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.kutu .bos { margin: auto 0 0; font-size: 12px; color: var(--yazi2); line-height: 1.3; }
+@media (min-width: 720px) { .kutu .ad b { font-size: 16px; } .kutu .deger { font-size: 24px; } .kutu .deger small { display: inline; font-size: 12px; } }
 .no-et span { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; color: #fff; font-size: 12px;
   font-weight: 700; box-shadow: 0 0 0 2px #fff, 0 1px 3px rgb(0 0 0 / .3); }
 .olcu button { white-space: nowrap; }
@@ -641,14 +655,14 @@ function renkHesap() {
 }
 function stil(j) {
   const f = FS[j] || {n: 0}, k = KUTU.indexOf(j), sec = k >= 0;
-  const kenar = karanlik() ? "#111110" : "#fcfcfb", kr = sec ? css("--k" + (k + 1)) : null;
+  const kenar = css("--mhc"), kr = sec ? css("--k" + (k + 1)) : null;
   if (f.n >= 5) {
     const R = ["--r1", "--r2", "--r3", "--r4", "--r5"].map(css);
-    return {fillColor: R[esik.filter(e => f[OLCU] > e).length], fillOpacity: .72, color: sec ? kr : kenar,
-      weight: sec ? 3.5 : .8, dashArray: null};
+    return {fillColor: R[esik.filter(e => f[OLCU] > e).length], fillOpacity: .7, color: sec ? kr : kenar,
+      weight: sec ? 2.5 : .5, opacity: 1, dashArray: null};
   }
-  return {fillColor: css("--zemin2"), fillOpacity: f.n ? .35 : .12, color: sec ? kr : css("--soluk"),
-    weight: sec ? 3.5 : .6, dashArray: sec ? null : f.n ? "3 3" : null};
+  return {fillColor: css("--zemin2"), fillOpacity: f.n ? .35 : .1, color: sec ? kr : kenar,
+    weight: sec ? 2.5 : .5, opacity: 1, dashArray: null};
 }
 let numK = null;
 function poliSecOne() {
@@ -682,15 +696,15 @@ function haritaKur() {
     style: ft => stil(ft.properties.j),
     onEachFeature: (ft, ly) => {
       const j = ft.properties.j;
-      ly.on("mouseover", () => { ly.setStyle({weight: 2.5, color: css("--yazi")}); ly.bringToFront(); bilgiYaz(j); });
-      ly.on("mouseout", () => { ly.setStyle(stil(j)); poliSecOne(); bilgiYaz(null); });
+      ly.on("mouseover", () => { ly.setStyle({fillColor: css("--hov"), fillOpacity: .85}); bilgiYaz(j); });
+      ly.on("mouseout", () => { ly.setStyle(stil(j)); bilgiYaz(null); });
       ly.on("click", () => mahalleSec(j, false));
     }}).addTo(harita);
   const Bilgi = L.Control.extend({onAdd: () => { const d = L.DomUtil.create("div", "bilgi"); d.id = "bilgi"; return d; }});
   new Bilgi({position: "topright"}).addTo(harita);
   bilgiYaz(null);
   ilceK = L.geoJSON({type: "FeatureCollection", features: GEO.ilce.map(m => ({type: "Feature", properties: {ad: m.ad}, geometry: m.g}))}, {
-    interactive: false, style: () => ({fill: false, color: css("--yazi2"), weight: 2, opacity: .9}),
+    interactive: false, style: ilceStil,
     onEachFeature: (ft, ly) => ly.bindTooltip(esc(ft.properties.ad), {permanent: true, direction: "center", className: "ilce-et"})
   }).addTo(harita);
   document.querySelectorAll("[data-olcu]").forEach(b => b.onclick = () => {
@@ -699,6 +713,16 @@ function haritaKur() {
     haritaCiz();
   });
 }
+const ilceStil = () => ({fill: false, color: css("--ilce"), weight: 1.6, opacity: .85});
+function yerlesim() {
+  if (!document.body.classList.contains("tam")) return [8, 8];
+  const u = Math.round(document.getElementById("lejant").getBoundingClientRect().bottom + 4);
+  const a = Math.round(innerHeight - document.getElementById("kutular").getBoundingClientRect().top + 4);
+  document.documentElement.style.setProperty("--ust", u + "px");
+  document.documentElement.style.setProperty("--alt", a + "px");
+  return [u, a];
+}
+addEventListener("resize", () => { yerlesim(); if (harita) harita.invalidateSize(); });
 let sonSinir = "";
 function haritaCiz() {
   if (document.getElementById("p-harita").hidden || typeof L === "undefined") return;
@@ -711,10 +735,10 @@ function haritaCiz() {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> katkıcıları'}).addTo(harita);
     karo.bringToBack();
   }
-  harita.invalidateSize();
+  yerlesim(); harita.invalidateSize();
   const say = renkHesap();
   poli.setStyle(ft => stil(ft.properties.j));
-  ilceK.setStyle(() => ({fill: false, color: css("--yazi2"), weight: 2, opacity: .9}));
+  ilceK.setStyle(ilceStil); ilceK.bringToFront();
   const R = ["--r1", "--r2", "--r3", "--r4", "--r5"].map(css);
   const fmt = v => OLCU === "v" ? TL.format(Math.round(v)) : OLCU === "kira" ? binS(v) : TL.format(Math.round(v));
   const birim = {v: "₺ / m²", kira: "bin ₺", n: "ilan"}[OLCU];
@@ -725,7 +749,8 @@ function haritaCiz() {
   const dolu = poli.getLayers().filter(ly => (FS[ly.feature.properties.j] || {}).n >= 5);
   const anahtar = D.il.join(",") + "|" + dolu.length;
   if (dolu.length && anahtar !== sonSinir) {
-    harita.fitBounds(L.featureGroup(dolu).getBounds(), {padding: [8, 8]});
+    const [u, a] = yerlesim();
+    harita.fitBounds(L.featureGroup(dolu).getBounds(), {paddingTopLeft: [8, u], paddingBottomRight: [8, a]});
     sonSinir = anahtar;
   }
   poliSecOne();
@@ -737,7 +762,8 @@ function mahalleSec(j, yaklas) {
   KUTU[HEDEF] = j; HEDEF = 0;
   poli.setStyle(ft => stil(ft.properties.j)); poliSecOne();
   const ly = poli.getLayers().find(x => x.feature.properties.j === j);
-  if (ly && yaklas) harita.fitBounds(ly.getBounds(), {maxZoom: 15, padding: [30, 30]});
+  if (ly && yaklas) { const [u, a] = yerlesim();
+    harita.fitBounds(ly.getBounds(), {maxZoom: 15, paddingTopLeft: [30, u + 20], paddingBottomRight: [30, a + 20]}); }
   bilgiYaz(j); hashYaz(); kutularCiz();
 }
 function kutularCiz() {
@@ -745,20 +771,23 @@ function kutularCiz() {
   const ref = KUTU[0] != null ? FS[KUTU[0]] : null;
   el.innerHTML = KUTU.map((j, k) => {
     const kr = `--kr:var(--k${k + 1})`, hedef = HEDEF === k && k > 0 ? " hedef" : "";
-    const secB = k === 0 ? "" : `<button class="sec" data-sec="${k}" aria-pressed="${HEDEF === k}">${HEDEF === k ? "Haritadan seç" : j == null ? "Seç" : "Değiştir"}</button>`;
-    if (j == null) return `<div class="kutu${hedef}" style="${kr}"><span class="kutu-no">${k + 1}</span>${secB}<p class="bos">` +
-      (k === 0 ? "Haritada bir mahalleye dokunun" : HEDEF === k ? "Şimdi haritada bir mahalleye dokunun" : "Karşılaştırmak için Seç'e basın") + `</p></div>`;
+    const secB = k === 0 ? "" : `<button class="sec" data-sec="${k}" aria-pressed="${HEDEF === k}">${HEDEF === k ? "Vazgeç" : j == null ? "Seç" : "Değiştir"}</button>`;
+    const ust = `<div class="kb"><span class="kutu-no">${k + 1}</span>${secB}</div>`;
+    if (j == null) return `<div class="kutu${hedef}" style="${kr}">${ust}<p class="bos">` +
+      (k === 0 || HEDEF === k ? "Haritada bir mahalleye dokunun" : "Seç'e basıp haritadan mahalle seçin") + `</p></div>`;
     const m = GEO.mahalle[j], f = FS[j] || {n: 0};
-    const fark = k > 0 && ref && ref.n >= 5 && f.n >= 5 && OLCU !== "n" ? ` · <span class="fark">1'e göre ${yuzde((f[OLCU] / ref[OLCU] - 1) * 100)}</span>` : "";
-    const deger = !f.n ? "–" : OLCU === "v" ? `${TL.format(Math.round(f.v))} <small>₺/m²</small>` : OLCU === "kira" ? `${binS(f.kira)} <small>bin ₺</small>` : `${TL.format(f.n)} <small>ilan</small>`;
-    const alt = !f.n ? "Süzgece uyan ilan yok" : (OLCU === "n" ? `${TL.format(Math.round(f.v))} ₺/m²` : `${TL.format(f.n)} ilan${f.n < 5 ? ", az" : ""}`) + fark;
-    return `<div class="kutu${hedef}" style="${kr}"><button class="ad" data-detay="${k}" aria-label="${esc(m.ad)} ayrıntısı">` +
-      `<b><span class="kutu-no">${k + 1}</span> ${esc(m.ad)}</b><small>${esc(m.ilce)}</small></button>${secB}` +
-      `<div class="ic"><div class="deger">${deger}</div><div class="alt2">${alt}</div></div></div>`;
+    const deger = !f.n ? "–" : OLCU === "v" ? `${TL.format(Math.round(f.v))} <small>₺ / m²</small>`
+      : OLCU === "kira" ? `${binS(f.kira)} <small>bin ₺</small>` : `${TL.format(f.n)} <small>ilan</small>`;
+    const alt = !f.n ? "İlan yok" : OLCU === "n" ? `${TL.format(Math.round(f.v))} ₺/m²` : `${TL.format(f.n)} ilan${f.n < 5 ? ", az" : ""}`;
+    const fark = k > 0 && ref && ref.n >= 5 && f.n >= 5 ? `<div class="fark">1'e göre ${yuzde((f[OLCU] / ref[OLCU] - 1) * 100)}</div>` : "";
+    return `<div class="kutu${hedef}" style="${kr}">${ust}<button class="ad" data-detay="${k}" aria-label="${esc(m.ad)} ayrıntısı">` +
+      `<b>${esc(m.ad)}</b><small>${esc(m.ilce)}</small></button>` +
+      `<div class="deger">${deger}</div><div class="alt2">${alt}</div>${fark}</div>`;
   }).join("");
   el.querySelectorAll("[data-sec]").forEach(b => b.onclick = () => { const k = +b.dataset.sec; HEDEF = HEDEF === k ? 0 : k; kutularCiz(); });
   el.querySelectorAll("[data-detay]").forEach(b => b.onclick = () => {
-    SECILI = KUTU[+b.dataset.detay]; const d = document.getElementById("detay-dlg"); d.showModal(); mahalleDetay(); });
+    SECILI = KUTU[+b.dataset.detay]; document.getElementById("detay-dlg").showModal(); mahalleDetay(); });
+  yerlesim();
 }
 function mahalleDetay() {
   const el = document.getElementById("mh-detay");
