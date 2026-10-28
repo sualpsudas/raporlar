@@ -245,7 +245,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 @media(min-width:600px){li.isk{grid-template-columns:176px 1fr;min-height:156px}li.isk .i-ft{height:132px}}
 @media(min-width:600px){.ilan{grid-template-columns:176px minmax(0,1fr);gap:0 16px}.ilan .ft{width:176px;height:132px}}
 </style></head><body>
-<span id="guncel" hidden>27 Ekim 2026</span>
+<span id="guncel" hidden>28 Ekim 2026</span>
 <div class="duzen">
 
 <aside class="panel" id="panel" aria-labelledby="panel-baslik">
@@ -336,7 +336,7 @@ Sağ üstteki yüzde (beklenen kiraya göre) puana girmez.</p>
 <div id="yazdir" aria-hidden="true"></div>
 <script>
 (function(){
-var AG=[["kat", 18, "Kat"], ["yas", 17, "Bina yeniliği"], ["fiyat", 15, "Kira"], ["konum", 14, "Hedef konum"], ["site", 13, "Site içinde"], ["bolge", 12, "Bölge"], ["m2", 11, "Net m²"]],YAS_TAVAN=35,YAS_EGRI=[[0, 100], [3, 92], [8, 78], [13, 64], [18, 46], [23, 24], [28, 10], [35, 0]],BIL=50,VERI_GUN=new Date('2026-10-27'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
+var AG=[["kat", 18, "Kat"], ["yas", 17, "Bina yeniliği"], ["fiyat", 15, "Kira"], ["konum", 14, "Hedef konum"], ["site", 13, "Site içinde"], ["bolge", 12, "Bölge"], ["m2", 11, "Net m²"]],YAS_TAVAN=35,YAS_EGRI=[[0, 100], [3, 92], [8, 78], [13, 64], [18, 46], [23, 24], [28, 10], [35, 0]],BIL=50,VERI_GUN=new Date('2026-10-28'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
 var F={no:0,bas:1,link:2,foto:3,fiyat:4,net:5,brut:6,oda:7,ilce:8,mah:9,kat:10,katS:11,katP:12,katN:13,yas:14,bolge:15,
  ses:16,site:17,asan:18,otop:19,isit:20,balk:21,yeni:22,eski:23,es:24,suph:25,tarih:26,kiraP:27,m2P:28,
  bek:29,bekA:30,bekU:31,bekB:32,kn:33};
@@ -475,6 +475,7 @@ function bilgi(r){
  var kn=parseInt(r[F.kat],10);if(r[F.asan]===0&&kn>=3)notlar.push('asansörsüz '+kn+'. kat');
  if(r[F.suph]===1)notlar.push('kira mahallesine göre çok düşük, ilanı kontrol edin');
  if(r[F.suph]===2)notlar.push('kira birden %'+Math.round((1-r[F.fiyat]/r[F.eski])*100)+' düştü, ilanı kontrol edin');
+ if(r[F.suph]===3)notlar.push('başlık, toplu girilen şüpheli ilanlarda görülen kalıpta; ilan gerçek olmayabilir');
  var kp=[r[F.oda],r[F.net]?r[F.net]+' m²':(r[F.brut]?Math.round(r[F.brut])+' m² brüt':''),
   r[F.kat]?(/^\d/.test(r[F.kat])?ks(r[F.kat])+(r[F.katS]?'/'+ks(r[F.katS]):'')+' kat':kucuk(r[F.kat])):'',
   r[F.yas]===null?'':(r[F.yas]===0?'sıfır bina':(r[F.yas]>=YAS_TAVAN?'31+ yaş':'~'+r[F.yas]+' yaş'))],kisa=kp.filter(Boolean).join(' · ');
@@ -520,7 +521,7 @@ function kart(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
   +'<p class="s2">'+ozHtml(b.parca)+'</p></div>'
   // kira satiri: genis ekranda metnin altinda, en dar ekranda fotografin altinda tam genislik
   +'<div class="s3"><span class="kira">'+tl(r[F.fiyat])+' TL'+(r[F.eski]?'<del><span class="sr">, önceki kira </span>'+tl(r[F.eski])+'</del>':'')+'</span>'+rz
-  +(r[F.suph]?'<span class="u">Fiyatı kontrol edin</span>':'')+'</div>'
+  +(r[F.suph]?'<span class="u">'+(r[F.suph]===3?'Şüpheli ilan':'Fiyatı kontrol edin')+'</span>':'')+'</div>'
   // islem satiri: uygunluk solda, Ayrinti ve Sec sagda
   +'<div class="s4"><span class="puan">Uygunluk <b>'+Math.round(x.t)+'</b>/100</span>'
   +'<button type="button" class="ayb" aria-expanded="false">Ayrıntı<span class="sr"> '+esc(b.baslik)+'</span></button>'
@@ -747,7 +748,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=47ed3805ea').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=4d1c34e028').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
