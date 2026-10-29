@@ -327,9 +327,9 @@ giriş / bahçe katı 20, bodrum ve kot sıfır. Asansörsüz binada 3. kat 10, 
 <b>Bölge:</b> mahallenin sosyo-ekonomik sınıfı (İBB, 2016); yoksa ilçenin gelişmişlik puanı (2022).
 <b>Net m²:</b> büyük olan yüksek puan alır. Bilgisi girilmemiş başlık ortalama (50) sayılır.
 Sağ üstteki yüzde (beklenen kiraya göre) puana girmez.</p>
-<p><b>Hedef konum</b> seçilirse ilanın mahallesi ile hedef arasındaki kuş uçuşu uzaklık puana katılır: 2 km'ye kadar tam puan,
+<p><b>Hedef konum</b> seçilirse ilan ile hedef arasındaki kuş uçuşu uzaklık puana katılır: 2 km'ye kadar tam puan,
 5 km yaklaşık 65, 10 km 32, 20 km 8. Boğaz'ın öbür yakası için 5 km eklenir. Puandaki payı Puanlama bölümündeki
-"Hedef konum" sürgüsüyle ayarlanır; hedef seçilmemişse bu başlık hesaba girmez. Uzaklık mahalle merkezinden ölçülür, kabadır.</p>
+"Hedef konum" sürgüsüyle ayarlanır; hedef seçilmemişse bu başlık hesaba girmez. Uzaklık evin ilandaki harita konumundan ölçülür; konumu olmayan ilanda mahalle merkezinden (kaba).</p>
 </details>
 </main>
 </div>
@@ -339,15 +339,18 @@ Sağ üstteki yüzde (beklenen kiraya göre) puana girmez.</p>
 var AG=[["kat", 18, "Kat"], ["yas", 17, "Bina yeniliği"], ["fiyat", 15, "Kira"], ["konum", 14, "Hedef konum"], ["site", 13, "Site içinde"], ["bolge", 12, "Bölge"], ["m2", 11, "Net m²"]],YAS_TAVAN=35,YAS_EGRI=[[0, 100], [3, 92], [8, 78], [13, 64], [18, 46], [23, 24], [28, 10], [35, 0]],BIL=50,VERI_GUN=new Date('2026-10-28'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
 var F={no:0,bas:1,link:2,foto:3,fiyat:4,net:5,brut:6,oda:7,ilce:8,mah:9,kat:10,katS:11,katP:12,katN:13,yas:14,bolge:15,
  ses:16,site:17,asan:18,otop:19,isit:20,balk:21,yeni:22,eski:23,es:24,suph:25,tarih:26,kiraP:27,m2P:28,
- bek:29,bekA:30,bekU:31,bekB:32,kn:33};
-// hedef konum: ilanin mahalle noktasi (D.kn) ile hedef arasi kus ucusu km; Bogaz'in obur yakasina KOPRU km eklenir.
+ bek:29,bekA:30,bekU:31,bekB:32,kn:33,lat:34,lon:35};
+// hedef konum: evin gercek konumu (F.lat/F.lon, harita aramasi; yoksa mahalle noktasi D.kn) ile hedef arasi kus ucusu
+// km; Bogaz'in obur yakasina KOPRU km eklenir.
 // Konum puani: KONUM_TAM km'ye kadar 100, sonra her KONUM_OLCEK km'de ~e kati azalir (5 km 65, 10 km 32, 20 km 8).
 // Puanlamada 7. surgu ("konum"); hedef secilmemisse hesaba girmez.
 var ANADOLU=['Adalar','Ataşehir','Beykoz','Çekmeköy','Kadıköy','Kartal','Maltepe','Pendik','Sancaktepe','Sultanbeyli','Şile','Tuzla','Ümraniye','Üsküdar'];
 var KOPRU=5,KONUM_TAM=2,KONUM_OLCEK=7;
 function konumPuan(km){return km<=KONUM_TAM?100:100*Math.exp(-(km-KONUM_TAM)/KONUM_OLCEK)}
 function hedef(){if(!D||!S.hi)return null;for(var i=0;i<D.kn.length;i++){var k=D.kn[i];if(k[0]===S.hi&&k[1]===S.hm)return k}return null}
-function uzaklik(r,h){var i=r[F.kn];if(i===null||i===undefined||!h)return null;var k=D.kn[i],R=Math.PI/180;
+function uzaklik(r,h){var i=r[F.kn];if(!h)return null;var k,R=Math.PI/180;
+ if(r[F.lat]!=null&&r[F.lon]!=null)k=[D.ilce[r[F.ilce]],'',r[F.lat],r[F.lon]];
+ else if(i===null||i===undefined)return null;else k=D.kn[i];
  var a=Math.pow(Math.sin((h[2]-k[2])*R/2),2)+Math.cos(k[2]*R)*Math.cos(h[2]*R)*Math.pow(Math.sin((h[3]-k[3])*R/2),2);
  return 12742*Math.asin(Math.sqrt(a))+((ANADOLU.indexOf(k[0])>=0)!==(ANADOLU.indexOf(h[0])>=0)?KOPRU:0)}
 function kmYaz(km){return km<1?'1 km\'den yakın':'~'+(km<10?(Math.round(km*10)/10).toLocaleString('tr-TR'):Math.round(km))+' km'}
@@ -482,7 +485,8 @@ function bilgi(r){
  return{link:tamLink(r[F.no],r[F.link]),foto:tamFoto(r[F.no],r[F.foto]),yer:D.ilce[r[F.ilce]]+', '+D.mah[r[F.mah]],kisa:kisa,parca:kp,
   satir:[r[F.oda],m2,kat,yas].filter(Boolean).join(' · '),ozler:oz,oz:oz.join(' · '),baslik:baslik(r[F.bas])||r[F.no],
   yayin:gun===null?'':(gun===0?'bugün yayınlandı':gun+' gündür yayında'),uyari:notlar,
-  harita:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(D.mah[r[F.mah]]+' Mahallesi, '+D.ilce[r[F.ilce]]+', İstanbul')}}
+  harita:'https://www.google.com/maps/search/?api=1&query='+(r[F.lat]!=null?r[F.lat]+','+r[F.lon]
+   :encodeURIComponent(D.mah[r[F.mah]]+' Mahallesi, '+D.ilce[r[F.ilce]]+', İstanbul'))}}
 // beklenen kira (kira_model): kiranin beklenene gore yuzdesi. Guveni dusuk / modelde olmayan ilanda bos.
 function bekMetin(r){if(!r[F.bek])return'';var f=Math.round((r[F.fiyat]/r[F.bek]-1)*100),
   y=Math.abs(f)<2?'Beklenen kiraya yakın':'Beklenen kiradan <b>%'+Math.abs(f)+' '+(f<0?'ucuz':'pahalı')+'</b>',
@@ -748,7 +752,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=4d1c34e028').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=4b458efd4e').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
