@@ -189,7 +189,14 @@ ol.ilanlar[hidden],.evharita[hidden]{display:none!important}
 @media(max-width:899px){.evharita{height:calc(100dvh - 210px);margin:8px -16px 0;border-radius:0}}
 .evharita .leaflet-popup-content{margin:10px 12px;font:inherit;font-size:14px;line-height:1.4}
 .evharita .leaflet-popup-content b{font-size:16px}
-.evharita .leaflet-popup-content a{display:inline-block;margin-top:6px}
+.evharita .leaflet-popup-content a.git{display:block;margin-top:10px;min-height:44px;line-height:44px;text-align:center;
+ border-radius:10px;background:var(--secili);color:var(--zemin);text-decoration:none;font-weight:600}
+.evharita .leaflet-popup-close-button{width:40px!important;height:40px!important;font-size:26px!important;line-height:40px!important}
+/* yakinlastirma (+/-) dugmeleri parmak icin buyuk: Leaflet'in sonradan yuklenen ".leaflet-touch .leaflet-bar a"
+   kuralini ezmek icin kimlik (#) secici */
+#evharita .leaflet-control-zoom a{width:48px;height:48px;line-height:48px;font-size:26px}
+.evharita .ehnot{background:var(--yuzey);color:var(--ink2);border-radius:8px;padding:6px 10px;font-size:13px;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+@media(pointer:coarse){.arac .seg button,.arac button.d,.arac select{min-height:44px}}
 .evharita .hy{color:var(--ink3);font-size:13px}
 .karo-acik{filter:grayscale(1) contrast(.85) brightness(1.06) opacity(.9)}
 .karo-koyu{filter:grayscale(1) invert(1) brightness(.75) contrast(.9)}
@@ -663,7 +670,10 @@ function secPaylas(){
  if(navigator.share){navigator.share({title:'Kiralık ilanlar',text:metin,url:u}).catch(function(){});return}
  window.open('https://wa.me/?text='+encodeURIComponent(metin+'\n'+u),'_blank','noopener')}
 /* ---------- harita gorunumu: Leaflet yalniz secilince yuklenir; sade altlik, tek renk nokta ---------- */
-var EH=null,EHK=null,EHR=null,EHA='',EHY=0;
+var EH=null,EHK=null,EHR=null,EHA='',EHY=0,EHN=null;
+// uzaktan seyrek: ekran EH_HUCRE px karelere bolunur, her karede siralamada en ustteki ilan; yaklastikca artar,
+// EH_TUM zoom ve ustunde hepsi (kullanici 2026-10-29: "uzaktan hepsi gozukmesin, yaklastikca artsin")
+var EH_HUCRE=34,EH_TUM=17;
 function leafletYukle(f){if(window.L)return f();if(EHY){EHY.push(f);return}EHY=[f];
  var c=document.createElement('link');c.rel='stylesheet';c.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';document.head.appendChild(c);
  var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
@@ -675,19 +685,30 @@ function haritaCiz(){leafletYukle(function(){
   // OSM altlik, CSS ile soluk gri (kullanici: sade, renksiz); CARTO artik anahtar istiyor
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,className:koyu()?'karo-koyu':'karo-acik',
    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> katkıcıları'}).addTo(EH);
-  EHR=L.canvas({padding:.3});EHK=L.layerGroup().addTo(EH)}
+  // tolerance: parmakla dokunmada nokta cevresinde ek piksel
+  EHR=L.canvas({padding:.3,tolerance:matchMedia('(pointer:coarse)').matches?12:4});EHK=L.layerGroup().addTo(EH);
+  var Not=L.Control.extend({onAdd:function(){var d=L.DomUtil.create('div','ehnot');EHN=d;return d}});
+  new Not({position:'bottomleft'}).addTo(EH);EH.on('moveend',noktaYenile)}
  setTimeout(function(){EH.invalidateSize()},0);
- EHK.clearLayers();var renk=koyu()?'#9ec5ff':'#2f6fd6',la=[],lo=[];
- SON.forEach(function(x){var r=x.r;if(r[F.lat]==null||r[F.lon]==null)return;la.push(r[F.lat]);lo.push(r[F.lon]);
-  L.circleMarker([r[F.lat],r[F.lon]],{renderer:EHR,radius:5,weight:1,color:koyu()?'#000':'#fff',fillColor:renk,fillOpacity:.85})
-   .bindPopup(function(){var b=bilgi(r);return'<b>'+r[F.fiyat].toLocaleString('tr-TR')+' TL</b><br>'+esc(b.kisa)+'<br><span class="hy">'+esc(b.yer)+'</span><br>'
-    +'<a href="'+esc(b.link)+'" target="_blank" rel="noopener">İlanı aç</a>'},{maxWidth:260}).addTo(EHK)});
+ var la=[],lo=[];
+ SON.forEach(function(x){var r=x.r;if(r[F.lat]==null||r[F.lon]==null)return;la.push(r[F.lat]);lo.push(r[F.lon])});
  // ilce/mahalle secimi degisince secili bolgedeki ilanlara sigdir (birden cok ilce: hepsini kapsar);
  // uc koordinatlar (hatali konum) yakinlasmayi bozmasin diye %1-%99 araligi
  var an=S.ilce.slice().sort().join(',')+'|'+S.mah.slice().sort().join(',');
  if(an!==EHA&&la.length){EHA=an;var q=function(a,p){var s=a.slice().sort(function(x,y){return x-y});return s[Math.min(s.length-1,Math.floor(p*(s.length-1)))]};
   var u=la.length>50?[.01,.99]:[0,1];
-  EH.fitBounds([[q(la,u[0]),q(lo,u[0])],[q(la,u[1]),q(lo,u[1])]],{padding:[24,24],maxZoom:16})}})}
+  EH.fitBounds([[q(la,u[0]),q(lo,u[0])],[q(la,u[1]),q(lo,u[1])]],{padding:[24,24],maxZoom:16})}
+ noktaYenile()})}
+function noktaYenile(){if(!EH||S.gor!=='harita')return;
+ EHK.clearLayers();var renk=koyu()?'#9ec5ff':'#2f6fd6',tum=EH.getZoom()>=EH_TUM,b=EH.getBounds().pad(.1),dolu={},n=0,top=0;
+ SON.forEach(function(x){var r=x.r;if(r[F.lat]==null||r[F.lon]==null)return;top++;
+  if(!b.contains([r[F.lat],r[F.lon]]))return;
+  if(!tum){var p=EH.latLngToContainerPoint([r[F.lat],r[F.lon]]),k=Math.floor(p.x/EH_HUCRE)+'_'+Math.floor(p.y/EH_HUCRE);
+   if(dolu[k])return;dolu[k]=1}
+  n++;L.circleMarker([r[F.lat],r[F.lon]],{renderer:EHR,radius:6,weight:1.5,color:koyu()?'#000':'#fff',fillColor:renk,fillOpacity:.9})
+   .bindPopup(function(){var bb=bilgi(r);return'<b>'+r[F.fiyat].toLocaleString('tr-TR')+' TL</b><br>'+esc(bb.kisa)+'<br><span class="hy">'+esc(bb.yer)+'</span>'
+    +'<a class="git" href="'+esc(bb.link)+'" target="_blank" rel="noopener">İlanı aç</a>'},{maxWidth:280,minWidth:220}).addTo(EHK)});
+ if(EHN)EHN.textContent=tum?n.toLocaleString('tr-TR')+' ilan':n.toLocaleString('tr-TR')+' / '+top.toLocaleString('tr-TR')+' ilan gösteriliyor · yaklaştıkça artar'}
 function liste(){
  var ol=$('liste'),hr=S.gor==='harita';ol.classList.toggle('tablo',S.gor==='tablo');basCiz();
  $('gor').querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.g===S.gor)});
@@ -796,7 +817,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=b748fbd4e6').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=ee1b8f4afc').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
