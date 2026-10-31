@@ -3,7 +3,7 @@
 <meta name="format-detection" content="telephone=no">
 <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-<meta name="description" content="İstanbul · Anadolu Yakası kiralık daire ilanları: süzgeçle, puana göre sırala.">
+<meta name="description" content="İstanbul kiralık daire ilanları: süzgeçle, puana göre sırala.">
 <title>Kiralık Evler</title><style>
 :root{color-scheme:light dark;--zemin:#f5f5f7;--yuzey:#fff;--ink:#1d1d1f;--ink2:#48484d;--ink3:#6a6a70;
 --cizgi:#c9c9cf;--acc:#1f6f4a;--acc-yazi:#fff;--link:#0b57a4;--uyari:#9a3b0c;--bar:#1f6f4a;--bar-zemin:#e3e3e8;
@@ -316,7 +316,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 
 <main id="sonuclar">
 <div class="ust-blok">
-<div class="bas-satir"><h1>Kiralık evler</h1><p class="alt-bas">İstanbul · Anadolu Yakası · <span id="say" role="status" aria-live="polite">İlanlar yükleniyor…</span></p></div>
+<div class="bas-satir"><h1>Kiralık evler</h1><p class="alt-bas">İstanbul · <span id="say" role="status" aria-live="polite">İlanlar yükleniyor…</span></p></div>
 <div class="arac">
 <button type="button" class="d" id="ac" aria-controls="panel" aria-expanded="false">Süzgeçler <span class="sayi" id="acsayi" hidden></span></button>
 <label><span class="sr">Sıralama</span><select id="sira"><option value="puan">Uygunluğa göre</option><option value="ucuz">Kirası düşük</option>
@@ -366,7 +366,7 @@ var F={no:0,bas:1,link:2,foto:3,fiyat:4,net:5,brut:6,oda:7,ilce:8,mah:9,kat:10,k
 // km; Bogaz'in obur yakasina KOPRU km eklenir.
 // Konum puani: KONUM_TAM km'ye kadar 100, sonra her KONUM_OLCEK km'de ~e kati azalir (5 km 65, 10 km 32, 20 km 8).
 // Puanlamada 7. surgu ("konum"); hedef secilmemisse hesaba girmez.
-var YAKA="İstanbul · Anadolu Yakası";
+var YAKA="İstanbul";
 var ANADOLU=['Adalar','Ataşehir','Beykoz','Çekmeköy','Kadıköy','Kartal','Maltepe','Pendik','Sancaktepe','Sultanbeyli','Şile','Tuzla','Ümraniye','Üsküdar'];
 var KOPRU=5,KONUM_TAM=2,KONUM_OLCEK=7;
 function konumPuan(km){return km<=KONUM_TAM?100:100*Math.exp(-(km-KONUM_TAM)/KONUM_OLCEK)}
@@ -818,7 +818,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=362857b76e').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=58b605ed7d').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
