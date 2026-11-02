@@ -718,24 +718,31 @@ function pdfHazirla(){if(!D||!PUANLA||!SEC.length)return;yolYukle();
 var pdfZam;function pdfSonra(){clearTimeout(pdfZam);pdfZam=setTimeout(pdfHazirla,300)}
 // --- PDF'te ilan basina kucuk harita + en yakin metro / otobus duragina yurume (2026-11-02, kullanici istegi) ---
 // Rotalar ulasim/ilan_yol.json'dan (OSM yol agi), ilan_no % YOL_PARCA parcalara bolunmus; yalniz secilen ilanlarin
-// parcasi indirilir, gelince PDF yeniden hazirlanir. Kayit: m=[istasyon, hat(lar), metre, rota], d=[durak, metre, rota];
-// rota 1e-5 derece tamsayi farklari, ilk fark ilanin koordinatina gore. Rota 3 km'den uzunsa bos (yalniz yazi).
-var YOL_SURUM='864b7ad6aa',YOL_PARCA=64,YOL={},YOLP={},YURU_HIZ=80;
+// parcasi indirilir, gelince PDF yeniden hazirlanir. Kayit {kod: [ad, hat, metre, rota]}: o=otobus (her ilanda),
+// m=metro r=Marmaray t=tramvay b=metrobus (3 km icindeyse, rota cizilir), v=vapur f=funikuler (yalniz yazi);
+// rota 1e-5 derece tamsayi farklari, ilk fark ilanin koordinatina gore (2026-11-02 kullanici karari).
+var YOL_SURUM='0860a597fc',YOL_PARCA=64,YOL={},YOLP={},YURU_HIZ=80;
 function yolYukle(){if(!YOL_SURUM)return;var bek=0;
  SEC.forEach(function(no){var p=('0'+(+no%YOL_PARCA)).slice(-2);if(YOLP[p])return;YOLP[p]=1;bek++;
   fetch('yol/'+p+'.json?v='+YOL_SURUM).then(function(r){if(!r.ok)throw 0;return r.json()})
    .then(function(v){for(var k in v)YOL[k]=v[k]}).catch(function(){}).then(function(){if(!--bek)pdfHazirla()})})}
 function rotaCoz(rota,la,lo){var a=Math.round(la*1e5),b=Math.round(lo*1e5),o=[[la,lo]];
  for(var i=0;i<rota.length;i+=2){a+=rota[i];b+=rota[i+1];o.push([a/1e5,b/1e5])}return o}
-function hatKisa(h){return(h||'').split(' | ').map(function(x){return x.indexOf('Marmaray')===0?'Marmaray':x.split(' ')[0]}).join(', ')}
+// haritadaki renklerle ayni (TT_RENK); sira = PDF'teki satir sirasi
+var TT_TUR=[['o','Otobüs durağı','otobus'],['m','Metro','metro'],['r','Marmaray','marmaray'],['t','Tramvay','tram'],
+ ['b','Metrobüs','mb'],['v','Vapur','vapur'],['f','Füniküler','fun']];
+function mesafe(m){return m<1000?tl(Math.round(m/10)*10)+' m':(m/1000).toFixed(1).replace('.',',')+' km'}
 function dkYaz(m){return Math.max(1,Math.round(m/YURU_HIZ))+' dk'}
 // Web Merkator piksel (zoom z, 256 px karo)
 function mpx(la,lo,z){var n=256*Math.pow(2,z),s=Math.sin(la*Math.PI/180);
  return[(lo+180)/360*n,(.5-Math.log((1+s)/(1-s))/(4*Math.PI))*n]}
-function miniHarita(r,y){var la=r[F.lat],lo=r[F.lon],W=260,H=165,PAY=22;
- var m=y.m&&y.m[3].length?rotaCoz(y.m[3],la,lo):null,d=y.d&&y.d[2].length?rotaCoz(y.d[2],la,lo):null;
- if(!m&&!d)return'';
- var tum=[[la,lo]].concat(m||[],d||[]),z=16,kx,ky,x0,y0;
+function miniHarita(r,y){var la=r[F.lat],lo=r[F.lon],W=260,H=165,PAY=22,RN=RENK;
+ // cizilecek rotalar; ayni duraga giden ikinci rota (metro + Marmaray ayni istasyon) tekrar cizilmez
+ var rotalar=[],son={};
+ TT_TUR.forEach(function(t){var k=y[t[0]];if(!k||!k[3].length)return;var ps=rotaCoz(k[3],la,lo),e=ps[ps.length-1],a=e[0].toFixed(4)+','+e[1].toFixed(4);
+  if(son[a])return;son[a]=1;rotalar.push([ps,RN[t[2]]])});
+ if(!rotalar.length)return'';
+ var tum=[[la,lo]],z=16,x0,y0;rotalar.forEach(function(x){tum=tum.concat(x[0])});
  for(;z>=11;z--){var ps=tum.map(function(p){return mpx(p[0],p[1],z)}),xs=ps.map(function(p){return p[0]}),ys=ps.map(function(p){return p[1]});
   var mnx=Math.min.apply(0,xs),mxx=Math.max.apply(0,xs),mny=Math.min.apply(0,ys),mxy=Math.max.apply(0,ys);
   if(mxx-mnx<=W-2*PAY&&mxy-mny<=H-2*PAY||z===11){x0=(mnx+mxx)/2-W/2;y0=(mny+mxy)/2-H/2;break}}
@@ -747,17 +754,19 @@ function miniHarita(r,y){var la=r[F.lat],lo=r[F.lon],W=260,H=165,PAY=22;
  var cizgi=function(ps,renk){return'<polyline points="'+ps.map(xy).join(' ')+'" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round" opacity=".8"/>'
   +'<polyline points="'+ps.map(xy).join(' ')+'" fill="none" stroke="'+renk+'" stroke-width="2.2" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>'};
  var nokta=function(p,renk,rr){var q=xy(p).split(',');return'<circle cx="'+q[0]+'" cy="'+q[1]+'" r="'+rr+'" fill="'+renk+'" stroke="#fff" stroke-width="1.5"/>'};
- h+='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'+(d?cizgi(d,'#b7791f'):'')+(m?cizgi(m,'#7e22ce'):'')
-  +(d?nokta(d[d.length-1],'#d69e2e',4.5):'')+(m?nokta(m[m.length-1],'#7e22ce',5):'')+nokta([la,lo],'#2f6fd6',6)+'</svg></div>';
+ // uzun rotalar once (alta), kisalar uste; duraklar en ustte, ev en son
+ rotalar.sort(function(a,b){return b[0].length-a[0].length});
+ h+='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'+rotalar.map(function(x){return cizgi(x[0],x[1])}).join('')
+  +rotalar.map(function(x){return nokta(x[0][x[0].length-1],x[1],4.5)}).join('')+nokta([la,lo],'#2f6fd6',6)+'</svg></div>';
  return h}
 function pdfUlasim(r){var y=YOL[r[F.no]];if(!y)return'';
- var s=[];
- if(y.m)s.push('<p><i class="p-ren" style="background:#7e22ce"></i>Metro: <b>'+esc(y.m[0])+'</b>'+(y.m[1]?' ('+esc(hatKisa(y.m[1]))+')':'')
-  +' · '+tl(y.m[2])+' m, ~'+dkYaz(y.m[2])+' yürüme</p>');
- else s.push('<p><i class="p-ren" style="background:#7e22ce"></i>Metro: 15 km içinde yürüme yolu yok</p>');
- if(y.d)s.push('<p><i class="p-ren" style="background:#d69e2e"></i>Otobüs durağı: <b>'+esc(y.d[0]||'adsız')+'</b> · '+tl(y.d[1])+' m, ~'+dkYaz(y.d[1])+' yürüme</p>');
+ var s=[],rayli=false;
+ TT_TUR.forEach(function(t){var k=y[t[0]];if(!k)return;if('mrtb'.indexOf(t[0])>=0)rayli=true;
+  s.push('<p><i class="p-ren" style="background:'+RENK[t[2]]+'"></i>'+t[1]+': <b>'+esc(k[0]||'adsız')+'</b>'+(k[1]?' ('+esc(k[1])+')':'')
+   +' — '+mesafe(k[2])+' ('+dkYaz(k[2])+')</p>')});
+ if(!rayli)s.push('<p class="p-ay">3 km içinde metro, Marmaray, tramvay ya da metrobüs yok</p>');
  return'<div class="p-ulas">'+(r[F.lat]!=null?miniHarita(r,y):'')+'<div class="p-ulas-yazi">'+s.join('')
-  +'<p class="p-ay">Kesikli çizgi: evden yürüme yolu (OSM yol ağı; ana yoldan karşıya yalnız üst/alt geçitten)</p></div></div>'}
+  +'<p class="p-ay">Yürüme mesafesi; kesikli çizgi evden yürüme yolu (ana yoldan karşıya yalnız üst/alt geçitten). Vapur ve füniküler çizilmez.</p></div></div>'}
 function pdf(){
  if(AYRI_UYG){window.open(urlYap()+'&sec='+SEC.join(',')+'&pdf=1','_blank');return}
  pdfHazirla();var eski=document.title;document.title='Kiralık ilanlar '+$('guncel').textContent;window.print();
@@ -800,8 +809,12 @@ var EH_HUCRE=34,EH_TUM=17;
 // Duraklar (2026-11-02): ilanlarla ayni tuvalde (EHR) ve ilanlardan ONCE cizilir -> ust uste gelince dokunus ilana gider,
 // bos yerdeki duraga dokununca adi yazar. Metro/Marmaray istasyonlari ilanlar gibi seyreltilir (uzaktan az, yaklastikca cok);
 // otobus duraklari DURAK_ZOOM ve ustunde, yalniz ekrandakiler. Metro hatti cok ince soluk cizgi (dokunulmaz).
-var KATMAN_DOSYA='harita-katman.json?v=6494e95150',KD=null,KDY=0,EHYOL=null,EHTT=null,EHIS=null,DURAK_ZOOM=14,IST_HUCRE=40;
-var RENK={e5:'#1d4ed8',tem:'#15803d',kmo:'#15803d',metro:'#7e22ce',otobus:'#eab308'},RENK_K={e5:'#60a5fa',tem:'#4ade80',kmo:'#4ade80',metro:'#c084fc',otobus:'#facc15'};
+var KATMAN_DOSYA='harita-katman.json?v=e7fb60074c',KD=null,KDY=0,EHYOL=null,EHTT=null,EHIS=null,DURAK_ZOOM=14,IST_HUCRE=40;
+// toplu tasima renkleri ture gore (2026-11-02 kullanici): metro mor, Marmaray kirmizi, tramvay turkuaz, metrobus
+// kahverengi, vapur lacivert, funikuler gri, otobus sari (turuncu Ayvaz Rota, mavi ilan, yesil otoyol icin ayrildi)
+var RENK={e5:'#1d4ed8',tem:'#15803d',kmo:'#15803d',metro:'#7e22ce',marmaray:'#dc2626',tram:'#0d9488',mb:'#92400e',vapur:'#1e3a8a',fun:'#6b7280',otobus:'#d69e2e'},
+ RENK_K={e5:'#60a5fa',tem:'#4ade80',kmo:'#4ade80',metro:'#c084fc',marmaray:'#f87171',tram:'#2dd4bf',mb:'#d6a06b',vapur:'#93c5fd',fun:'#9ca3af',otobus:'#facc15'},
+ IST_TUR={Metro:'metro',Marmaray:'marmaray',Tramvay:'tram','Füniküler':'fun'};
 var AYVAZ=[[41.00441,29.07300],[41.00465,29.07260],[41.00485,29.07255],[41.00543,29.07265],[41.00646,29.07295],[41.00624,29.07348],[41.00614,29.07359],[41.00603,29.07359],[41.00599,29.07332],[41.00585,29.07021],[41.00608,29.07015],[41.00634,29.07020],[41.00651,29.06895],[41.00670,29.06830],[41.00721,29.06693],[41.00742,29.06657],[41.00761,29.06636],[41.00831,29.06584],[41.00837,29.06557],[41.00841,29.06500],[41.00851,29.06459],[41.00871,29.06406],[41.00899,29.06368],[41.00942,29.06340],[41.01042,29.06337],[41.01146,29.06302],[41.01277,29.06209],[41.01288,29.06191],[41.01310,29.06114],[41.01323,29.06094],[41.01386,29.06048],[41.01479,29.06002],[41.01524,29.05961],[41.01563,29.05883],[41.01594,29.05837],[41.01676,29.05722],[41.01841,29.05510],[41.01857,29.05452],[41.01864,29.05439],[41.01873,29.05393],[41.01914,29.05297],[41.01920,29.05265],[41.01971,29.05135],[41.01973,29.05102],[41.01954,29.04988],[41.01990,29.04872],[41.02022,29.04792],[41.02041,29.04728],[41.02069,29.04582],[41.02181,29.04615],[41.02199,29.04612],[41.02224,29.04593],[41.02268,29.04516],[41.02301,29.04444],[41.02314,29.04399],[41.02338,29.04266],[41.02355,29.04028],[41.02370,29.04037],[41.02461,29.04136],[41.02471,29.04184],[41.02500,29.04232],[41.02537,29.04318],[41.02596,29.04406],[41.02615,29.04414],[41.02624,29.04410],[41.02669,29.04260],[41.02856,29.04048],[41.02882,29.04035],[41.03066,29.03999],[41.03209,29.03975],[41.03247,29.03974],[41.03276,29.03987],[41.03301,29.04015],[41.03312,29.04058],[41.03310,29.04083],[41.03303,29.04104],[41.03280,29.04137],[41.03215,29.04164],[41.03197,29.04181],[41.03187,29.04210],[41.03185,29.04250],[41.03198,29.04279],[41.03213,29.04291],[41.03244,29.04297],[41.03331,29.04224],[41.03354,29.04213],[41.03413,29.04207],[41.03484,29.04236],[41.03523,29.04260],[41.03573,29.04299],[41.03686,29.04411],[41.03704,29.04425],[41.03744,29.04435],[41.03755,29.04433],[41.03763,29.04415],[41.03761,29.04402],[41.03738,29.04362],[41.03735,29.04343],[41.03737,29.04325],[41.03748,29.04303],[41.03890,29.04151],[41.03926,29.04100],[41.03961,29.04061],[41.04181,29.03835]],EHC=null;
 function leafletYukle(f){if(window.L)return f();if(EHY){EHY.push(f);return}EHY=[f];
  var c=document.createElement('link');c.rel='stylesheet';c.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';document.head.appendChild(c);
@@ -835,7 +848,7 @@ function haritaCiz(){leafletYukle(function(){
     +'<label><input type="checkbox" id="ilankutu"><span>İlanlar</span>'+sw(koyu()?'#9ec5ff':'#2f6fd6',1)+'</label>'
     +'<label><input type="checkbox" id="rotakutu"><span>Ayvaz Rota</span>'+sw(koyu()?'#ff9b3d':'#e8730c')+'</label>'
     +(KATMAN_DOSYA?'<label><input type="checkbox" id="yolkutu"><span>Yollar</span>'+sw(r.e5)+sw(r.tem)+'</label>'
-    +'<label><input type="checkbox" id="ttkutu"><span>Toplu taşıma</span>'+sw(r.metro,1)+sw(r.otobus,1)+'</label>':'')
+    +'<label><input type="checkbox" id="ttkutu"><span>Toplu taşıma</span>'+['metro','marmaray','tram','mb','otobus'].map(function(k){return sw(r[k],1)}).join('')+'</label>':'')
     +(SINIR_DOSYA?'<label><input type="checkbox" id="sinirkutu"><span>Sınırlar</span>'+sw(koyu()?'#8e8e93':'#8e8e93')+'</label>':'')
     +'<label><input type="checkbox" id="detaykutu"><span>Detaylı harita</span></label></div>';
    var ic=d.querySelector('#katic'),dg=d.querySelector('#katdug'),ac=function(v){ic.hidden=!v;dg.setAttribute('aria-expanded',v)};
@@ -882,6 +895,7 @@ function katmanCiz(){if(!KATMAN_DOSYA||!EH)return;var y=$('yolkutu'),t=$('ttkutu
  if(EHYOL){if(S.yol)EHYOL.addTo(EH);else EH.removeLayer(EHYOL)}
  if(S.toplu&&!EHTT){var rt=L.canvas({pane:'toplu'});EHTT=L.layerGroup();
   (KD.metro||[]).forEach(function(c){L.polyline(c,{renderer:rt,color:r.metro,interactive:false}).addTo(EHTT)});
+  (KD.marmaray||[]).forEach(function(c){L.polyline(c,{renderer:rt,color:r.marmaray,interactive:false}).addTo(EHTT)});
   hatStil();EH.on('zoomend',hatStil)}
  if(EHTT){if(S.toplu)EHTT.addTo(EH);else EH.removeLayer(EHTT)}
  noktaYenile()}
@@ -898,12 +912,16 @@ function durakCiz(b){if(!EHIS)EHIS=L.layerGroup().addTo(EH);EHIS.clearLayers();i
   L.circleMarker([p[0],p[1]],{renderer:EHR,radius:z<16?2:2.5,weight:.6,opacity:z<16?.4:.55,color:koyu()?'#000':'#6b5400',
    fillColor:r.otobus,fillOpacity:z<16?.4:.55})
    .bindPopup('<b>'+esc(p[2]||'Adsız durak')+'</b><br>Otobüs durağı',ac).addTo(EHIS)});
- KD.ist.forEach(function(p){if(!b.contains([p[0],p[1]]))return;
+ // raylilar / metrobus / vapur: ture gore renk, ilanlar gibi seyreltilir (uzaktan az); cizim sirasi = ustluk
+ var ekle=function(p,renk,yazi){if(!b.contains([p[0],p[1]]))return;
   if(z<EH_TUM-3){var q=EH.latLngToContainerPoint([p[0],p[1]]),k=Math.floor(q.x/IST_HUCRE)+'_'+Math.floor(q.y/IST_HUCRE);if(dolu[k])return;dolu[k]=1}
-  var st=istStil(z);st.renderer=EHR;st.color=koyu()?'#000':'#fff';st.fillColor=r.metro;
-  // p[4]: istasyondan gecen hatlar (or. 'M4 Kadikoy - Sabiha Gokcen', 'Marmaray'); eski dosyada yoksa yalniz tur
-  L.circleMarker([p[0],p[1]],st)
-   .bindPopup('<b>'+esc(p[2])+'</b><br>'+(p[4]&&p[4].length?p[4].map(esc).join('<br>'):(p[3]==='Marmaray'?'Marmaray':'Metro')+' istasyonu'),ac).addTo(EHIS)})}
+  var st=istStil(z);st.renderer=EHR;st.color=koyu()?'#000':'#fff';st.fillColor=renk;
+  L.circleMarker([p[0],p[1]],st).bindPopup('<b>'+esc(p[2]||'Adsız')+'</b><br>'+yazi,ac).addTo(EHIS)};
+ // p[4]: istasyondan gecen hatlar (or. 'M4 Kadikoy - Sabiha Gokcen', 'Marmaray (Halkali - Gebze)')
+ KD.ist.forEach(function(p){ekle(p,r[IST_TUR[p[3]]||'metro'],p[4]&&p[4].length?p[4].map(esc).join('<br>'):esc(p[3])+' istasyonu')});
+ (KD.mb||[]).forEach(function(p){ekle(p,r.mb,'Metrobüs durağı')});
+ (KD.tram||[]).forEach(function(p){ekle(p,r.tram,'Tramvay durağı')});
+ (KD.vapur||[]).forEach(function(p){ekle(p,r.vapur,'Vapur iskelesi')})}
 // --- ilce / mahalle "Haritadan sec" ve listede uzerine gelince haritada gosterme (2026-11-02, kullanici istegi) ---
 // Sinirlar (bolge/harita_sinir.json) ilk gerektiginde yuklenir. Secim modunda ilan noktalari soluk ve dokunulmaz
 // (tuvalin isaretci olaylari kapanir), sinirlar dokunulabilir; normal modda yalniz secili bolgelerin sinir cizgisi.
