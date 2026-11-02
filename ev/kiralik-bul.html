@@ -332,6 +332,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <p class="mah-not">Kat seçilince katı yazmayan ilanlar gizlenir.</p></div></details>
 <details class="bolum" name="suz"><summary id="b_oz">Ev özellikleri<span class="deger" id="d_oz"></span></summary>
 <div class="bolum-ic"><div class="cipler" id="ozellik" role="group" aria-labelledby="b_oz"></div>
+<p class="mah-not">Sahibinden: yalnız ev sahibinin kendi verdiği ilanlar (emlakçı ilanları gizlenir). Avrupa Yakası'nda bu bilgi henüz toplanıyor.</p>
 <label class="tek"><input type="checkbox" id="gizle">Günlük, oda, öğrenci, apart ilanlarını gizle</label></div></details>
 <details class="bolum" name="suz"><summary id="b_ilce">İlçe<span class="deger" id="d_ilce"></span></summary>
 <div class="bolum-ic"><button type="button" class="metin secdug" data-sec="ilce" hidden>Haritadan seç</button><div class="cipler kutu-liste" id="ilceler" role="group" aria-labelledby="b_ilce"></div></div></details>
@@ -409,7 +410,7 @@ Sağ üstteki yüzde (beklenen kiraya göre) puana girmez.</p>
 var AG=[["kat", 18, "Kat"], ["yas", 17, "Bina yeniliği"], ["fiyat", 15, "Kira"], ["konum", 14, "Hedef konum"], ["site", 13, "Site içinde"], ["bolge", 12, "Bölge"], ["m2", 11, "Net m²"]],YAS_TAVAN=35,YAS_EGRI=[[0, 100], [3, 92], [8, 78], [13, 64], [18, 46], [23, 24], [28, 10], [35, 0]],BIL=50,VERI_GUN=new Date('2026-11-02'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
 var F={no:0,bas:1,link:2,foto:3,fiyat:4,net:5,brut:6,oda:7,ilce:8,mah:9,kat:10,katS:11,katP:12,katN:13,yas:14,bolge:15,
  ses:16,site:17,asan:18,otop:19,isit:20,balk:21,yeni:22,eski:23,es:24,suph:25,tarih:26,kiraP:27,m2P:28,
- bek:29,bekA:30,bekU:31,bekB:32,kn:33,lat:34,lon:35};
+ bek:29,bekA:30,bekU:31,bekB:32,kn:33,lat:34,lon:35,kim:36};
 // hedef konum: evin gercek konumu (F.lat/F.lon, harita aramasi; yoksa mahalle noktasi D.kn) ile hedef arasi kus ucusu
 // km; Bogaz'in obur yakasina KOPRU km eklenir.
 // Konum puani: KONUM_TAM km'ye kadar 100, sonra her KONUM_OLCEK km'de ~e kati azalir (5 km 65, 10 km 32, 20 km 8).
@@ -442,11 +443,13 @@ function yasPuan(y){if(y===null)return null;for(var i=1;i<YAS_EGRI.length;i++){v
 // "apart" tek kelime olarak (aile apartmani gizlenmez); "ogrenci" yalniz oda/ev/yurt ile ("ogrenciye uygun 3+1" gizlenmez)
 var GIZLE=/günlük|gunluk|haftalık|paylaşımlı|oda kiralık|kiralık oda|öğrenciye oda|öğrenci evi|öğrenci yurdu|ev arkadaşı|(^|[^a-zçğıöşü])apart([^a-zçğıöşü]|$)|apart daire|yurt/;
 // olmazsa olmazlar (dugme) + gizle (onay kutusu)
-var OZ=[['asansor','Asansör'],['otopark','Otopark'],['site','Site içi'],['balkon','Balkon'],['uygunkat','Ara kat']];
+// sahibi (2026-11-02 kullanici): yalniz ev sahibinin verdigi ilanlar (sahibinden.com "Kimden: Sahibinden"); bilgisi
+// olmayan ilan gizlenir (Avrupa yakasinda alan henuz toplaniyor)
+var OZ=[['asansor','Asansör'],['otopark','Otopark'],['site','Site içi'],['balkon','Balkon'],['uygunkat','Ara kat'],['sahibi','Sahibinden']];
 var KUTU=OZ.map(function(o){return o[0]}).concat(['gizle']),ALAN=['min','max','m2','yas','km','kx','bm','bx','pm','ara','sira','hi','hm','hu'];
 var ODALAR=['Stüdyo','1+1','2+1','3+1','4+'];
 // kat suzgeci (2026-11-02): km/kx = bulundugu kat en az/en cok, bm/bx = binanin kat sayisi en az/en cok
-var BOS={min:'',max:'',m2:'',yas:'',km:'',kx:'',bm:'',bx:'',pm:'',oda:[],ilce:[],mah:[],ara:'',asansor:false,otopark:false,site:false,balkon:false,
+var BOS={min:'',max:'',m2:'',yas:'',km:'',kx:'',bm:'',bx:'',pm:'',oda:[],ilce:[],mah:[],ara:'',asansor:false,otopark:false,site:false,balkon:false,sahibi:false,
  uygunkat:false,gizle:true,rota:false,yol:false,toplu:false,sinir:false,detay:false,ilanlar:true,sira:'puan',w:{},yalnizSecili:false,hi:'',hm:'',hu:'',gor:'kart',ters:false};
 AG.forEach(function(a){BOS.w[a[0]]=a[1]});
 function kopya(o){return JSON.parse(JSON.stringify(o))}
@@ -510,6 +513,7 @@ function suz(r,yerHaric){
   if(S.mah.length&&S.mah.indexOf(D.ilce[r[F.ilce]]+'|'+D.mah[r[F.mah]])<0)return false}
  if(S.asansor&&r[F.asan]!==1)return false;if(S.site&&r[F.site]!==1)return false;
  if(S.balkon&&r[F.balk]!==1)return false;if(S.uygunkat&&r[F.katN]!==0)return false;
+ if(S.sahibi&&r[F.kim]!==1)return false;
  if(S.otopark&&!/Otopark/.test(D.otopark[r[F.otop]]))return false;
  var b=kucuk(r[F.bas]);
  if(S.gizle&&GIZLE.test(b))return false;
@@ -558,7 +562,7 @@ function bilgi(r){
  var ks=function(s){return s.replace(/ ve üzeri/,'+')};
  var kat=r[F.kat]?(/^\d/.test(r[F.kat])?ks(r[F.kat])+'. kat':r[F.kat])+(r[F.katS]?' / '+ks(r[F.katS])+' katlı':''):'';
  var yas=r[F.yas]===null?'':(r[F.yas]===0?'sıfır bina':(r[F.yas]>=YAS_TAVAN?'31+ yaşında':'~'+r[F.yas]+' yaşında'));
- var oz=[];if(r[F.site]===1)oz.push('site içinde');if(r[F.asan]===1)oz.push('asansörlü');else if(r[F.asan]===0)oz.push('asansörsüz');
+ var oz=[];if(r[F.kim]===1)oz.push('sahibinden');if(r[F.site]===1)oz.push('site içinde');if(r[F.asan]===1)oz.push('asansörlü');else if(r[F.asan]===0)oz.push('asansörsüz');
  var ot=D.otopark[r[F.otop]];if(ot&&ot!=='Yok')oz.push(kucuk(ot));if(D.isitma[r[F.isit]])oz.push(kucuk(D.isitma[r[F.isit]]));
  if(r[F.balk]===1)oz.push('balkonlu');
  var gun=r[F.tarih]?Math.max(0,Math.round((VERI_GUN-new Date(r[F.tarih]))/864e5)):null;
@@ -1119,7 +1123,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=48dc471c1a').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=b7119535ac').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
