@@ -442,7 +442,7 @@ var KUTU=OZ.map(function(o){return o[0]}).concat(['gizle']),ALAN=['min','max','m
 var ODALAR=['Stüdyo','1+1','2+1','3+1','4+'];
 // kat suzgeci (2026-11-02): km/kx = bulundugu kat en az/en cok, bm/bx = binanin kat sayisi en az/en cok
 var BOS={min:'',max:'',m2:'',yas:'',km:'',kx:'',bm:'',bx:'',pm:'',oda:[],ilce:[],mah:[],ara:'',asansor:false,otopark:false,site:false,balkon:false,
- uygunkat:false,gizle:true,rota:false,yol:false,toplu:false,sinir:false,sade:false,sira:'puan',w:{},yalnizSecili:false,hi:'',hm:'',hu:'',gor:'kart',ters:false};
+ uygunkat:false,gizle:true,rota:false,yol:false,toplu:false,sinir:false,detay:false,sira:'puan',w:{},yalnizSecili:false,hi:'',hm:'',hu:'',gor:'kart',ters:false};
 AG.forEach(function(a){BOS.w[a[0]]=a[1]});
 function kopya(o){return JSON.parse(JSON.stringify(o))}
 var S=kopya(BOS),D=null,SON=[],GOSTER=20,$=function(id){return document.getElementById(id)};
@@ -454,10 +454,10 @@ function urlden(){var p=new URLSearchParams(location.search);if(!p.toString())re
  ['oda','ilce','mah'].forEach(function(k){if(p.get(k))s[k]=p.get(k).split(',')});
  if(p.has('f')){var f=p.get('f').split(',');KUTU.forEach(function(k){s[k]=f.indexOf(k)>=0})}
  if(p.get('w')){var w=p.get('w').split(',');AG.forEach(function(a,i){if(w[i])s.w[a[0]]=+w[i]})}
- s.ters=p.get('t')==='1';s.rota=p.get('r')==='1';s.yol=p.get('y')==='1';s.toplu=p.get('tt')==='1';s.sinir=p.get('sn')==='1';s.sade=p.get('sd')==='1';return s}
+ s.ters=p.get('t')==='1';s.rota=p.get('r')==='1';s.yol=p.get('y')==='1';s.toplu=p.get('tt')==='1';s.sinir=p.get('sn')==='1';s.detay=p.get('dt')==='1';return s}
 function urlYap(){var p=new URLSearchParams();
  ['min','max','m2','yas','km','kx','bm','bx','pm','ara'].forEach(function(k){if(S[k]!=='')p.set(k,S[k])});
- if(S.sira!=='puan')p.set('sira',S.sira);if(S.ters)p.set('t','1');if(S.rota)p.set('r','1');if(S.yol)p.set('y','1');if(S.toplu)p.set('tt','1');if(S.sinir)p.set('sn','1');if(S.sade)p.set('sd','1');
+ if(S.sira!=='puan')p.set('sira',S.sira);if(S.ters)p.set('t','1');if(S.rota)p.set('r','1');if(S.yol)p.set('y','1');if(S.toplu)p.set('tt','1');if(S.sinir)p.set('sn','1');if(S.detay)p.set('dt','1');
  if(S.hi){p.set('hi',S.hi);if(S.hm)p.set('hm',S.hm);if(S.hu!=='')p.set('hu',S.hu)}
  ['oda','ilce','mah'].forEach(function(k){if(S[k].length)p.set(k,S[k].join(','))});
  p.set('f',KUTU.filter(function(k){return S[k]}).join(','));
@@ -788,7 +788,7 @@ function haritaCiz(){leafletYukle(function(){
     +(KATMAN_DOSYA?'<label><input type="checkbox" id="yolkutu"><span>Yollar</span>'+sw(r.e5)+sw(r.tem)+'</label>'
     +'<label><input type="checkbox" id="ttkutu"><span>Toplu taşıma</span>'+sw(r.metro,1)+sw(r.otobus,1)+'</label>':'')
     +(SINIR_DOSYA?'<label><input type="checkbox" id="sinirkutu"><span>Sınırlar</span>'+sw(koyu()?'#8e8e93':'#8e8e93')+'</label>':'')
-    +'<label><input type="checkbox" id="sadekutu"><span>Sade harita</span></label></div>';
+    +'<label><input type="checkbox" id="detaykutu"><span>Detaylı harita</span></label></div>';
    var ic=d.querySelector('#katic'),dg=d.querySelector('#katdug'),ac=function(v){ic.hidden=!v;dg.setAttribute('aria-expanded',v)};
    ac(GENIS.matches);dg.addEventListener('click',function(){ac(ic.hidden)});
    // telefonda haritaya dokununca liste kapanir; acik katman sayisi dugmede yazar
@@ -799,7 +799,7 @@ function haritaCiz(){leafletYukle(function(){
    if(KATMAN_DOSYA){d.querySelector('#yolkutu').addEventListener('change',function(){S.yol=this.checked;kaydet();katmanCiz()});
     d.querySelector('#ttkutu').addEventListener('change',function(){S.toplu=this.checked;kaydet();katmanCiz()})}
    if(SINIR_DOSYA)d.querySelector('#sinirkutu').addEventListener('change',function(){S.sinir=this.checked;kaydet();sinirAg()});
-   d.querySelector('#sadekutu').addEventListener('change',function(){S.sade=this.checked;kaydet();altlik()});
+   d.querySelector('#detaykutu').addEventListener('change',function(){S.detay=this.checked;kaydet();altlik()});
    return d}});
   new Kat({position:'topright'}).addTo(EH)}
  altlik();rotaCiz(false);katmanCiz();sinirAg();katSay();
@@ -813,7 +813,7 @@ function haritaCiz(){leafletYukle(function(){
   var u=la.length>50?[.01,.99]:[0,1];
   EH.fitBounds([[q(la,u[0]),q(lo,u[0])],[q(la,u[1]),q(lo,u[1])]],{padding:[24,24],maxZoom:16})}
  noktaYenile();sinirCiz()})}
-function katSay(){var n=['rota','yol','toplu','sinir','sade'].filter(function(k){return S[k]}).length,s=$('katsay');
+function katSay(){var n=['rota','yol','toplu','sinir','detay'].filter(function(k){return S[k]}).length,s=$('katsay');
  if(s){s.textContent=n;s.hidden=!n}}
 function rotaCiz(sigdir){var k=$('rotakutu');if(k)k.checked=S.rota;
  if(!S.rota){if(EHC){EH.removeLayer(EHC);EHC=null}return}
@@ -847,8 +847,8 @@ function durakCiz(b){if(!EHIS)EHIS=L.layerGroup().addTo(EH);EHIS.clearLayers();i
 // (tuvalin isaretci olaylari kapanir), sinirlar dokunulabilir; normal modda yalniz secili bolgelerin sinir cizgisi.
 // Sinir adlari ilan verisindeki yazima anah() ile eslenir (mahalle_konum.anahtar ile ayni kural).
 var SINIR_DOSYA='harita-sinir.json?v=1c0c3a49e9',SN=null,SNY=0,SECMOD=null,EHS=null,EHH=null,EHT=null,EHT2=null,EHBI=null,EHBM=null,MAH_AG_ZOOM=12;
-// altlik: normal (OSM, soluk gri) ya da sade (Esri gri, yazisiz)
-function altlik(){var k=$('sadekutu');if(k)k.checked=S.sade;var a=S.sade?EHT2:EHT,b=S.sade?EHT:EHT2;EH.removeLayer(b);if(!EH.hasLayer(a))a.addTo(EH)}
+// altlik: varsayilan sade (Esri gri, yazisiz; 2026-11-02 kullanici: 'harita zaten sade baslasin'), 'Detayli harita' = OSM (sokak adlari)
+function altlik(){var k=$('detaykutu');if(k)k.checked=S.detay;var a=S.detay?EHT:EHT2,b=S.detay?EHT2:EHT;EH.removeLayer(b);if(!EH.hasLayer(a))a.addTo(EH)}
 // 'Sinirlar' (2026-11-02, kullanici: cok ince silik ilce, daha ince mahalle cizgisi, karisiklik yaratmasin):
 // ilce her olcekte; mahalle MAH_AG_ZOOM ve ustunde. Tuval, ilanlarin ve yollarin altinda, dokunulmaz.
 function sinirAg(){if(!EH||!SINIR_DOSYA)return;var k=$('sinirkutu');if(k)k.checked=S.sinir;
@@ -1001,7 +1001,7 @@ function kur(){
  $('mahliste').onclick=function(e){var b=e.target.closest('button');if(!b)return;var k=b.dataset.v,i=S.mah.indexOf(k);
   if(i>=0)S.mah.splice(i,1);else S.mah.push(k);kaydet();arayuzYaz();ciz()};
  $('agsifir').onclick=function(){AG.forEach(function(a){S.w[a[0]]=a[1]});kaydet();agCiz();ciz()};
- $('temizle').onclick=function(){var w=S.w,sr=S.sira,h=[S.hi,S.hm,S.gor,S.ters,S.rota,S.yol,S.toplu,S.sinir,S.sade];S=kopya(BOS);S.w=w;S.sira=sr;S.hi=h[0];S.hm=h[1];S.gor=h[2];S.ters=h[3];S.rota=h[4];S.yol=h[5];S.toplu=h[6];S.sinir=h[7];S.sade=h[8];kaydet();arayuzYaz();ciz()};
+ $('temizle').onclick=function(){var w=S.w,sr=S.sira,h=[S.hi,S.hm,S.gor,S.ters,S.rota,S.yol,S.toplu,S.sinir,S.detay];S=kopya(BOS);S.w=w;S.sira=sr;S.hi=h[0];S.hm=h[1];S.gor=h[2];S.ters=h[3];S.rota=h[4];S.yol=h[5];S.toplu=h[6];S.sinir=h[7];S.detay=h[8];kaydet();arayuzYaz();ciz()};
  $('daha').onclick=function(){var ilk=GOSTER;GOSTER+=adim();liste();var li=$('liste').children[ilk];if(li){var a=li.querySelector('h2 a,.tsat');if(a)a.focus()}};
  $('gor').onclick=function(e){var b=e.target.closest('button');if(!b||b.dataset.g===S.gor)return;S.gor=b.dataset.g;GOSTER=adim();kaydet();liste()};
  $('tbas').onclick=function(e){var b=e.target.closest('button');if(!b)return;var k=b.dataset.k;
@@ -1033,7 +1033,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=fe495ffbf5').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=3afc71a8c9').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
