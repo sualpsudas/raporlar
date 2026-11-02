@@ -734,10 +734,10 @@ var EH_HUCRE=34,EH_TUM=17;
 // Ayvaz servis rotasinin Anadolu yakasi (2026-11-02, kullanici istegi): Fetih -> Unalan -> Altunizade -> 15 Temmuz koprusu basi.
 // Kullanicinin Google Haritalar rotasindaki 7 isaretten OSM yol agiyla cikarildi (routing.openstreetmap.de), 3 m sadelestirme.
 // Servis bu cizgi boyunca alir (durak yok); haritadaki 'Ayvaz Rota' kutucuguyla gosterilir.
-// Yollar (E-5 mavi; TEM ve 3. otoban yesil) ve Toplu tasima (metro mor, otobus duragi sari) katmanlari (2026-11-02, kullanici istegi):
+// Yollar (E-5 mavi; TEM ve 3. otoban yesil) ve Toplu tasima (metro + Marmaray istasyonu mor, otobus duragi sari; hat cizgisi yok) katmanlari (2026-11-02, kullanici istegi):
 // iki yaka, OSM'den bolge/harita_katman.py ile uretilen sabit dosya; yalniz kutucuk ilk isaretlenince yuklenir. Otobus duraklari
 // (~15 bin) sehir olceginde kalabalik etmesin diye DURAK_ZOOM ve ustunde gorunur. Hepsi ilan noktalarinin altinda kalir.
-var KATMAN_DOSYA='harita-katman.json?v=a3d20f2f41',KD=null,KDY=0,EHYOL=null,EHTT=null,EHIS=null,EHOT=null,DURAK_ZOOM=14,IST_ZOOM=12;
+var KATMAN_DOSYA='harita-katman.json?v=f6ba8f9b1b',KD=null,KDY=0,EHYOL=null,EHTT=null,EHIS=null,EHOT=null,DURAK_ZOOM=14,IST_ZOOM=11;
 var RENK={e5:'#1d4ed8',tem:'#15803d',kmo:'#15803d',metro:'#7e22ce',otobus:'#eab308'},RENK_K={e5:'#60a5fa',tem:'#4ade80',kmo:'#4ade80',metro:'#c084fc',otobus:'#facc15'};
 var AYVAZ=[[41.00441,29.07300],[41.00465,29.07260],[41.00485,29.07255],[41.00543,29.07265],[41.00646,29.07295],[41.00624,29.07348],[41.00614,29.07359],[41.00603,29.07359],[41.00599,29.07332],[41.00585,29.07021],[41.00608,29.07015],[41.00634,29.07020],[41.00651,29.06895],[41.00670,29.06830],[41.00721,29.06693],[41.00742,29.06657],[41.00761,29.06636],[41.00831,29.06584],[41.00837,29.06557],[41.00841,29.06500],[41.00851,29.06459],[41.00871,29.06406],[41.00899,29.06368],[41.00942,29.06340],[41.01042,29.06337],[41.01146,29.06302],[41.01277,29.06209],[41.01288,29.06191],[41.01310,29.06114],[41.01323,29.06094],[41.01386,29.06048],[41.01479,29.06002],[41.01524,29.05961],[41.01563,29.05883],[41.01594,29.05837],[41.01676,29.05722],[41.01841,29.05510],[41.01857,29.05452],[41.01864,29.05439],[41.01873,29.05393],[41.01914,29.05297],[41.01920,29.05265],[41.01971,29.05135],[41.01973,29.05102],[41.01954,29.04988],[41.01990,29.04872],[41.02022,29.04792],[41.02041,29.04728],[41.02069,29.04582],[41.02181,29.04615],[41.02199,29.04612],[41.02224,29.04593],[41.02268,29.04516],[41.02301,29.04444],[41.02314,29.04399],[41.02338,29.04266],[41.02355,29.04028],[41.02370,29.04037],[41.02461,29.04136],[41.02471,29.04184],[41.02500,29.04232],[41.02537,29.04318],[41.02596,29.04406],[41.02615,29.04414],[41.02624,29.04410],[41.02669,29.04260],[41.02856,29.04048],[41.02882,29.04035],[41.03066,29.03999],[41.03209,29.03975],[41.03247,29.03974],[41.03276,29.03987],[41.03301,29.04015],[41.03312,29.04058],[41.03310,29.04083],[41.03303,29.04104],[41.03280,29.04137],[41.03215,29.04164],[41.03197,29.04181],[41.03187,29.04210],[41.03185,29.04250],[41.03198,29.04279],[41.03213,29.04291],[41.03244,29.04297],[41.03331,29.04224],[41.03354,29.04213],[41.03413,29.04207],[41.03484,29.04236],[41.03523,29.04260],[41.03573,29.04299],[41.03686,29.04411],[41.03704,29.04425],[41.03744,29.04435],[41.03755,29.04433],[41.03763,29.04415],[41.03761,29.04402],[41.03738,29.04362],[41.03735,29.04343],[41.03737,29.04325],[41.03748,29.04303],[41.03890,29.04151],[41.03926,29.04100],[41.03961,29.04061],[41.04181,29.03835]],EHC=null;
 function leafletYukle(f){if(window.L)return f();if(EHY){EHY.push(f);return}EHY=[f];
@@ -763,7 +763,7 @@ function haritaCiz(){leafletYukle(function(){
    sw=function(c,y){return'<i class="sw'+(y?' yu':'')+'" style="background:'+c+'"></i>'};
    d.innerHTML='<label><input type="checkbox" id="rotakutu"><span>Ayvaz Rota</span>'+sw(koyu()?'#ff9b3d':'#e8730c')+'</label>'
     +(KATMAN_DOSYA?'<label><input type="checkbox" id="yolkutu"><span>Yollar</span>'+sw(r.e5)+sw(r.tem)+'</label>'
-    +'<label><input type="checkbox" id="ttkutu"><span>Toplu taşıma</span>'+sw(r.metro)+sw(r.otobus,1)+'</label>':'');
+    +'<label><input type="checkbox" id="ttkutu"><span>Toplu taşıma</span>'+sw(r.metro,1)+sw(r.otobus,1)+'</label>':'');
    L.DomEvent.disableClickPropagation(d);L.DomEvent.disableScrollPropagation(d);
    d.querySelector('#rotakutu').addEventListener('change',function(){S.rota=this.checked;kaydet();rotaCiz(true)});
    if(KATMAN_DOSYA){d.querySelector('#yolkutu').addEventListener('change',function(){S.yol=this.checked;kaydet();katmanCiz()});
@@ -783,7 +783,7 @@ function haritaCiz(){leafletYukle(function(){
  noktaYenile()})}
 function rotaCiz(sigdir){var k=$('rotakutu');if(k)k.checked=S.rota;
  if(!S.rota){if(EHC){EH.removeLayer(EHC);EHC=null}return}
- if(!EHC)EHC=L.polyline(AYVAZ,{pane:'rota',color:koyu()?'#ff9b3d':'#e8730c',weight:6,opacity:.9,lineCap:'round',lineJoin:'round',interactive:false}).addTo(EH);
+ if(!EHC)EHC=L.polyline(AYVAZ,{pane:'rota',color:koyu()?'#ff9b3d':'#e8730c',weight:3.5,opacity:.95,lineCap:'round',lineJoin:'round',interactive:false}).addTo(EH);
  // harita acilis yakinlasmasi surerken cagrilirsa o bitince sigdir (yoksa acilis hareketi bunu ezer)
  if(sigdir){var g=function(){EH.fitBounds(EHC.getBounds(),{padding:[40,40],maxZoom:16})};if(EH._animatingZoom)EH.once('zoomend',g);else g()}}
 // katman dosyasi ilk gerektiginde bir kez yuklenir
@@ -792,10 +792,9 @@ function katmanCiz(){if(!KATMAN_DOSYA||!EH)return;var y=$('yolkutu'),t=$('ttkutu
    .then(function(v){KD=v;katmanCiz()}).catch(function(){KDY=0;if(EHN)EHN.textContent='Yollar / toplu taşıma yüklenemedi'})}return}
  var r=koyu()?RENK_K:RENK;
  if(S.yol&&!EHYOL){var ry=L.canvas({pane:'yol'});EHYOL=L.layerGroup();
-  ['tem','kmo','e5'].forEach(function(k){KD.yol[k].forEach(function(c){L.polyline(c,{renderer:ry,color:r[k],weight:6,opacity:.8,interactive:false}).addTo(EHYOL)})})}
+  ['tem','kmo','e5'].forEach(function(k){KD.yol[k].forEach(function(c){L.polyline(c,{renderer:ry,color:r[k],weight:2.5,opacity:.9,interactive:false}).addTo(EHYOL)})})}
  if(EHYOL){if(S.yol)EHYOL.addTo(EH);else EH.removeLayer(EHYOL)}
  if(S.toplu&&!EHTT){var rt=L.canvas({pane:'toplu'});EHTT=L.layerGroup();EHOT=L.layerGroup();
-  KD.metro.forEach(function(c){L.polyline(c,{renderer:rt,color:r.metro,weight:2.5,opacity:.9,interactive:false}).addTo(EHTT)});
   EHIS=L.layerGroup();KD.ist.forEach(function(p){L.circleMarker(p,{renderer:rt,radius:3,weight:1,color:koyu()?'#000':'#fff',fillColor:r.metro,fillOpacity:1,interactive:false}).addTo(EHIS)});
   KD.otobus.forEach(function(p){L.circleMarker(p,{renderer:rt,radius:2,weight:.6,color:koyu()?'#000':'#6b5400',fillColor:r.otobus,fillOpacity:1,interactive:false}).addTo(EHOT)})}
  if(EHTT){if(S.toplu)EHTT.addTo(EH);else EH.removeLayer(EHTT)}
@@ -930,7 +929,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=1c42856514').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=07f4605aab').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
