@@ -442,7 +442,7 @@ var KUTU=OZ.map(function(o){return o[0]}).concat(['gizle']),ALAN=['min','max','m
 var ODALAR=['Stüdyo','1+1','2+1','3+1','4+'];
 // kat suzgeci (2026-11-02): km/kx = bulundugu kat en az/en cok, bm/bx = binanin kat sayisi en az/en cok
 var BOS={min:'',max:'',m2:'',yas:'',km:'',kx:'',bm:'',bx:'',pm:'',oda:[],ilce:[],mah:[],ara:'',asansor:false,otopark:false,site:false,balkon:false,
- uygunkat:false,gizle:true,rota:false,yol:false,toplu:false,sinir:false,detay:false,sira:'puan',w:{},yalnizSecili:false,hi:'',hm:'',hu:'',gor:'kart',ters:false};
+ uygunkat:false,gizle:true,rota:false,yol:false,toplu:false,sinir:false,detay:false,ilanlar:true,sira:'puan',w:{},yalnizSecili:false,hi:'',hm:'',hu:'',gor:'kart',ters:false};
 AG.forEach(function(a){BOS.w[a[0]]=a[1]});
 function kopya(o){return JSON.parse(JSON.stringify(o))}
 var S=kopya(BOS),D=null,SON=[],GOSTER=20,$=function(id){return document.getElementById(id)};
@@ -768,7 +768,7 @@ function haritaCiz(){leafletYukle(function(){
    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> katkıcıları'});
   // 'Sade harita' (2026-11-02, kullanici: sokak adi yazmayan, karisik olmayan): Esri gri altlik, yazisiz, anahtarsiz; 16'dan sonra buyutulur
   EHT2=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_'+(koyu()?'Dark':'Light')+'_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-   {maxZoom:19,maxNativeZoom:16,attribution:'Altlık © Esri, HERE, Garmin · © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> katkıcıları'});
+   {maxZoom:19,maxNativeZoom:SADE_TAVAN,attribution:'Altlık © Esri, HERE, Garmin · © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> katkıcıları'});
   altlik();
   // tolerance: parmakla dokunmada nokta cevresinde ek piksel
   EHR=L.canvas({padding:.3,tolerance:matchMedia('(pointer:coarse)').matches?12:4});EHK=L.layerGroup().addTo(EH);
@@ -777,13 +777,14 @@ function haritaCiz(){leafletYukle(function(){
   // rota cizgisi ilan noktalarinin altinda (kendi katmani) kalir, noktalara dokunmayi engellemez
   EH.createPane('rota').style.zIndex=350;
   EH.createPane('yol').style.zIndex=330;EH.createPane('toplu').style.zIndex=340;EH.createPane('sinirag').style.zIndex=320;
-  EH.on('zoomend',sinirAg);
+  EH.on('zoomend',sinirAg);EH.on('zoomend',altlik);
   // sag ustte katman kutucuklari; renk ornekleri cizgi/nokta renginde
   var Kat=L.Control.extend({onAdd:function(){var d=L.DomUtil.create('div','ehkatman'),r=koyu()?RENK_K:RENK,
    sw=function(c,y){return'<i class="sw'+(y?' yu':'')+'" style="background:'+c+'"></i>'};
    // 2026-11-02: kutucuklar 'Katmanlar' dugmesinin icinde; telefonda kapali baslar (haritayi kaplamasin), genis ekranda acik
    d.innerHTML='<button type="button" class="ehkat-dug" id="katdug" aria-expanded="false" aria-controls="katic">Katmanlar<span class="sayi" id="katsay" hidden></span></button>'
     +'<div class="ehkat-ic" id="katic">'
+    +'<label><input type="checkbox" id="ilankutu"><span>İlanlar</span>'+sw(koyu()?'#9ec5ff':'#2f6fd6',1)+'</label>'
     +'<label><input type="checkbox" id="rotakutu"><span>Ayvaz Rota</span>'+sw(koyu()?'#ff9b3d':'#e8730c')+'</label>'
     +(KATMAN_DOSYA?'<label><input type="checkbox" id="yolkutu"><span>Yollar</span>'+sw(r.e5)+sw(r.tem)+'</label>'
     +'<label><input type="checkbox" id="ttkutu"><span>Toplu taşıma</span>'+sw(r.metro,1)+sw(r.otobus,1)+'</label>':'')
@@ -795,6 +796,8 @@ function haritaCiz(){leafletYukle(function(){
    EH.on('click',function(){if(!GENIS.matches)ac(false)});
    d.addEventListener('change',katSay);
    L.DomEvent.disableClickPropagation(d);L.DomEvent.disableScrollPropagation(d);
+   // 2026-11-02 kullanici: ilan noktalarini gizleyip yalniz katmanlara bakabilmek icin
+   d.querySelector('#ilankutu').addEventListener('change',function(){S.ilanlar=this.checked;kaydet();noktaYenile()});
    d.querySelector('#rotakutu').addEventListener('change',function(){S.rota=this.checked;kaydet();rotaCiz(true)});
    if(KATMAN_DOSYA){d.querySelector('#yolkutu').addEventListener('change',function(){S.yol=this.checked;kaydet();katmanCiz()});
     d.querySelector('#ttkutu').addEventListener('change',function(){S.toplu=this.checked;kaydet();katmanCiz()})}
@@ -813,7 +816,8 @@ function haritaCiz(){leafletYukle(function(){
   var u=la.length>50?[.01,.99]:[0,1];
   EH.fitBounds([[q(la,u[0]),q(lo,u[0])],[q(la,u[1]),q(lo,u[1])]],{padding:[24,24],maxZoom:16})}
  noktaYenile();sinirCiz()})}
-function katSay(){var n=['rota','yol','toplu','sinir','detay'].filter(function(k){return S[k]}).length,s=$('katsay');
+// sayac acik ek katmanlari sayar; ilanlar varsayilan acik oldugundan gizlenince sayilir
+function katSay(){var n=['rota','yol','toplu','sinir','detay'].filter(function(k){return S[k]}).length+(S.ilanlar?0:1),s=$('katsay');
  if(s){s.textContent=n;s.hidden=!n}}
 function rotaCiz(sigdir){var k=$('rotakutu');if(k)k.checked=S.rota;
  if(!S.rota){if(EHC){EH.removeLayer(EHC);EHC=null}return}
@@ -842,7 +846,9 @@ function istStil(z){return z<13?{radius:2,weight:.5,opacity:.45,fillOpacity:.45}
 function durakCiz(b){if(!EHIS)EHIS=L.layerGroup().addTo(EH);EHIS.clearLayers();if(!S.toplu||!KD)return;
  var r=koyu()?RENK_K:RENK,z=EH.getZoom(),dolu={},ac={maxWidth:240,className:'durak-ac'};
  if(z>=DURAK_ZOOM)KD.otobus.forEach(function(p){if(!b.contains([p[0],p[1]]))return;
-  L.circleMarker([p[0],p[1]],{renderer:EHR,radius:3,weight:.8,color:koyu()?'#000':'#6b5400',fillColor:r.otobus,fillOpacity:1})
+  // otobus duragi silik (2026-11-02 kullanici): ilan ve istasyonun gerisinde kalsin, yaklasinca biraz belirginlesir
+  L.circleMarker([p[0],p[1]],{renderer:EHR,radius:z<16?2:2.5,weight:.6,opacity:z<16?.4:.55,color:koyu()?'#000':'#6b5400',
+   fillColor:r.otobus,fillOpacity:z<16?.4:.55})
    .bindPopup('<b>'+esc(p[2]||'Adsız durak')+'</b><br>Otobüs durağı',ac).addTo(EHIS)});
  KD.ist.forEach(function(p){if(!b.contains([p[0],p[1]]))return;
   if(z<EH_TUM-3){var q=EH.latLngToContainerPoint([p[0],p[1]]),k=Math.floor(q.x/IST_HUCRE)+'_'+Math.floor(q.y/IST_HUCRE);if(dolu[k])return;dolu[k]=1}
@@ -856,7 +862,11 @@ function durakCiz(b){if(!EHIS)EHIS=L.layerGroup().addTo(EH);EHIS.clearLayers();i
 // Sinir adlari ilan verisindeki yazima anah() ile eslenir (mahalle_konum.anahtar ile ayni kural).
 var SINIR_DOSYA='harita-sinir.json?v=1c0c3a49e9',SN=null,SNY=0,SECMOD=null,EHS=null,EHH=null,EHT=null,EHT2=null,EHBI=null,EHBM=null,MAH_AG_ZOOM=12;
 // altlik: varsayilan sade (Esri gri, yazisiz; 2026-11-02 kullanici: 'harita zaten sade baslasin'), 'Detayli harita' = OSM (sokak adlari)
-function altlik(){var k=$('detaykutu');if(k)k.checked=S.detay;var a=S.detay?EHT:EHT2,b=S.detay?EHT2:EHT;EH.removeLayer(b);if(!EH.hasLayer(a))a.addTo(EH)}
+// Esri gri altlik 16'dan sonra gercek karo vermiyor (17-19: 2,5 KB bos yer tutucu; 16 karosu buyutulunce bulanik,
+// yazilar iri). 2026-11-02 kullanici bildirdi -> SADE_TAVAN ustunde sade secili olsa da detayli (gri OSM) altlik.
+var SADE_TAVAN=16;
+function altlik(){var k=$('detaykutu');if(k)k.checked=S.detay;var d=S.detay||EH.getZoom()>SADE_TAVAN,
+ a=d?EHT:EHT2,b=d?EHT2:EHT;EH.removeLayer(b);if(!EH.hasLayer(a))a.addTo(EH)}
 // 'Sinirlar' (2026-11-02, kullanici: cok ince silik ilce, daha ince mahalle cizgisi, karisiklik yaratmasin):
 // ilce her olcekte; mahalle MAH_AG_ZOOM ve ustunde. Tuval, ilanlarin ve yollarin altinda, dokunulmaz.
 function sinirAg(){if(!EH||!SINIR_DOSYA)return;var k=$('sinirkutu');if(k)k.checked=S.sinir;
@@ -914,6 +924,8 @@ function noktaYenile(){if(!EH||S.gor!=='harita')return;
  // uzaktan bakinca ilan noktasi bir boy kucuk (2026-11-02 kullanici)
  var zz=EH.getZoom(),yr=zz<11?4:zz<13?4.5:6;
  EHK.clearLayers();durakCiz(EH.getBounds().pad(.1));var renk=koyu()?'#9ec5ff':'#2f6fd6',tum=EH.getZoom()>=EH_TUM,b=EH.getBounds().pad(.1),dolu={},n=0,top=0;
+ var ik=$('ilankutu');if(ik)ik.checked=S.ilanlar;
+ if(!S.ilanlar){if(EHN)EHN.textContent='İlanlar gizli · Katmanlar’dan açılır';return}
  SON.forEach(function(x){var r=x.r;if(r[F.lat]==null||r[F.lon]==null)return;top++;
   if(!b.contains([r[F.lat],r[F.lon]]))return;
   if(!tum){var p=EH.latLngToContainerPoint([r[F.lat],r[F.lon]]),k=Math.floor(p.x/EH_HUCRE)+'_'+Math.floor(p.y/EH_HUCRE);
@@ -1009,7 +1021,7 @@ function kur(){
  $('mahliste').onclick=function(e){var b=e.target.closest('button');if(!b)return;var k=b.dataset.v,i=S.mah.indexOf(k);
   if(i>=0)S.mah.splice(i,1);else S.mah.push(k);kaydet();arayuzYaz();ciz()};
  $('agsifir').onclick=function(){AG.forEach(function(a){S.w[a[0]]=a[1]});kaydet();agCiz();ciz()};
- $('temizle').onclick=function(){var w=S.w,sr=S.sira,h=[S.hi,S.hm,S.gor,S.ters,S.rota,S.yol,S.toplu,S.sinir,S.detay];S=kopya(BOS);S.w=w;S.sira=sr;S.hi=h[0];S.hm=h[1];S.gor=h[2];S.ters=h[3];S.rota=h[4];S.yol=h[5];S.toplu=h[6];S.sinir=h[7];S.detay=h[8];kaydet();arayuzYaz();ciz()};
+ $('temizle').onclick=function(){var w=S.w,sr=S.sira,h=[S.hi,S.hm,S.gor,S.ters,S.rota,S.yol,S.toplu,S.sinir,S.detay,S.ilanlar];S=kopya(BOS);S.w=w;S.sira=sr;S.hi=h[0];S.hm=h[1];S.gor=h[2];S.ters=h[3];S.rota=h[4];S.yol=h[5];S.toplu=h[6];S.sinir=h[7];S.detay=h[8];S.ilanlar=h[9];kaydet();arayuzYaz();ciz()};
  $('daha').onclick=function(){var ilk=GOSTER;GOSTER+=adim();liste();var li=$('liste').children[ilk];if(li){var a=li.querySelector('h2 a,.tsat');if(a)a.focus()}};
  $('gor').onclick=function(e){var b=e.target.closest('button');if(!b||b.dataset.g===S.gor)return;S.gor=b.dataset.g;GOSTER=adim();kaydet();liste()};
  $('tbas').onclick=function(e){var b=e.target.closest('button');if(!b)return;var k=b.dataset.k;
@@ -1041,7 +1053,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=fd267a3d41').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=33340cf903').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
