@@ -213,6 +213,11 @@ ol.ilanlar[hidden],.evharita[hidden]{display:none!important}
 .evharita .ehkatman{background:var(--yuzey);color:var(--ink);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.25);padding:2px 0}
 .evharita .ehkatman label{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;font-size:15px;font-weight:600;cursor:pointer}
 .evharita .ehkatman label+label{border-top:1px solid var(--f0)}
+.evharita .ehkat-dug{display:flex;align-items:center;gap:8px;min-height:44px;width:100%;padding:0 14px;border:0;background:none;color:var(--ink);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+.evharita .ehkat-dug::after{content:"";width:7px;height:7px;border-right:1.5px solid var(--ink3);border-bottom:1.5px solid var(--ink3);transform:rotate(45deg);margin:-4px 0 0 auto}
+.evharita .ehkat-dug[aria-expanded=true]::after{transform:rotate(-135deg);margin-top:4px}
+.evharita .ehkat-dug .sayi{background:var(--secili);color:var(--zemin);border-radius:10px;font-size:13px;padding:0 7px;line-height:20px}
+.evharita .ehkat-ic{border-top:1px solid var(--f0)}.evharita .ehkat-ic[hidden]{display:none}
 .evharita .ehkatman input{width:20px;height:20px;margin:0;accent-color:var(--secili)}
 .evharita .ehkatman .sw{display:inline-block;width:14px;height:4px;border-radius:2px;margin-left:auto}.evharita .ehkatman .sw+.sw{margin-left:3px}
 .evharita .ehkatman .sw.yu{width:8px;height:8px;border-radius:4px}
@@ -776,11 +781,19 @@ function haritaCiz(){leafletYukle(function(){
   // sag ustte katman kutucuklari; renk ornekleri cizgi/nokta renginde
   var Kat=L.Control.extend({onAdd:function(){var d=L.DomUtil.create('div','ehkatman'),r=koyu()?RENK_K:RENK,
    sw=function(c,y){return'<i class="sw'+(y?' yu':'')+'" style="background:'+c+'"></i>'};
-   d.innerHTML='<label><input type="checkbox" id="rotakutu"><span>Ayvaz Rota</span>'+sw(koyu()?'#ff9b3d':'#e8730c')+'</label>'
+   // 2026-11-02: kutucuklar 'Katmanlar' dugmesinin icinde; telefonda kapali baslar (haritayi kaplamasin), genis ekranda acik
+   d.innerHTML='<button type="button" class="ehkat-dug" id="katdug" aria-expanded="false" aria-controls="katic">Katmanlar<span class="sayi" id="katsay" hidden></span></button>'
+    +'<div class="ehkat-ic" id="katic">'
+    +'<label><input type="checkbox" id="rotakutu"><span>Ayvaz Rota</span>'+sw(koyu()?'#ff9b3d':'#e8730c')+'</label>'
     +(KATMAN_DOSYA?'<label><input type="checkbox" id="yolkutu"><span>Yollar</span>'+sw(r.e5)+sw(r.tem)+'</label>'
     +'<label><input type="checkbox" id="ttkutu"><span>Toplu taşıma</span>'+sw(r.metro,1)+sw(r.otobus,1)+'</label>':'')
     +(SINIR_DOSYA?'<label><input type="checkbox" id="sinirkutu"><span>Sınırlar</span>'+sw(koyu()?'#8e8e93':'#8e8e93')+'</label>':'')
-    +'<label><input type="checkbox" id="sadekutu"><span>Sade harita</span></label>';
+    +'<label><input type="checkbox" id="sadekutu"><span>Sade harita</span></label></div>';
+   var ic=d.querySelector('#katic'),dg=d.querySelector('#katdug'),ac=function(v){ic.hidden=!v;dg.setAttribute('aria-expanded',v)};
+   ac(GENIS.matches);dg.addEventListener('click',function(){ac(ic.hidden)});
+   // telefonda haritaya dokununca liste kapanir; acik katman sayisi dugmede yazar
+   EH.on('click',function(){if(!GENIS.matches)ac(false)});
+   d.addEventListener('change',katSay);
    L.DomEvent.disableClickPropagation(d);L.DomEvent.disableScrollPropagation(d);
    d.querySelector('#rotakutu').addEventListener('change',function(){S.rota=this.checked;kaydet();rotaCiz(true)});
    if(KATMAN_DOSYA){d.querySelector('#yolkutu').addEventListener('change',function(){S.yol=this.checked;kaydet();katmanCiz()});
@@ -789,7 +802,7 @@ function haritaCiz(){leafletYukle(function(){
    d.querySelector('#sadekutu').addEventListener('change',function(){S.sade=this.checked;kaydet();altlik()});
    return d}});
   new Kat({position:'topright'}).addTo(EH)}
- altlik();rotaCiz(false);katmanCiz();sinirAg();
+ altlik();rotaCiz(false);katmanCiz();sinirAg();katSay();
  setTimeout(function(){EH.invalidateSize()},0);
  var la=[],lo=[];
  SON.forEach(function(x){var r=x.r;if(r[F.lat]==null||r[F.lon]==null)return;la.push(r[F.lat]);lo.push(r[F.lon])});
@@ -800,6 +813,8 @@ function haritaCiz(){leafletYukle(function(){
   var u=la.length>50?[.01,.99]:[0,1];
   EH.fitBounds([[q(la,u[0]),q(lo,u[0])],[q(la,u[1]),q(lo,u[1])]],{padding:[24,24],maxZoom:16})}
  noktaYenile();sinirCiz()})}
+function katSay(){var n=['rota','yol','toplu','sinir','sade'].filter(function(k){return S[k]}).length,s=$('katsay');
+ if(s){s.textContent=n;s.hidden=!n}}
 function rotaCiz(sigdir){var k=$('rotakutu');if(k)k.checked=S.rota;
  if(!S.rota){if(EHC){EH.removeLayer(EHC);EHC=null}return}
  if(!EHC)EHC=L.polyline(AYVAZ,{pane:'rota',color:koyu()?'#ff9b3d':'#e8730c',weight:2.5,opacity:.95,lineCap:'round',lineJoin:'round',interactive:false}).addTo(EH);
@@ -1018,7 +1033,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=a5cee0b6c7').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=fe495ffbf5').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
