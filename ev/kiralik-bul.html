@@ -290,6 +290,11 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
  .p-ilan img,.p-bos{width:34mm;height:25mm;object-fit:cover;border-radius:2mm;background:#eee;display:block}
  .p-yer{font-size:10pt;color:#222;text-align:right;line-height:1.35}.p-yer b{font-size:11pt}
  .p-ilan h4{font-size:11pt;margin:0 0 1mm}.p-ilan a{color:#0b4f8a;text-decoration:none}
+ .p-ulas{grid-column:1/-1;display:flex;gap:4mm;align-items:flex-start;margin-top:1mm}
+ .p-harita{position:relative;overflow:hidden;flex:none;border:1px solid #bbb;border-radius:2mm;background:#eee}
+ .p-harita img{position:absolute;width:256px;height:256px;max-width:none;border-radius:0}
+ .p-harita svg{position:absolute;left:0;top:0}
+ .p-ulas-yazi p{margin:0 0 1.5mm}.p-ren{display:inline-block;width:3mm;height:3mm;border-radius:50%;margin-right:1.5mm;vertical-align:-.3mm}
  .p-ilan p{margin:0 0 1mm;color:#222}.p-uyari{font-size:9pt;color:#8a3200!important}.p-fiyat{font-size:11pt}.p-ay,.p-link{font-size:8.5pt;color:#444!important}
 }
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
@@ -702,14 +707,57 @@ function secCubuk(){var n=SEC.length;pdfSonra();$('secbar').hidden=!n;document.b
 // aninda acar -> icerik secim degisince arka planda hazirlanir (fotograflar onceden yuklenir), dugmede
 // beklemeden window.print(). Ana Ekran'a eklenmis uygulama (standalone) yazdirmayi desteklemez -> Safari'de ac.
 var AYRI_UYG=window.navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
-function pdfHazirla(){if(!D||!PUANLA||!SEC.length)return;
+function pdfHazirla(){if(!D||!PUANLA||!SEC.length)return;yolYukle();
  var rs=D.satir.filter(function(r){return SEC.indexOf(r[F.no])>=0}).map(PUANLA);
  var et=etiketler().map(function(x){return x[0]}).join(', ');
  var ag=AG.map(function(a){return a[2]+' %'+S.w[a[0]]}).join(', ');
  var tarih=$('guncel').textContent;
  $('yazdir').innerHTML='<h1>Seçilen kiralık ilanlar</h1><p class="p-ust">'+rs.length+' ilan · '+YAKA+' · sahibinden.com · '+esc(tarih)+' verisi'
-  +(et?'<br>Süzgeçler: '+esc(et):'')+'<br>Puan ağırlıkları: '+esc(ag)+'</p>'+pdfGruplar(rs)}
+  +(et?'<br>Süzgeçler: '+esc(et):'')+'<br>Puan ağırlıkları: '+esc(ag)
+  +(YOL_SURUM?'<br>Küçük haritalar: altlık © Esri, HERE, Garmin · yol ağı ve duraklar © OpenStreetMap katkıcıları':'')+'</p>'+pdfGruplar(rs)}
 var pdfZam;function pdfSonra(){clearTimeout(pdfZam);pdfZam=setTimeout(pdfHazirla,300)}
+// --- PDF'te ilan basina kucuk harita + en yakin metro / otobus duragina yurume (2026-11-02, kullanici istegi) ---
+// Rotalar ulasim/ilan_yol.json'dan (OSM yol agi), ilan_no % YOL_PARCA parcalara bolunmus; yalniz secilen ilanlarin
+// parcasi indirilir, gelince PDF yeniden hazirlanir. Kayit: m=[istasyon, hat(lar), metre, rota], d=[durak, metre, rota];
+// rota 1e-5 derece tamsayi farklari, ilk fark ilanin koordinatina gore. Rota 3 km'den uzunsa bos (yalniz yazi).
+var YOL_SURUM='864b7ad6aa',YOL_PARCA=64,YOL={},YOLP={},YURU_HIZ=80;
+function yolYukle(){if(!YOL_SURUM)return;var bek=0;
+ SEC.forEach(function(no){var p=('0'+(+no%YOL_PARCA)).slice(-2);if(YOLP[p])return;YOLP[p]=1;bek++;
+  fetch('yol/'+p+'.json?v='+YOL_SURUM).then(function(r){if(!r.ok)throw 0;return r.json()})
+   .then(function(v){for(var k in v)YOL[k]=v[k]}).catch(function(){}).then(function(){if(!--bek)pdfHazirla()})})}
+function rotaCoz(rota,la,lo){var a=Math.round(la*1e5),b=Math.round(lo*1e5),o=[[la,lo]];
+ for(var i=0;i<rota.length;i+=2){a+=rota[i];b+=rota[i+1];o.push([a/1e5,b/1e5])}return o}
+function hatKisa(h){return(h||'').split(' | ').map(function(x){return x.indexOf('Marmaray')===0?'Marmaray':x.split(' ')[0]}).join(', ')}
+function dkYaz(m){return Math.max(1,Math.round(m/YURU_HIZ))+' dk'}
+// Web Merkator piksel (zoom z, 256 px karo)
+function mpx(la,lo,z){var n=256*Math.pow(2,z),s=Math.sin(la*Math.PI/180);
+ return[(lo+180)/360*n,(.5-Math.log((1+s)/(1-s))/(4*Math.PI))*n]}
+function miniHarita(r,y){var la=r[F.lat],lo=r[F.lon],W=260,H=165,PAY=22;
+ var m=y.m&&y.m[3].length?rotaCoz(y.m[3],la,lo):null,d=y.d&&y.d[2].length?rotaCoz(y.d[2],la,lo):null;
+ if(!m&&!d)return'';
+ var tum=[[la,lo]].concat(m||[],d||[]),z=16,kx,ky,x0,y0;
+ for(;z>=11;z--){var ps=tum.map(function(p){return mpx(p[0],p[1],z)}),xs=ps.map(function(p){return p[0]}),ys=ps.map(function(p){return p[1]});
+  var mnx=Math.min.apply(0,xs),mxx=Math.max.apply(0,xs),mny=Math.min.apply(0,ys),mxy=Math.max.apply(0,ys);
+  if(mxx-mnx<=W-2*PAY&&mxy-mny<=H-2*PAY||z===11){x0=(mnx+mxx)/2-W/2;y0=(mny+mxy)/2-H/2;break}}
+ var h='<div class="p-harita" style="width:'+W+'px;height:'+H+'px">';
+ for(var tx=Math.floor(x0/256);tx<=Math.floor((x0+W)/256);tx++)for(var ty=Math.floor(y0/256);ty<=Math.floor((y0+H)/256);ty++)
+  h+='<img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/'+z+'/'+ty+'/'+tx
+   +'" style="left:'+Math.round(tx*256-x0)+'px;top:'+Math.round(ty*256-y0)+'px">';
+ var xy=function(p){var q=mpx(p[0],p[1],z);return(q[0]-x0).toFixed(1)+','+(q[1]-y0).toFixed(1)};
+ var cizgi=function(ps,renk){return'<polyline points="'+ps.map(xy).join(' ')+'" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round" opacity=".8"/>'
+  +'<polyline points="'+ps.map(xy).join(' ')+'" fill="none" stroke="'+renk+'" stroke-width="2.2" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>'};
+ var nokta=function(p,renk,rr){var q=xy(p).split(',');return'<circle cx="'+q[0]+'" cy="'+q[1]+'" r="'+rr+'" fill="'+renk+'" stroke="#fff" stroke-width="1.5"/>'};
+ h+='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'+(d?cizgi(d,'#b7791f'):'')+(m?cizgi(m,'#7e22ce'):'')
+  +(d?nokta(d[d.length-1],'#d69e2e',4.5):'')+(m?nokta(m[m.length-1],'#7e22ce',5):'')+nokta([la,lo],'#2f6fd6',6)+'</svg></div>';
+ return h}
+function pdfUlasim(r){var y=YOL[r[F.no]];if(!y)return'';
+ var s=[];
+ if(y.m)s.push('<p><i class="p-ren" style="background:#7e22ce"></i>Metro: <b>'+esc(y.m[0])+'</b>'+(y.m[1]?' ('+esc(hatKisa(y.m[1]))+')':'')
+  +' · '+tl(y.m[2])+' m, ~'+dkYaz(y.m[2])+' yürüme</p>');
+ else s.push('<p><i class="p-ren" style="background:#7e22ce"></i>Metro: 15 km içinde yürüme yolu yok</p>');
+ if(y.d)s.push('<p><i class="p-ren" style="background:#d69e2e"></i>Otobüs durağı: <b>'+esc(y.d[0]||'adsız')+'</b> · '+tl(y.d[1])+' m, ~'+dkYaz(y.d[1])+' yürüme</p>');
+ return'<div class="p-ulas">'+(r[F.lat]!=null?miniHarita(r,y):'')+'<div class="p-ulas-yazi">'+s.join('')
+  +'<p class="p-ay">Kesikli çizgi: evden yürüme yolu (OSM yol ağı; ana yoldan karşıya yalnız üst/alt geçitten)</p></div></div>'}
 function pdf(){
  if(AYRI_UYG){window.open(urlYap()+'&sec='+SEC.join(',')+'&pdf=1','_blank');return}
  pdfHazirla();var eski=document.title;document.title='Kiralık ilanlar '+$('guncel').textContent;window.print();
@@ -723,11 +771,11 @@ function pdfIlan(x,no,yeniIlce){var r=x.r,b=bilgi(r);
     +'<div><h4>'+no+'. <a href="'+b.link+'">'+esc(b.baslik)+'</a></h4><p>'+esc(b.satir)+(b.oz?'<br>'+esc(b.oz):'')+'</p>'
     +'<p class="p-fiyat"><b>'+tl(r[F.fiyat])+' TL</b>'+(r[F.eski]?' (önceki '+tl(r[F.eski])+' TL)':'')+' · Uygunluk <b>'+Math.round(x.t)+'</b>/100</p>'
     +(bekMetin(r)?'<p class="p-ay">'+bekMetin(r).replace(/<\/?b>/g,'')+'</p>':'')
-    +'<p class="p-ay">'+AG.map(function(a){return a[2]+' '+Math.round(x.p[a[0]])}).join(' · ')
+    +'<p class="p-ay">'+AG.filter(function(a){return isFinite(x.p[a[0]])}).map(function(a){return a[2]+' '+Math.round(x.p[a[0]])}).join(' · ')
     +(r[F.ses]?' · mahallenin 2016 sınıfı '+esc(r[F.ses]):'')+(b.yayin?' · '+b.yayin:'')+'</p>'
     +(b.uyari.length?'<p class="p-uyari">'+esc(b.uyari.join(' · '))+'</p>':'')
     +'<p class="p-link">İlan no '+r[F.no]+' · <a href="'+b.link+'">'+esc(b.link.replace(/^https:\/\/www\./,''))+'</a></p></div>'
-    +'<div class="p-yer"><b>'+esc(D.ilce[r[F.ilce]])+'</b><br>'+esc(D.mah[r[F.mah]]||'')+'</div></div>'}
+    +'<div class="p-yer"><b>'+esc(D.ilce[r[F.ilce]])+'</b><br>'+esc(D.mah[r[F.mah]]||'')+'</div>'+pdfUlasim(r)+'</div>'}
 // secilenleri mesaj olarak paylas (iPhone: paylas menusu -> WhatsApp; yoksa WhatsApp Web)
 function secPaylas(){
  var rs=D.satir.filter(function(r){return SEC.indexOf(r[F.no])>=0}).map(PUANLA).sort(function(a,b){return b.t-a.t});
@@ -1053,7 +1101,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=076dbd6ae2').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=eb84cfe097').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
