@@ -325,6 +325,25 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 .evharita .ehkat-dug{min-height:36px;font-size:13px;padding:0 11px}
 .evharita .ehkatman input{width:17px;height:17px}
 #ustTemizle:disabled{opacity:.45;cursor:default}
+/* fiyat dususu rozeti: renksiz, ok isaretiyle */
+.fark.dus{background:var(--f0);color:var(--ink2);font-weight:600}
+/* fiyat kaydiricisi: iki range ust uste; yalniz tutamaclar dokunulur */
+.fkay{position:relative;height:30px;margin:12px 6px 2px}
+.fkay-iz{position:absolute;left:0;right:0;top:13px;height:4px;border-radius:2px;background:var(--f0)}
+.fkay-iz i{position:absolute;top:0;bottom:0;left:0;right:0;border-radius:2px;background:var(--secili)}
+.fkay input{position:absolute;left:0;top:0;width:100%;height:30px;margin:0;padding:0;border:0;background:none;
+ -webkit-appearance:none;appearance:none;pointer-events:none;min-height:0}
+.fkay input::-webkit-slider-runnable-track{background:none;height:30px}
+.fkay input::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:24px;height:24px;margin-top:3px;border-radius:50%;
+ background:var(--yuzey);border:2px solid var(--secili);box-shadow:0 1px 3px rgba(0,0,0,.25);cursor:pointer}
+.fkay input::-moz-range-track{background:none}
+.fkay input::-moz-range-thumb{pointer-events:auto;width:20px;height:20px;border-radius:50%;background:var(--yuzey);border:2px solid var(--secili);cursor:pointer}
+/* kira seviyesi lejanti */
+.evharita .ehlej{display:flex;flex-direction:column;gap:2px;font-size:11px;line-height:1.3;padding:6px 8px}
+.evharita .ehlej[hidden]{display:none}
+.evharita .ehlej b{font-size:11px;font-weight:600;color:var(--ink)}
+.evharita .ehlej span{display:flex;align-items:center;gap:5px;font-variant-numeric:tabular-nums}
+.evharita .ehlej i{width:14px;height:10px;border-radius:2px;flex:none}
 @media(max-width:899px){
  .bas-satir h1{font-size:18px}
  .arac{gap:5px;margin-top:4px}
@@ -358,7 +377,8 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <details class="bolum" name="suz"><summary id="b_kira">Fiyat<span class="deger" id="d_kira"></span></summary>
 <div class="bolum-ic" role="group" aria-labelledby="b_kira"><div class="iki">
 <label><span class="sr">En az fiyat</span><input id="min" type="number" inputmode="numeric" min="0" step="1000" placeholder="En az TL"></label>
-<label><span class="sr">En çok fiyat</span><input id="max" type="number" inputmode="numeric" min="0" step="1000" placeholder="En çok TL"></label></div></div></details>
+<label><span class="sr">En çok fiyat</span><input id="max" type="number" inputmode="numeric" min="0" step="1000" placeholder="En çok TL"></label></div>
+<div class="fkay"><div class="fkay-iz"><i id="fdol"></i></div><input type="range" id="rmin" min="0" max="1000" step="1" value="0" aria-label="En az fiyat"><input type="range" id="rmax" min="0" max="1000" step="1" value="1000" aria-label="En çok fiyat"></div></div></details>
 <details class="bolum" name="suz"><summary id="b_oda">Oda<span class="deger" id="d_oda"></span></summary>
 <div class="bolum-ic"><div class="cipler" id="oda" role="group" aria-labelledby="b_oda"></div></div></details>
 <details class="bolum" name="suz"><summary id="b_boyut">Net m² ve bina yaşı<span class="deger" id="d_boyut"></span></summary>
@@ -444,7 +464,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 var AG=[["kat", 18, "Kat"], ["yas", 17, "Bina yeniliği"], ["fiyat", 15, "Kira"], ["konum", 14, "Hedef konum"], ["site", 13, "Site içinde"], ["bolge", 12, "Bölge"], ["m2", 11, "Net m²"]],YAS_TAVAN=35,YAS_EGRI=[[0, 100], [3, 92], [8, 78], [13, 64], [18, 46], [23, 24], [28, 10], [35, 0]],BIL=50,VERI_GUN=new Date('2026-11-02'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
 var F={no:0,bas:1,link:2,foto:3,fiyat:4,net:5,brut:6,oda:7,ilce:8,mah:9,kat:10,katS:11,katP:12,katN:13,yas:14,bolge:15,
  ses:16,site:17,asan:18,otop:19,isit:20,balk:21,yeni:22,eski:23,es:24,suph:25,tarih:26,kiraP:27,m2P:28,
- bek:29,bekA:30,bekU:31,bekB:32,kn:33,lat:34,lon:35,kim:36};
+ bek:29,bekA:30,bekU:31,bekB:32,kn:33,lat:34,lon:35,kim:36,dusT:37};
 // hedef konum: evin gercek konumu (F.lat/F.lon, harita aramasi; yoksa mahalle noktasi D.kn) ile hedef arasi kus ucusu
 // km; Bogaz'in obur yakasina KOPRU km eklenir.
 // Konum puani: KONUM_TAM km'ye kadar 100, sonra her KONUM_OLCEK km'de ~e kati azalir (5 km 65, 10 km 32, 20 km 8).
@@ -484,7 +504,7 @@ var KUTU=OZ.map(function(o){return o[0]}).concat(['gizle']),ALAN=['min','max','m
 var ODALAR=['Stüdyo','1+1','2+1','3+1','4+'];
 // kat suzgeci (2026-11-02): km/kx = bulundugu kat en az/en cok, bm/bx = binanin kat sayisi en az/en cok
 var BOS={min:'',max:'',m2:'',yas:'',km:'',kx:'',bm:'',bx:'',pm:'',oda:[],ilce:[],mah:[],ara:'',asansor:false,otopark:false,site:false,balkon:false,sahibi:false,
- uygunkat:false,gizle:true,rota:false,yol:false,toplu:false,sinir:false,detay:false,ilanlar:true,sira:'puan',w:{},yalnizSecili:false,hi:'',hm:'',hu:'',gor:'kart',ters:false};
+ uygunkat:false,gizle:true,rota:false,yol:false,toplu:false,sinir:false,kira:false,detay:false,ilanlar:true,sira:'puan',w:{},yalnizSecili:false,hi:'',hm:'',hu:'',gor:'kart',ters:false};
 AG.forEach(function(a){BOS.w[a[0]]=a[1]});
 function kopya(o){return JSON.parse(JSON.stringify(o))}
 var S=kopya(BOS),D=null,SON=[],GOSTER=20,$=function(id){return document.getElementById(id)};
@@ -496,10 +516,10 @@ function urlden(){var p=new URLSearchParams(location.search);if(!p.toString())re
  ['oda','ilce','mah'].forEach(function(k){if(p.get(k))s[k]=p.get(k).split(',')});
  if(p.has('f')){var f=p.get('f').split(',');KUTU.forEach(function(k){s[k]=f.indexOf(k)>=0})}
  if(p.get('w')){var w=p.get('w').split(',');AG.forEach(function(a,i){if(w[i])s.w[a[0]]=+w[i]})}
- s.ters=p.get('t')==='1';s.rota=p.get('r')==='1';s.yol=p.get('y')==='1';s.toplu=p.get('tt')==='1';s.sinir=p.get('sn')==='1';s.detay=p.get('dt')==='1';return s}
+ s.ters=p.get('t')==='1';s.rota=p.get('r')==='1';s.yol=p.get('y')==='1';s.toplu=p.get('tt')==='1';s.sinir=p.get('sn')==='1';s.detay=p.get('dt')==='1';s.kira=p.get('kr')==='1';return s}
 function urlYap(){var p=new URLSearchParams();
  ['min','max','m2','yas','km','kx','bm','bx','pm','ara'].forEach(function(k){if(S[k]!=='')p.set(k,S[k])});
- if(S.sira!=='puan')p.set('sira',S.sira);if(S.ters)p.set('t','1');if(S.rota)p.set('r','1');if(S.yol)p.set('y','1');if(S.toplu)p.set('tt','1');if(S.sinir)p.set('sn','1');if(S.detay)p.set('dt','1');
+ if(S.sira!=='puan')p.set('sira',S.sira);if(S.ters)p.set('t','1');if(S.rota)p.set('r','1');if(S.yol)p.set('y','1');if(S.toplu)p.set('tt','1');if(S.sinir)p.set('sn','1');if(S.detay)p.set('dt','1');if(S.kira)p.set('kr','1');
  if(S.hi){p.set('hi',S.hi);if(S.hm)p.set('hm',S.hm);if(S.hu!=='')p.set('hu',S.hu)}
  ['oda','ilce','mah'].forEach(function(k){if(S[k].length)p.set(k,S[k].join(','))});
  p.set('f',KUTU.filter(function(k){return S[k]}).join(','));
@@ -624,6 +644,11 @@ function bekRakam(r){if(!r[F.bek])return'';var k=function(v){return bin(Math.rou
   +' · ilan '+bekMetin(r).split(' · ')[0].replace('Beklenen kiradan ','beklenenden ').replace('Beklenen kiraya yakın','beklenene yakın')}
 // kartta kiranin yaninda: beklenen kiraya gore yuzde ("%18 ucuz"). Yesil = ucuz, kirmizi = pahali; koyu ton = araligin disinda
 // (belirgin). Tahmin belirsizse soluk. Uzerine gelince / ekran okuyucuda aciklama.
+// fiyat dususu (2026-11-03): son 14 gunde kira dustuyse "↓%5 · 3 gün önce" (ev_bul._dususler)
+function dusus(r){if(!r[F.eski]||!r[F.dusT])return null;var g=Math.max(0,Math.round((VERI_GUN-new Date(r[F.dusT]))/864e5));
+ return{y:Math.round((1-r[F.fiyat]/r[F.eski])*100),g:g===0?'bugün':g+' gün önce'}}
+function dusRozet(r){var d=dusus(r);if(!d)return'';
+ return'<span class="fark dus" title="Kira '+d.g+' %'+d.y+' düştü"><span aria-hidden="true">↓%'+d.y+' · '+d.g+'</span><span class="sr">kira '+d.g+' yüzde '+d.y+' düştü</span></span>'}
 function farkRozet(r){if(!r[F.bek])return'';var f=Math.round((r[F.fiyat]/r[F.bek]-1)*100),sinif='',yazi;
  if(Math.abs(f)<2){yazi='benzerleri gibi'}else{yazi='%'+Math.abs(f)+(f<0?' ucuz':' pahalı');
   sinif=f<0?(r[F.fiyat]<r[F.bekA]&&!r[F.bekB]?'u2':'u1'):(r[F.fiyat]>r[F.bekU]&&!r[F.bekB]?'p2':'p1')}
@@ -650,7 +675,7 @@ function kart(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
   +'<p class="yer">'+(r[F.yeni]?'<b class="yeni">yeni</b> · ':'')+esc(b.yer)+esc(km)+'</p>'
   +'<p class="s2">'+ozHtml(b.parca)+'</p></div>'
   // kira satiri: genis ekranda metnin altinda, en dar ekranda fotografin altinda tam genislik
-  +'<div class="s3"><span class="kira">'+tl(r[F.fiyat])+' TL'+(r[F.eski]?'<del><span class="sr">, önceki kira </span>'+tl(r[F.eski])+'</del>':'')+'</span>'+rz
+  +'<div class="s3"><span class="kira">'+tl(r[F.fiyat])+' TL'+(r[F.eski]?'<del><span class="sr">, önceki kira </span>'+tl(r[F.eski])+'</del>':'')+'</span>'+rz+dusRozet(r)
   +(r[F.suph]?'<span class="u">'+(r[F.suph]===3?'Şüpheli ilan':'Fiyatı kontrol edin')+'</span>':'')+'</div>'
   // islem satiri: uygunluk solda, Ayrinti ve Sec sagda
   +'<div class="s4"><span class="puan">Uygunluk <b>'+Math.round(x.t)+'</b>/100</span>'
@@ -684,7 +709,7 @@ function satir(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
   +'<p>'+esc([b.kisa,x.km!==null&&x.km!==undefined?'hedefe '+kmYaz(x.km):''].filter(Boolean).join(' · '))+'</p>'
   +(b.oz?'<p>'+esc(b.oz)+'</p>':'')
   +'<p>'+(b.yayin?esc(b.yayin)+' · ':'')+'<a href="'+b.harita+'" target="_blank" rel="noopener">haritada aç</a>'
-  +(r[F.eski]?' · önceki kira '+tl(r[F.eski])+' TL':'')+'</p>'
+  +(r[F.eski]?' · önceki kira '+tl(r[F.eski])+' TL'+(dusus(r)?' ('+dusus(r).g+' düştü)':''):'')+'</p>'
   +(not.length?'<p class="not">'+not.join(' · ')+'</p>':'')+es
   +'<p class="dok">'+dok+'</p>'+(bek?'<p class="dok">'+bek+'</p>':'')
   +'<label class="sec"><input type="checkbox" data-no="'+r[F.no]+'"'+(sec?' checked':'')+'><span>'+(sec?'Seçildi':'Seç')+'</span><span class="sr"> '+esc(b.baslik)+'</span></label>'
@@ -726,7 +751,18 @@ function degerYaz(){var d=function(id,v){$(id).textContent=v};
  d('d_ara',S.ara.trim());
  d('d_hedef',hedef()?(S.hm?S.hm+', ':'')+S.hi:'Yok');
  d('d_puan',[S.pm!==''?'en az '+S.pm:'',AG.some(function(a){return S.w[a[0]]!==a[1]})?'ağırlık değişti':''].filter(Boolean).join(', ')||'Hepsi')}
-function ozet(){degerYaz();var e=etiketler(),el=$('aktif');
+// fiyat kaydiricisi (2026-11-03): sayi kutulariyla ayni S.min / S.max; ust uc ilanlarin %98'i (uc kiralar kaydiriciyi bozmasin)
+var FUST=0;
+function fiyatUst(){if(!FUST&&D&&D.satir.length){var a=D.satir.map(function(r){return r[F.fiyat]}).sort(function(x,y){return x-y});
+ FUST=Math.ceil(a[Math.floor((a.length-1)*.98)]/10000)*10000}return FUST}
+// kaydirici 0-1000 konum, fiyat = ust x (konum/1000)^2: kiralarin cogu dusuk uca yigili, orada daha hassas (40 bin ~ orta)
+function kdFiyat(k){return Math.round(fiyatUst()*Math.pow(k/1000,2)/1000)*1000}
+function kdKonum(v){return Math.round(Math.sqrt(Math.min(v,fiyatUst())/fiyatUst())*1000)}
+function kaydiriciYaz(){var u=fiyatUst(),a=$('rmin'),b=$('rmax');if(!u)return;
+ if(document.activeElement!==a)a.value=S.min!==''?kdKonum(+S.min):0;if(document.activeElement!==b)b.value=S.max!==''?kdKonum(+S.max):1000;
+ $('fdol').style.left=(a.value/10)+'%';$('fdol').style.right=(100-b.value/10)+'%';a.style.zIndex=+a.value>900?3:1;
+ a.setAttribute('aria-valuetext',tl(kdFiyat(+a.value))+' TL');b.setAttribute('aria-valuetext',+b.value<1000?tl(kdFiyat(+b.value))+' TL':'üst sınır yok')}
+function ozet(){degerYaz();kaydiriciYaz();var e=etiketler(),el=$('aktif');
  el.innerHTML=e.map(function(x,i){return'<button type="button" data-i="'+i+'" aria-label="'+esc(x[0])+' süzgecini kaldır">'+esc(x[0])+'<span aria-hidden="true">×</span></button>'}).join('');
  el.hidden=!e.length;
  el.onclick=function(ev){var b=ev.target.closest('button');if(!b)return;e[+b.dataset.i][1]();kaydet();arayuzYaz();ciz()};
@@ -802,7 +838,7 @@ function pdfIlan(x,no,yeniIlce){var r=x.r,b=bilgi(r),t=Math.round(x.t);
   +'<div class="p-ust"><div><p class="p-no">'+no+'. <a href="'+b.link+'">'+r[F.no]+'</a>'+(b.yayin?' <small>· '+b.yayin+'</small>':'')+'</p>'
   +'<p class="p-konum">'+esc(D.ilce[r[F.ilce]])+(D.mah[r[F.mah]]?' / '+esc(D.mah[r[F.mah]]):'')+'</p></div>'
   +'<div class="p-sag"><span class="p-puan" title="Uygunluk puanı">'+t+'</span>'
-  +'<div class="p-fiyat"><b>'+tl(r[F.fiyat])+' TL</b>'+(r[F.eski]?'<small>önceki '+tl(r[F.eski])+' TL</small>':'')
+  +'<div class="p-fiyat"><b>'+tl(r[F.fiyat])+' TL</b>'+(r[F.eski]?'<small>önceki '+tl(r[F.eski])+' TL'+(dusus(r)?' · '+dusus(r).g:'')+'</small>':'')
   +(r[F.bek]?'<small>Beklenen fiyat: ~'+tl(Math.round(r[F.bek]/1000)*1000)+' TL</small>':'')+'</div></div></div>'
   +pdfEtiket(r,b)+(b.uyari.length?'<p class="p-uyari">'+esc(b.uyari.join(' · '))+'</p>':'')+pdfUlasim(r)+'</div>'}
 // secilenleri mesaj olarak paylas (iPhone: paylas menusu -> WhatsApp; yoksa WhatsApp Web)
@@ -854,7 +890,7 @@ function haritaCiz(){leafletYukle(function(){
   // tolerance: parmakla dokunmada nokta cevresinde ek piksel
   EHR=L.canvas({padding:.3,tolerance:matchMedia('(pointer:coarse)').matches?12:4});EHK=L.layerGroup().addTo(EH);
   var Not=L.Control.extend({onAdd:function(){var d=L.DomUtil.create('div','ehnot');EHN=d;return d}});
-  new Not({position:'bottomleft'}).addTo(EH);EH.on('moveend',noktaYenile)
+  new Not({position:'bottomleft'}).addTo(EH);EH.on('moveend',noktaYenile);EH.on('click',kiraDokun)
   // rota cizgisi ilan noktalarinin altinda (kendi katmani) kalir, noktalara dokunmayi engellemez
   EH.createPane('rota').style.zIndex=350;
   EH.createPane('yol').style.zIndex=330;EH.createPane('toplu').style.zIndex=340;EH.createPane('sinirag').style.zIndex=320;
@@ -866,6 +902,7 @@ function haritaCiz(){leafletYukle(function(){
    d.innerHTML='<button type="button" class="ehkat-dug" id="katdug" aria-expanded="false" aria-controls="katic">Katmanlar<span class="sayi" id="katsay" hidden></span></button>'
     +'<div class="ehkat-ic" id="katic">'
     +'<label><input type="checkbox" id="ilankutu"><span>İlanlar</span>'+sw(koyu()?'#9ec5ff':'#2f6fd6',1)+'</label>'
+    +(SINIR_DOSYA?'<label><input type="checkbox" id="kirakutu"><span>Kira seviyesi</span><i class="sw" style="width:22px;background:linear-gradient(90deg,'+KIRA_RENK[0]+','+KIRA_RENK[4]+')"></i></label>':'')
     +'<label><input type="checkbox" id="rotakutu"><span>Ayvaz Rota</span>'+sw(koyu()?'#ff9b3d':'#e8730c')+'</label>'
     +(KATMAN_DOSYA?'<label><input type="checkbox" id="yolkutu"><span>Yollar</span>'+sw(r.e5)+sw(r.tem)+'</label>'
     +'<label><input type="checkbox" id="ttkutu"><span>Toplu taşıma</span>'+['metro','marmaray','tram','mb','otobus'].map(function(k){return sw(r[k],1)}).join('')+'</label>':'')
@@ -880,13 +917,14 @@ function haritaCiz(){leafletYukle(function(){
    // 2026-11-02 kullanici: ilan noktalarini gizleyip yalniz katmanlara bakabilmek icin
    d.querySelector('#ilankutu').addEventListener('change',function(){S.ilanlar=this.checked;kaydet();noktaYenile()});
    d.querySelector('#rotakutu').addEventListener('change',function(){S.rota=this.checked;kaydet();rotaCiz(true)});
+   if(SINIR_DOSYA)d.querySelector('#kirakutu').addEventListener('change',function(){S.kira=this.checked;kaydet();kiraCiz()});
    if(KATMAN_DOSYA){d.querySelector('#yolkutu').addEventListener('change',function(){S.yol=this.checked;kaydet();katmanCiz()});
     d.querySelector('#ttkutu').addEventListener('change',function(){S.toplu=this.checked;kaydet();katmanCiz()})}
    if(SINIR_DOSYA)d.querySelector('#sinirkutu').addEventListener('change',function(){S.sinir=this.checked;kaydet();sinirAg()});
    d.querySelector('#detaykutu').addEventListener('change',function(){S.detay=this.checked;kaydet();altlik()});
    return d}});
   new Kat({position:'topright'}).addTo(EH)}
- altlik();rotaCiz(false);katmanCiz();sinirAg();katSay();
+ altlik();rotaCiz(false);katmanCiz();sinirAg();kiraCiz();katSay();
  setTimeout(function(){EH.invalidateSize()},0);
  var la=[],lo=[];
  SON.forEach(function(x){var r=x.r;if(r[F.lat]==null||r[F.lon]==null)return;la.push(r[F.lat]);lo.push(r[F.lon])});
@@ -898,7 +936,7 @@ function haritaCiz(){leafletYukle(function(){
   EH.fitBounds([[q(la,u[0]),q(lo,u[0])],[q(la,u[1]),q(lo,u[1])]],{padding:[24,24],maxZoom:16})}
  noktaYenile();sinirCiz()})}
 // sayac acik ek katmanlari sayar; ilanlar varsayilan acik oldugundan gizlenince sayilir
-function katSay(){var n=['rota','yol','toplu','sinir','detay'].filter(function(k){return S[k]}).length+(S.ilanlar?0:1),s=$('katsay');
+function katSay(){var n=['rota','yol','toplu','sinir','detay','kira'].filter(function(k){return S[k]}).length+(S.ilanlar?0:1),s=$('katsay');
  if(s){s.textContent=n;s.hidden=!n}}
 function rotaCiz(sigdir){var k=$('rotakutu');if(k)k.checked=S.rota;
  if(!S.rota){if(EHC){EH.removeLayer(EHC);EHC=null}return}
@@ -975,6 +1013,36 @@ function sinirYukle(f){if(SN)return f();if(!SINIR_DOSYA||!D)return;if(SNY){SNY.p
   v.mah.forEach(function(x){var i=il[anah(x.i)],m=mh[anah(x.i)+'|'+anah(x.a)];x.il=i||null;x.k=i&&m?i+'|'+m:null;x.ad=m||x.a});
   SN=v;var q=SNY;SNY=0;q.forEach(function(g){g()})})
  .catch(function(){SNY=0;if(EHN)EHN.textContent='İlçe / mahalle sınırları yüklenemedi'})}
+// Kira seviyesi katmani (2026-11-03, kullanici onayi): mahalle, suzgece uyan ilanlarin ortanca m2 kirasina gore tek
+// renk tonunda boyanir (5 kademe, esikler o anki mahallelerin %20'lik dilimleri); en az KIRA_EN_AZ ilanli mahalle.
+// Bos yere dokununca o mahallenin degeri yazar (ilan noktasi dokunusu haritaya gecmez: bubblingMouseEvents:false).
+var KIRA_RENK=['#fbe7d3','#f5c497','#e9975b','#cc6a2c','#97461b'],KIRA_EN_AZ=3,EHKR=null,EHKRC=null,EHKL=null,KIRA_MED=null,KIRA_ESIK=null;
+function kiraCiz(){var k=$('kirakutu');if(k)k.checked=S.kira;if(!EH)return;
+ if(EHKR){EH.removeLayer(EHKR);EHKR=null}KIRA_MED=KIRA_ESIK=null;
+ if(!S.kira){kiraLejant();return}
+ sinirYukle(function(){if(!S.kira||EHKR)return;var g={},med={},vs=[];
+  SON.forEach(function(x){var r=x.r,m=r[F.net]||r[F.brut];if(!m||r[F.suph]||!D.mah[r[F.mah]])return;
+   var a=D.ilce[r[F.ilce]]+'|'+D.mah[r[F.mah]];(g[a]=g[a]||[]).push(r[F.fiyat]/m)});
+  for(var a in g){if(g[a].length<KIRA_EN_AZ)continue;var s=g[a].sort(function(p,q){return p-q});med[a]=[s[Math.floor(s.length/2)],s.length];vs.push(med[a][0])}
+  if(!vs.length){kiraLejant();return}
+  vs.sort(function(p,q){return p-q});var es=[.2,.4,.6,.8].map(function(p){return vs[Math.floor(p*(vs.length-1))]});
+  if(!EH.getPane('kira'))EH.createPane('kira').style.zIndex=300;if(!EHKRC)EHKRC=L.canvas({pane:'kira'});
+  EHKR=L.layerGroup();KIRA_MED=med;KIRA_ESIK=es;
+  SN.mah.forEach(function(x){var v=x.k&&med[x.k];if(!v)return;var i=0;while(i<4&&v[0]>es[i])i++;
+   L.polygon(x.h,{renderer:EHKRC,pane:'kira',stroke:false,fillColor:KIRA_RENK[i],fillOpacity:.55,interactive:false}).addTo(EHKR)});
+  EHKR.addTo(EH);kiraLejant()})}
+function kiraLejant(){if(!EH)return;
+ if(!EHKL){var C=L.Control.extend({onAdd:function(){var e=L.DomUtil.create('div','ehnot ehlej');L.DomEvent.disableClickPropagation(e);return e}});EHKL=new C({position:'bottomleft'}).addTo(EH)}
+ var el=EHKL.getContainer(),es=KIRA_ESIK;el.hidden=!S.kira||!es;if(el.hidden)return;
+ var y=function(v){return tl(Math.round(v/10)*10)},ad=['< '+y(es[0]),y(es[0])+'–'+y(es[1]),y(es[1])+'–'+y(es[2]),y(es[2])+'–'+y(es[3]),'> '+y(es[3])];
+ el.innerHTML='<b>m² kirası (TL)</b>'+ad.map(function(a,i){return'<span><i style="background:'+KIRA_RENK[i]+'"></i>'+a+'</span>'}).join('')}
+// nokta poligonun icinde mi (cok parcali / delikli sinirlar: tum halkalar tek-cift kurali)
+function icinde(p,h){var hs=[];(function f(a){if(typeof a[0][0]==='number')hs.push(a);else a.forEach(f)})(h);var c=false;
+ hs.forEach(function(rg){for(var i=0,j=rg.length-1;i<rg.length;j=i++){var a=rg[i],b=rg[j];
+  if((a[0]>p.lat)!==(b[0]>p.lat)&&p.lng<(b[1]-a[1])*(p.lat-a[0])/(b[0]-a[0])+a[1])c=!c}});return c}
+function kiraDokun(e){if(!S.kira||!KIRA_MED||!SN||SECMOD)return;
+ var x=SN.mah.filter(function(m){return m.k&&KIRA_MED[m.k]&&icinde(e.latlng,m.h)})[0];if(!x)return;var v=KIRA_MED[x.k];
+ L.popup({autoPan:false,className:'durak-ac'}).setLatLng(e.latlng).setContent('<b>'+esc(x.ad)+'</b><br>'+esc(x.il)+' · m² kirası ~'+tl(Math.round(v[0]/10)*10)+' TL<br><small>'+v[1]+' ilanın ortancası</small>').openOn(EH)}
 function bolgeBar(){var b=$('bolgebar');b.hidden=!SECMOD;
  if(SECMOD)$('bolgeyazi').textContent=(SECMOD==='ilce'?'İlçe seçmek için haritada dokunun':'Mahalle seçmek için haritada dokunun')
   +' · '+(SECMOD==='ilce'?S.ilce.length+' ilçe':S.mah.length+' mahalle')+' seçili';
@@ -1021,8 +1089,8 @@ function noktaYenile(){if(!EH||S.gor!=='harita')return;
   if(!tum){var p=EH.latLngToContainerPoint([r[F.lat],r[F.lon]]),k=Math.floor(p.x/EH_HUCRE)+'_'+Math.floor(p.y/EH_HUCRE);
    if(dolu[k]&&!buAcik)return;dolu[k]=1}
   n++;if(buAcik)return;
-  var mk=L.circleMarker([r[F.lat],r[F.lon]],{renderer:EHR,radius:yr,weight:yr<6?1:1.5,color:koyu()?'#000':'#fff',fillColor:renk,fillOpacity:.9})
-   .bindPopup(function(){var bb=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;return'<a class="hb" href="'+esc(bb.link)+'" target="_blank" rel="noopener">'+esc(bb.baslik)+'</a><b>'+r[F.fiyat].toLocaleString('tr-TR')+' TL</b><br>'+esc(bb.kisa)+'<br><span class="hy">'+esc(bb.yer)+'</span>'
+  var mk=L.circleMarker([r[F.lat],r[F.lon]],{renderer:EHR,radius:yr,weight:yr<6?1:1.5,color:koyu()?'#000':'#fff',fillColor:renk,fillOpacity:.9,bubblingMouseEvents:false})
+   .bindPopup(function(){var bb=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;return'<a class="hb" href="'+esc(bb.link)+'" target="_blank" rel="noopener">'+esc(bb.baslik)+'</a><b>'+r[F.fiyat].toLocaleString('tr-TR')+' TL</b>'+(dusus(r)?' <small>↓%'+dusus(r).y+' · '+dusus(r).g+'</small>':'')+'<br>'+esc(bb.kisa)+'<br><span class="hy">'+esc(bb.yer)+'</span>'
     +'<label class="sec"><input type="checkbox" data-no="'+r[F.no]+'"'+(sec?' checked':'')+'><span>'+(sec?'PDF için seçildi':'PDF için seç')+'</span></label>'
     +'<a class="git" href="'+esc(bb.link)+'" target="_blank" rel="noopener">İlanı aç</a>'},{maxWidth:280,minWidth:220,autoPan:false}).addTo(EHK);mk._no=r[F.no]});
  if(EHN)EHN.textContent=''}
@@ -1106,13 +1174,17 @@ function kur(){
   el.addEventListener(el.tagName==='SELECT'?'change':'input',function(){S[id]=el.value;clearTimeout(zam);zam=setTimeout(function(){kaydet();ciz()},250)})});
  $('hi').addEventListener('change',function(){S.hi=$('hi').value;S.hm='';if(S.hi===ROTA){S.rota=true;if(EH)rotaCiz(false)}hedefCiz();$('hm').value='';agCiz()});
  $('gizle').addEventListener('change',function(){S.gizle=$('gizle').checked;kaydet();ciz()});
+ ['rmin','rmax'].forEach(function(id){$(id).addEventListener('input',function(){var a=$('rmin'),b=$('rmax'),u=fiyatUst();
+  if(+a.value>+b.value){if(id==='rmin')a.value=b.value;else b.value=a.value}
+  if(!u)return;S.min=+a.value>0?String(kdFiyat(+a.value)):'';S.max=+b.value<1000?String(kdFiyat(+b.value)):'';$('min').value=S.min;$('max').value=S.max;
+  kaydiriciYaz();degerYaz();clearTimeout(zam);zam=setTimeout(function(){kaydet();ciz()},250)})});
  $('mahara').addEventListener('input',mahCiz);
  document.querySelectorAll('.secdug').forEach(function(b){b.hidden=!SINIR_DOSYA;b.onclick=function(){secBasla(b.dataset.sec)}});
  $('bolgebitti').onclick=secBitir;vurguKur('ilceler','ilce');vurguKur('mahliste','mah');
  $('mahliste').onclick=function(e){var b=e.target.closest('button');if(!b)return;var k=b.dataset.v,i=S.mah.indexOf(k);
   if(i>=0)S.mah.splice(i,1);else S.mah.push(k);kaydet();arayuzYaz();ciz()};
  $('agsifir').onclick=function(){AG.forEach(function(a){S.w[a[0]]=a[1]});kaydet();agCiz();ciz()};
- $('temizle').onclick=function(){var w=S.w,sr=S.sira,h=[S.hi,S.hm,S.gor,S.ters,S.rota,S.yol,S.toplu,S.sinir,S.detay,S.ilanlar];S=kopya(BOS);S.w=w;S.sira=sr;S.hi=h[0];S.hm=h[1];S.gor=h[2];S.ters=h[3];S.rota=h[4];S.yol=h[5];S.toplu=h[6];S.sinir=h[7];S.detay=h[8];S.ilanlar=h[9];kaydet();arayuzYaz();ciz()};
+ $('temizle').onclick=function(){var w=S.w,sr=S.sira,h=[S.hi,S.hm,S.gor,S.ters,S.rota,S.yol,S.toplu,S.sinir,S.detay,S.ilanlar,S.kira];S=kopya(BOS);S.kira=h[10];S.w=w;S.sira=sr;S.hi=h[0];S.hm=h[1];S.gor=h[2];S.ters=h[3];S.rota=h[4];S.yol=h[5];S.toplu=h[6];S.sinir=h[7];S.detay=h[8];S.ilanlar=h[9];kaydet();arayuzYaz();ciz()};
  $('daha').onclick=function(){var ilk=GOSTER;GOSTER+=adim();liste();var li=$('liste').children[ilk];if(li){var a=li.querySelector('h2 a,.tsat');if(a)a.focus()}};
  $('gor').onclick=function(e){var b=e.target.closest('button');if(!b||b.dataset.g===S.gor)return;S.gor=b.dataset.g;GOSTER=adim();kaydet();liste()};
  $('tbas').onclick=function(e){var b=e.target.closest('button');if(!b)return;var k=b.dataset.k;
@@ -1147,7 +1219,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=e9b69b5a66').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=30e11d49ea').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
