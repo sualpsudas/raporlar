@@ -279,23 +279,29 @@ box-shadow:0 -2px 12px rgba(0,0,0,.08)}
 body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 #yazdir{display:none}
 @media print{
- @page{size:A4;margin:14mm 12mm}
+ @page{size:A4;margin:20mm 18mm}
  body{background:#fff!important;color:#000;padding:0!important;font-size:10.5pt}
  body>*:not(#yazdir){display:none!important}
  #yazdir{display:block!important;color:#000;font-size:10.5pt}
- #yazdir h1{font-size:16pt;margin:0 0 2mm}
- .p-ust{font-size:9.5pt;color:#333;margin:0 0 4mm;border-bottom:1px solid #999;padding-bottom:3mm}
- .p-ilan{display:grid;grid-template-columns:34mm 1fr 30mm;gap:4mm;padding:2.5mm 0;border-bottom:1px solid #ddd;break-inside:avoid;page-break-inside:avoid}
+ #yazdir h1{font-size:16pt;margin:0 0 4mm}.p-mes{white-space:nowrap}
+ .p-ilan{display:grid;grid-template-columns:1fr 32mm;gap:4mm;padding:3mm 0;border-bottom:1px solid #ddd;break-inside:avoid;page-break-inside:avoid}
  .p-ilan.p-yeni{border-top:1.5px solid #000}
- .p-ilan img,.p-bos{width:34mm;height:25mm;object-fit:cover;border-radius:2mm;background:#eee;display:block}
- .p-yer{font-size:10pt;color:#222;text-align:right;line-height:1.35}.p-yer b{font-size:11pt}
- .p-ilan h4{font-size:11pt;margin:0 0 1mm}.p-ilan a{color:#0b4f8a;text-decoration:none}
- .p-ulas{grid-column:1/-1;display:flex;gap:4mm;align-items:flex-start;margin-top:1mm}
+ .p-yan{display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;text-align:right;gap:3mm}
+ .p-yer{font-size:10pt;color:#222;line-height:1.35}.p-yer b{font-size:11pt}
+ .p-puan{display:inline-flex;align-items:center;justify-content:center;width:11mm;height:11mm;border-radius:50%;margin-top:2mm;
+  font-size:12pt;font-weight:700;border:1.5px solid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .p-puan.iyi{background:#dcfce7;border-color:#15803d;color:#14532d}.p-puan.orta{background:#fef3c7;border-color:#b45309;color:#78350f}
+ .p-puan.zayif{background:#fee2e2;border-color:#b91c1c;color:#7f1d1d}
+ .p-fiyat{font-size:12pt;line-height:1.3}.p-fiyat small{display:block;font-size:8pt;font-weight:400;color:#444}
+ .p-oz{display:grid;grid-template-columns:1fr 1fr;gap:0 4mm;font-size:9.5pt;margin:0 0 1.5mm}.p-oz span{color:#555}
+ .p-ilan h4{font-size:11pt;margin:0 0 1.5mm}.p-ilan a{color:#0b4f8a;text-decoration:none}
+ .p-bas{font-weight:700}
+ .p-ulas{display:flex;gap:4mm;align-items:flex-start;margin-top:1.5mm}
  .p-harita{position:relative;overflow:hidden;flex:none;border:1px solid #bbb;border-radius:2mm;background:#eee}
  .p-harita img{position:absolute;width:256px;height:256px;max-width:none;border-radius:0}
  .p-harita svg{position:absolute;left:0;top:0}
  .p-ulas-yazi p{margin:0 0 1.5mm}.p-ren{display:inline-block;width:3mm;height:3mm;border-radius:50%;margin-right:1.5mm;vertical-align:-.3mm}
- .p-ilan p{margin:0 0 1mm;color:#222}.p-uyari{font-size:9pt;color:#8a3200!important}.p-fiyat{font-size:11pt}.p-ay,.p-link{font-size:8.5pt;color:#444!important}
+ .p-ilan p{margin:0 0 1mm;color:#222}.p-uyari{font-size:9pt;color:#8a3200!important}.p-ay{font-size:8.5pt;color:#444!important}
 }
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
 @media(max-width:389px){.ilan{grid-template-columns:112px minmax(0,1fr);gap:0 10px;grid-template-areas:"ft orta" "s3 s3" "s4 s4" "ay ay";grid-template-rows:auto}
@@ -575,7 +581,7 @@ function bilgi(r){
   r[F.kat]?(/^\d/.test(r[F.kat])?ks(r[F.kat])+(r[F.katS]?'/'+ks(r[F.katS]):'')+' kat':kucuk(r[F.kat])):'',
   r[F.yas]===null?'':(r[F.yas]===0?'sıfır bina':(r[F.yas]>=YAS_TAVAN?'31+ yaş':'~'+r[F.yas]+' yaş'))],kisa=kp.filter(Boolean).join(' · ');
  return{link:tamLink(r[F.no],r[F.link]),foto:tamFoto(r[F.no],r[F.foto]),yer:D.ilce[r[F.ilce]]+', '+D.mah[r[F.mah]],kisa:kisa,parca:kp,
-  satir:[r[F.oda],m2,kat,yas].filter(Boolean).join(' · '),ozler:oz,oz:oz.join(' · '),baslik:baslik(r[F.bas])||r[F.no],
+  satir:[r[F.oda],m2,kat,yas].filter(Boolean).join(' · '),m2:m2,kat:kat,yas:yas,ozler:oz,oz:oz.join(' · '),baslik:baslik(r[F.bas])||r[F.no],
   yayin:gun===null?'':(gun===0?'bugün yayınlandı':gun+' gündür yayında'),uyari:notlar,
   harita:'https://www.google.com/maps/search/?api=1&query='+(r[F.lat]!=null?r[F.lat]+','+r[F.lon]
    :encodeURIComponent(D.mah[r[F.mah]]+' Mahallesi, '+D.ilce[r[F.ilce]]+', İstanbul'))}}
@@ -713,12 +719,8 @@ function secCubuk(){var n=SEC.length;pdfSonra();$('secbar').hidden=!n;document.b
 var AYRI_UYG=window.navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
 function pdfHazirla(){if(!D||!PUANLA||!SEC.length)return;yolYukle();
  var rs=D.satir.filter(function(r){return SEC.indexOf(r[F.no])>=0}).map(PUANLA);
- var et=etiketler().map(function(x){return x[0]}).join(', ');
- var ag=AG.map(function(a){return a[2]+' %'+S.w[a[0]]}).join(', ');
- var tarih=$('guncel').textContent;
- $('yazdir').innerHTML='<h1>Seçilen kiralık ilanlar</h1><p class="p-ust">'+rs.length+' ilan · '+YAKA+' · sahibinden.com · '+esc(tarih)+' verisi'
-  +(et?'<br>Süzgeçler: '+esc(et):'')+'<br>Puan ağırlıkları: '+esc(ag)
-  +(YOL_SURUM?'<br>Küçük haritalar: altlık © Esri, HERE, Garmin · yol ağı ve duraklar © OpenStreetMap katkıcıları':'')+'</p>'+pdfGruplar(rs)}
+ // ust bilgi satirlari (ilan sayisi, suzgec, agirlik, harita kaynagi) 2026-11-03 kullanici istegiyle kaldirildi
+ $('yazdir').innerHTML='<h1>Seçilen kiralık ilanlar</h1>'+pdfGruplar(rs)}
 var pdfZam;function pdfSonra(){clearTimeout(pdfZam);pdfZam=setTimeout(pdfHazirla,300)}
 // --- PDF'te ilan basina kucuk harita + en yakin metro / otobus duragina yurume (2026-11-02, kullanici istegi) ---
 // Rotalar ulasim/ilan_yol.json'dan (OSM yol agi), ilan_no % YOL_PARCA parcalara bolunmus; yalniz secilen ilanlarin
@@ -767,10 +769,9 @@ function pdfUlasim(r){var y=YOL[r[F.no]];if(!y)return'';
  var s=[],rayli=false;
  TT_TUR.forEach(function(t){var k=y[t[0]];if(!k)return;if('mrtb'.indexOf(t[0])>=0)rayli=true;
   s.push('<p><i class="p-ren" style="background:'+RENK[t[2]]+'"></i>'+t[1]+': <b>'+esc(k[0]||'adsız')+'</b>'+(k[1]?' ('+esc(k[1])+')':'')
-   +' — '+mesafe(k[2])+' ('+dkYaz(k[2])+')</p>')});
+   +' <span class="p-mes">— '+mesafe(k[2])+' ('+dkYaz(k[2])+')</span></p>')});
  if(!rayli)s.push('<p class="p-ay">3 km içinde metro, Marmaray, tramvay ya da metrobüs yok</p>');
- return'<div class="p-ulas">'+(r[F.lat]!=null?miniHarita(r,y):'')+'<div class="p-ulas-yazi">'+s.join('')
-  +'<p class="p-ay">Yürüme mesafesi; kesikli çizgi evden yürüme yolu (ana yoldan karşıya yalnız üst/alt geçitten). Vapur ve füniküler çizilmez.</p></div></div>'}
+ return'<div class="p-ulas">'+(r[F.lat]!=null?miniHarita(r,y):'')+'<div class="p-ulas-yazi"><p class="p-bas">Ulaşım:</p>'+s.join('')+'</div></div>'}
 function pdf(){
  if(AYRI_UYG){window.open(urlYap()+'&sec='+SEC.join(',')+'&pdf=1','_blank');return}
  pdfHazirla();var eski=document.title;document.title='Kiralık ilanlar '+$('guncel').textContent;window.print();
@@ -779,16 +780,25 @@ function pdfGruplar(rs){var tr=function(a,b){return a.localeCompare(b,'tr')},onc
  var mah=function(x){return D.mah[x.r[F.mah]]||'Mahallesi bilinmeyen'};
  rs.sort(function(a,b){return tr(D.ilce[a.r[F.ilce]],D.ilce[b.r[F.ilce]])||tr(mah(a),mah(b))||b.t-a.t});
  return rs.map(function(x,i){var il=D.ilce[x.r[F.ilce]],yeni=il!==onceki;onceki=il;return pdfIlan(x,i+1,yeni)}).join('')}
-function pdfIlan(x,no,yeniIlce){var r=x.r,b=bilgi(r);
-   return'<div class="p-ilan'+(yeniIlce?' p-yeni':'')+'">'+(b.foto?'<img src="'+b.foto+'" alt="" referrerpolicy="no-referrer">':'<span class="p-bos"></span>')
-    +'<div><h4>'+no+'. <a href="'+b.link+'">'+esc(b.baslik)+'</a></h4><p>'+esc(b.satir)+(b.oz?'<br>'+esc(b.oz):'')+'</p>'
-    +'<p class="p-fiyat"><b>'+tl(r[F.fiyat])+' TL</b>'+(r[F.eski]?' (önceki '+tl(r[F.eski])+' TL)':'')+' · Uygunluk <b>'+Math.round(x.t)+'</b>/100</p>'
-    +(bekMetin(r)?'<p class="p-ay">'+bekMetin(r).replace(/<\/?b>/g,'')+'</p>':'')
-    +'<p class="p-ay">'+AG.filter(function(a){return isFinite(x.p[a[0]])}).map(function(a){return a[2]+' '+Math.round(x.p[a[0]])}).join(' · ')
-    +(r[F.ses]?' · mahallenin 2016 sınıfı '+esc(r[F.ses]):'')+(b.yayin?' · '+b.yayin:'')+'</p>'
-    +(b.uyari.length?'<p class="p-uyari">'+esc(b.uyari.join(' · '))+'</p>':'')
-    +'<p class="p-link">İlan no '+r[F.no]+' · <a href="'+b.link+'">'+esc(b.link.replace(/^https:\/\/www\./,''))+'</a></p></div>'
-    +'<div class="p-yer"><b>'+esc(D.ilce[r[F.ilce]])+'</b><br>'+esc(D.mah[r[F.mah]]||'')+'</div>'+pdfUlasim(r)+'</div>'}
+// PDF ilan blogu (2026-11-03 kullanici istegi): fotograf yok, baslik yerine linkli ilan no, ozellikler "ad: deger",
+// sagda ilce / mahalle / renkli puan yuvarlagi, sag altta kira + kucuk puntoyla beklenen kira tutari
+function pdfOz(r,b){var o=[],ek=function(a,v){if(v)o.push('<p><span>'+a+':</span> '+esc(v)+'</p>')};
+ var ot=D.otopark[r[F.otop]];
+ ek('Oda',r[F.oda]);ek('Alan',b.m2);ek('Kat',b.kat);ek('Bina',b.yas);
+ ek('Kimden',r[F.kim]===1?'sahibinden':'');ek('Site',r[F.site]===1?'içinde':(r[F.site]===0?'dışında':''));
+ ek('Asansör',r[F.asan]===1?'var':(r[F.asan]===0?'yok':''));ek('Otopark',ot?kucuk(ot).replace(/ otopark$/,''):'');
+ ek('Isıtma',D.isitma[r[F.isit]]?kucuk(D.isitma[r[F.isit]]):'');ek('Balkon',r[F.balk]===1?'var':(r[F.balk]===0?'yok':''));
+ ek('Mahalle sınıfı (2016)',r[F.ses]||'');ek('Yayında',b.yayin.replace(/gündür yayında$/,'gün').replace(/ yayınlandı$/,''));
+ return'<div class="p-oz">'+o.join('')+'</div>'}
+function puanSinif(t){return t>=70?'iyi':(t>=50?'orta':'zayif')}
+function pdfIlan(x,no,yeniIlce){var r=x.r,b=bilgi(r),t=Math.round(x.t);
+   return'<div class="p-ilan'+(yeniIlce?' p-yeni':'')+'"><div>'
+    +'<h4>'+no+'. <a href="'+b.link+'">'+r[F.no]+'</a></h4>'+pdfOz(r,b)
+    +(b.uyari.length?'<p class="p-uyari">'+esc(b.uyari.join(' · '))+'</p>':'')+pdfUlasim(r)+'</div>'
+    +'<div class="p-yan"><div class="p-yer"><b>'+esc(D.ilce[r[F.ilce]])+'</b><br>'+esc(D.mah[r[F.mah]]||'')
+    +'<br><span class="p-puan '+puanSinif(t)+'" title="Uygunluk puanı">'+t+'</span></div>'
+    +'<div class="p-fiyat"><b>'+tl(r[F.fiyat])+' TL</b>'+(r[F.eski]?'<small>önceki '+tl(r[F.eski])+' TL</small>':'')
+    +(r[F.bek]?'<small>beklenen ~'+tl(Math.round(r[F.bek]/1000)*1000)+' TL</small>':'')+'</div></div></div>'}
 // secilenleri mesaj olarak paylas (iPhone: paylas menusu -> WhatsApp; yoksa WhatsApp Web)
 function secPaylas(){
  var rs=D.satir.filter(function(r){return SEC.indexOf(r[F.no])>=0}).map(PUANLA).sort(function(a,b){return b.t-a.t});
@@ -1001,7 +1011,8 @@ function noktaYenile(){if(!EH||S.gor!=='harita')return;
   if(!tum){var p=EH.latLngToContainerPoint([r[F.lat],r[F.lon]]),k=Math.floor(p.x/EH_HUCRE)+'_'+Math.floor(p.y/EH_HUCRE);
    if(dolu[k])return;dolu[k]=1}
   n++;L.circleMarker([r[F.lat],r[F.lon]],{renderer:EHR,radius:yr,weight:yr<6?1:1.5,color:koyu()?'#000':'#fff',fillColor:renk,fillOpacity:.9})
-   .bindPopup(function(){var bb=bilgi(r);return'<b>'+r[F.fiyat].toLocaleString('tr-TR')+' TL</b><br>'+esc(bb.kisa)+'<br><span class="hy">'+esc(bb.yer)+'</span>'
+   .bindPopup(function(){var bb=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;return'<b>'+r[F.fiyat].toLocaleString('tr-TR')+' TL</b><br>'+esc(bb.kisa)+'<br><span class="hy">'+esc(bb.yer)+'</span>'
+    +'<label class="sec"><input type="checkbox" data-no="'+r[F.no]+'"'+(sec?' checked':'')+'><span>'+(sec?'PDF için seçildi':'PDF için seç')+'</span></label>'
     +'<a class="git" href="'+esc(bb.link)+'" target="_blank" rel="noopener">İlanı aç</a>'},{maxWidth:280,minWidth:220}).addTo(EHK)});
  if(EHN)EHN.textContent=(tum?n.toLocaleString('tr-TR')+' ilan':n.toLocaleString('tr-TR')+' / '+top.toLocaleString('tr-TR')+' ilan gösteriliyor · yaklaştıkça artar')
   +(S.toplu&&EH.getZoom()<DURAK_ZOOM?' · otobüs durakları yakınlaşınca':'')}
@@ -1112,6 +1123,9 @@ function kur(){
  $('liste').addEventListener('change',function(e){var c=e.target;if(!c.dataset||!c.dataset.no)return;
   var i=SEC.indexOf(c.dataset.no);if(c.checked&&i<0)SEC.push(c.dataset.no);if(!c.checked&&i>=0)SEC.splice(i,1);
   c.closest('li').classList.toggle('secili',c.checked);c.nextElementSibling.textContent=c.checked?'Seçildi':'Seç';secKaydet();secCubuk()});
+ $('evharita').addEventListener('change',function(e){var c=e.target;if(!c.dataset||!c.dataset.no)return;
+  var i=SEC.indexOf(c.dataset.no);if(c.checked&&i<0)SEC.push(c.dataset.no);if(!c.checked&&i>=0)SEC.splice(i,1);
+  c.nextElementSibling.textContent=c.checked?'PDF için seçildi':'PDF için seç';secKaydet();secCubuk()});
  $('yalniz').onclick=function(){S.yalnizSecili=!S.yalnizSecili;ciz();window.scrollTo(0,$('sonuclar').offsetTop-8)};
  $('secsil').onclick=function(){if(!confirm(SEC.length+' ilanın seçimi kaldırılsın mı?'))return;SEC=[];S.yalnizSecili=false;secKaydet();ciz()};
  $('buyuk-kapat').onclick=function(){$('buyuk').close()};
@@ -1123,7 +1137,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=b7119535ac').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=f136d6c5b6').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
