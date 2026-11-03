@@ -193,8 +193,6 @@ button.ayb[aria-expanded=true]::after{transform:rotate(-135deg);margin-bottom:0}
 .ayrinti{font-size:14px;line-height:1.5;color:var(--ink2);margin:2px 0 8px}
 .ayrinti p{margin:0 0 3px}
 .ilan h2 a{text-decoration:none;color:var(--link)}.ilan h2 a:hover,.ilan h2 a:focus-visible{text-decoration:underline}
-.dok{margin:0 0 3px}
-.dok b{font-weight:600;color:var(--ink2);font-variant-numeric:tabular-nums}
 .fark{flex:none;font-size:12.5px;font-weight:600;line-height:1;padding:4px 7px;border-radius:6px;margin-top:1px;white-space:nowrap;
 font-variant-numeric:tabular-nums;background:var(--f0);color:var(--f0y)}
 .fark.u1,.fark.u2{background:var(--u1);color:var(--uy)}.fark.u2{font-weight:700}
@@ -655,10 +653,6 @@ function bekMetin(r){if(!r[F.bek])return'';var f=Math.round((r[F.fiyat]/r[F.bek]
   y=Math.abs(f)<2?'Beklenen kiraya yakın':'Beklenen kiradan <b>%'+Math.abs(f)+' '+(f<0?'ucuz':'pahalı')+'</b>',
   d=r[F.bekB]?' (tahmin belirsiz)':(r[F.fiyat]<r[F.bekA]?' (benzerlerine göre belirgin ucuz)':(r[F.fiyat]>r[F.bekU]?' (benzerlerine göre belirgin pahalı)':''));
  return y+d+' · beklenen ~'+bin(Math.round(r[F.bek]/1000)*1000)+' TL'}
-// puan ayrintisinda acik rakamlar: ilan / beklenen / olasi aralik (kira_model %80 araligi)
-function bekRakam(r){if(!r[F.bek])return'';var k=function(v){return bin(Math.round(v/1000))};
- return'Beklenen kira ~'+k(r[F.bek])+' bin TL'+(r[F.bekB]?' (tahmin belirsiz)':' · olası aralık '+k(r[F.bekA])+'–'+k(r[F.bekU])+' bin TL')
-  +' · ilan '+bekMetin(r).split(' · ')[0].replace('Beklenen kiradan ','beklenenden ').replace('Beklenen kiraya yakın','beklenene yakın')}
 // kartta kiranin yaninda: beklenen kiraya gore yuzde ("%18 ucuz"). Yesil = ucuz, kirmizi = pahali; koyu ton = araligin disinda
 // (belirgin). Tahmin belirsizse soluk. Uzerine gelince / ekran okuyucuda aciklama.
 // fiyat dususu (2026-11-03): son 14 gunde kira dustuyse "↓%5 · 3 gün önce" (ev_bul._dususler)
@@ -682,8 +676,7 @@ function kart(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
  var foto=fs?'<button type="button" class="ftb" data-buyuk="'+fs.replace('/x5_','/x16_')+'" aria-label="Fotoğrafı büyüt: '+esc(b.baslik)+'"><img class="ft" src="'+fs+'" alt="" width="132" height="99" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="ftYok(this)"></button>':BOS_FT;
  var not=b.uyari.map(function(u){return'<span class="u">'+esc(u)+'</span>'});
  if(r[F.es].length)not.push('aynı ev '+(r[F.es].length+1)+' ilanda');
- var dok=AG.filter(function(a){return x.p[a[0]]!==undefined}).map(function(a){return a[2]+(a[0]==='bolge'&&r[F.ses]?' ('+esc(r[F.ses])+')':'')+' <b>'+(x.u[a[0]]?'bilinmiyor':Math.round(x.p[a[0]]))+'</b>'}).join(' · ');
- var bek=bekRakam(r),rz=farkRozet(r);
+ var rz=farkRozet(r);
  var es=r[F.es].length?'<p class="diger">Aynı evin diğer ilanları: '+r[F.es].map(function(e,i){
   return'<a href="'+tamLink(e[0],e[1])+'" target="_blank" rel="noopener">'+(i+2)+'. ilan</a>'}).join('')+'</p>':'';
  var km=x.km!==null&&x.km!==undefined?' · '+kmYaz(x.km):'';
@@ -702,15 +695,14 @@ function kart(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
   +(b.oz?'<p>'+esc(b.oz)+'</p>':'')
   +'<p>'+(b.yayin?esc(b.yayin)+' · ':'')+'<a href="'+b.harita+'" target="_blank" rel="noopener">haritada aç</a></p>'
   +(not.length?'<p class="not">'+not.join(' · ')+'</p>':'')+es
-  +'<p class="dok">'+dok+'</p>'+(bek?'<p class="dok">'+bek+'</p>':'')+'</div>'
+  +'</div>'
   +'</article></li>'}
 
 // tablo satiri: tek dokunusla acilir (fotograf, ilan baglantisi, sec, tum ayrintilar)
 function satir(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
  var not=b.uyari.map(function(u){return'<span class="u">'+esc(u)+'</span>'});
  if(r[F.es].length)not.push('aynı ev '+(r[F.es].length+1)+' ilanda');
- var dok=AG.filter(function(a){return x.p[a[0]]!==undefined}).map(function(a){return a[2]+(a[0]==='bolge'&&r[F.ses]?' ('+esc(r[F.ses])+')':'')+' <b>'+(x.u[a[0]]?'bilinmiyor':Math.round(x.p[a[0]]))+'</b>'}).join(' · ');
- var bek=bekRakam(r),es=r[F.es].length?'<p class="diger">Aynı evin diğer ilanları: '+r[F.es].map(function(e,i){
+ var es=r[F.es].length?'<p class="diger">Aynı evin diğer ilanları: '+r[F.es].map(function(e,i){
   return'<a href="'+tamLink(e[0],e[1])+'" target="_blank" rel="noopener">'+(i+2)+'. ilan</a>'}).join('')+'</p>':'';
  // kira hucresi: beklenen kiraya gore belirgin ucuz yesil, belirgin pahali kirmizi; supheli fiyat turuncu
  var ks=r[F.suph]?' su':(r[F.bek]&&!r[F.bekB]?(r[F.fiyat]<r[F.bekA]?' uc':(r[F.fiyat]>r[F.bekU]?' pa':'')):'');
@@ -729,7 +721,6 @@ function satir(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
   +'<p>'+(b.yayin?esc(b.yayin)+' · ':'')+'<a href="'+b.harita+'" target="_blank" rel="noopener">haritada aç</a>'
   +(r[F.eski]?' · önceki kira '+tl(r[F.eski])+' TL'+(dusus(r)?' ('+dusus(r).g+' düştü)':''):'')+'</p>'
   +(not.length?'<p class="not">'+not.join(' · ')+'</p>':'')+es
-  +'<p class="dok">'+dok+'</p>'+(bek?'<p class="dok">'+bek+'</p>':'')
   +'</div></div></li>'}
 function adim(){return S.gor==='kart'?20:50}
 // sutun basliklari (tablo gorunumu): dokununca o sutuna gore sirala, ikinci dokunusta yonu cevir
@@ -1242,7 +1233,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=30e11d49ea').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=458f09f39b').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
