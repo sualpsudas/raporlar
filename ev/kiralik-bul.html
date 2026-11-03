@@ -353,6 +353,12 @@ button.tsat[aria-expanded=true]{border-radius:0}
  background:var(--yuzey);border:2px solid var(--secili);box-shadow:0 1px 3px rgba(0,0,0,.25);cursor:pointer}
 .fkay input::-moz-range-track{background:none}
 .fkay input::-moz-range-thumb{pointer-events:auto;width:20px;height:20px;border-radius:50%;background:var(--yuzey);border:2px solid var(--secili);cursor:pointer}
+/* sinir adlari: ilce koyu ve buyuk, mahalle kucuk; beyaz hale ile okunur, dokunulmaz */
+.snr-ad{pointer-events:none;white-space:nowrap}
+.snr-ad span{display:block;transform:translate(-50%,-50%);font:600 12px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#3a3a3c;
+ text-shadow:0 0 2px #fff,0 0 2px #fff,0 0 3px #fff;letter-spacing:.2px}
+.snr-ad.mh span{font-size:10.5px;font-weight:500;color:#5a5a5f}
+@media(prefers-color-scheme:dark){.snr-ad span{color:#e5e5ea;text-shadow:0 0 2px #000,0 0 2px #000,0 0 3px #000}.snr-ad.mh span{color:#c7c7cc}}
 /* kira seviyesi lejanti */
 .evharita .ehlej{display:flex;flex-direction:column;gap:2px;font-size:11px;line-height:1.3;padding:6px 8px}
 .evharita .ehlej[hidden]{display:none}
@@ -476,10 +482,12 @@ button.tsat[aria-expanded=true]{border-radius:0}
 <div id="yazdir" aria-hidden="true"></div>
 <script>
 (function(){
-var AG=[["kat", 18, "Kat"], ["yas", 17, "Bina yeniliği"], ["fiyat", 15, "Kira"], ["konum", 14, "Hedef konum"], ["site", 13, "Site içinde"], ["bolge", 12, "Bölge"], ["m2", 11, "Net m²"]],YAS_TAVAN=35,YAS_EGRI=[[0, 100], [3, 92], [8, 78], [13, 64], [18, 46], [23, 24], [28, 10], [35, 0]],BIL=50,VERI_GUN=new Date('2026-11-02'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
+var AG=[["kat", 14, "Kat"], ["yas", 13, "Bina yeniliği"], ["fiyat", 11, "Kira"], ["konum", 11, "Hedef konum"], ["site", 9, "Site içinde"], ["deger", 8, "Fiyatına değer"], ["ulasim", 7, "Ulaşım"], ["bolge", 7, "Bölge"], ["m2", 6, "Ferahlık"], ["donanim", 4, "Donanım"]],YAS_TAVAN=35,YAS_EGRI=[[0, 100], [3, 92], [8, 78], [13, 64], [18, 46], [23, 24], [28, 10], [35, 0]],BIL=50,VERI_GUN=new Date('2026-11-02'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
 var F={no:0,bas:1,link:2,foto:3,fiyat:4,net:5,brut:6,oda:7,ilce:8,mah:9,kat:10,katS:11,katP:12,katN:13,yas:14,bolge:15,
  ses:16,site:17,asan:18,otop:19,isit:20,balk:21,yeni:22,eski:23,es:24,suph:25,tarih:26,kiraP:27,m2P:28,
- bek:29,bekA:30,bekU:31,bekB:32,kn:33,lat:34,lon:35,kim:36,dusT:37};
+ bek:29,bekA:30,bekU:31,bekB:32,kn:33,lat:34,lon:35,kim:36,dusT:37,deger:38,ulasim:39,donanim:40,deprem:41,doga:42,mutfak:43};
+// gizli basliklar (2026-11-03 kullanici: puana girsin, sayfada gorunmesin): sabit agirlik, surgu yok (ev_bul.py)
+var GIZLI=[['deprem',5],['doga',5]];
 // hedef konum: evin gercek konumu (F.lat/F.lon, harita aramasi; yoksa mahalle noktasi D.kn) ile hedef arasi kus ucusu
 // km; Bogaz'in obur yakasina KOPRU km eklenir.
 // Konum puani: KONUM_TAM km'ye kadar 100, sonra her KONUM_OLCEK km'de ~e kati azalir (5 km 65, 10 km 32, 20 km 8).
@@ -514,12 +522,12 @@ var GIZLE=/günlük|gunluk|haftalık|paylaşımlı|oda kiralık|kiralık oda|ö�
 // olmazsa olmazlar (dugme) + gizle (onay kutusu)
 // sahibi (2026-11-02 kullanici): yalniz ev sahibinin verdigi ilanlar (sahibinden.com "Kimden: Sahibinden"); bilgisi
 // olmayan ilan gizlenir (Avrupa yakasinda alan henuz toplaniyor)
-var OZ=[['asansor','Asansör'],['otopark','Otopark'],['site','Site içi'],['balkon','Balkon'],['uygunkat','Ara kat'],['sahibi','Sahibinden']];
+var OZ=[['asansor','Asansör'],['otopark','Otopark'],['site','Site içi'],['balkon','Balkon'],['uygunkat','Ara kat'],['sahibi','Sahibinden'],['mutAcik','Açık mutfak'],['mutAyri','Ayrı mutfak']];
 var KUTU=OZ.map(function(o){return o[0]}).concat(['gizle']),ALAN=['min','max','m2','yas','km','kx','bm','bx','pm','ara','sira','hi','hm','hu'];
 var ODALAR=['Stüdyo','1+1','2+1','3+1','4+'];
 // kat suzgeci (2026-11-02): km/kx = bulundugu kat en az/en cok, bm/bx = binanin kat sayisi en az/en cok
 var BOS={min:'',max:'',m2:'',yas:'',km:'',kx:'',bm:'',bx:'',pm:'',oda:[],ilce:[],mah:[],ara:'',asansor:false,otopark:false,site:false,balkon:false,sahibi:false,
- uygunkat:false,gizle:true,rota:false,yol:false,toplu:false,sinir:false,kira:false,detay:false,ilanlar:true,sira:'puan',w:{},yalnizSecili:false,hi:'',hm:'',hu:'',gor:'kart',ters:false};
+ uygunkat:false,mutAcik:false,mutAyri:false,gizle:true,rota:false,yol:false,toplu:false,sinir:false,kira:false,detay:false,ilanlar:true,sira:'puan',w:{},yalnizSecili:false,hi:'',hm:'',hu:'',gor:'kart',ters:false};
 AG.forEach(function(a){BOS.w[a[0]]=a[1]});
 function kopya(o){return JSON.parse(JSON.stringify(o))}
 var S=kopya(BOS),D=null,SON=[],GOSTER=20,$=function(id){return document.getElementById(id)};
@@ -583,6 +591,8 @@ function suz(r,yerHaric){
  if(S.asansor&&r[F.asan]!==1)return false;if(S.site&&r[F.site]!==1)return false;
  if(S.balkon&&r[F.balk]!==1)return false;if(S.uygunkat&&r[F.katN]!==0)return false;
  if(S.sahibi&&r[F.kim]!==1)return false;
+ // mutfak (2026-11-03): yalniz biri secilince suzer; ikisi birden = hepsi; bilgisi olmayan teki secilince gizlenir
+ if(S.mutAcik!==S.mutAyri&&r[F.mutfak]!==(S.mutAcik?1:2))return false;
  if(S.otopark&&!/Otopark/.test(D.otopark[r[F.otop]]))return false;
  var b=kucuk(r[F.bas]);
  if(S.gizle&&GIZLE.test(b))return false;
@@ -595,15 +605,16 @@ function puanSuz(x){if(hedef()&&S.hu!==''&&!(x.km!==null&&x.km<=+S.hu))return fa
  return S.pm===''||Math.round(x.t)>=+S.pm}
 function hesap(){
  var rs=D.satir.filter(function(r){return suz(r)});
- var H=hedef(),top=0;AG.forEach(function(a){if(a[0]!=='konum'||H)top+=+S.w[a[0]]});top=top||1;
+ var H=hedef(),top=0;AG.forEach(function(a){if(a[0]!=='konum'||H)top+=+S.w[a[0]]});GIZLI.forEach(function(g){top+=g[1]});top=top||1;
  PUANLA=function(r){var p={kat:r[F.katP],yas:r[F.yas]===null?BIL:yasPuan(r[F.yas]),
   bolge:r[F.bolge]===null?BIL:r[F.bolge],fiyat:r[F.kiraP],site:r[F.site]===null?BIL:r[F.site]*100,m2:r[F.m2P]},t=0;
+  ['deger','ulasim','donanim','deprem','doga'].forEach(function(k){p[k]=r[F[k]]==null?BIL:r[F[k]]});
   // bilinmeyen basliklar (notr puan alir, ayrintida "bilinmiyor" yazar)
   var u={kat:r[F.katN]===4&&r[F.katP]===BIL,yas:r[F.yas]===null,bolge:r[F.bolge]===null,fiyat:!!r[F.suph],
-   site:r[F.site]===null,m2:!r[F.net]};
+   site:r[F.site]===null,m2:!r[F.net],deger:r[F.deger]==null,ulasim:r[F.ulasim]==null,donanim:r[F.donanim]==null};
   var km=H?uzaklik(r,H):null;
   if(H){p.konum=km===null?BIL:konumPuan(km,H);u.konum=km===null}
-  AG.forEach(function(a){if(p[a[0]]!==undefined)t+=p[a[0]]*S.w[a[0]]});t=t/top;
+  AG.forEach(function(a){if(p[a[0]]!==undefined)t+=p[a[0]]*S.w[a[0]]});GIZLI.forEach(function(g){t+=p[g[0]]*g[1]});t=t/top;
   return{r:r,p:p,u:u,t:t,km:km}};
  if(S.yalnizSecili)rs=D.satir.filter(function(r){return SEC.indexOf(r[F.no])>=0});
  rs=rs.map(PUANLA);
@@ -957,7 +968,7 @@ function katmanCiz(){if(!KATMAN_DOSYA||!EH)return;var y=$('yolkutu'),t=$('ttkutu
    .then(function(v){KD=v;katmanCiz()}).catch(function(){KDY=0;if(EHN)EHN.textContent='Yollar / toplu taşıma yüklenemedi'})}return}
  var r=koyu()?RENK_K:RENK;
  if(S.yol&&!EHYOL){var ry=L.canvas({pane:'yol'});EHYOL=L.layerGroup();
-  ['tem','kmo','e5'].forEach(function(k){KD.yol[k].forEach(function(c){L.polyline(c,{renderer:ry,color:r[k],weight:1.5,opacity:.9,interactive:false}).addTo(EHYOL)})})}
+  ['tem','kmo','e5'].forEach(function(k){KD.yol[k].forEach(function(c){L.polyline(c,{renderer:ry,color:r[k],weight:1,opacity:.5,interactive:false}).addTo(EHYOL)})})}
  if(EHYOL){if(S.yol)EHYOL.addTo(EH);else EH.removeLayer(EHYOL)}
  if(S.toplu&&!EHTT){var rt=L.canvas({pane:'toplu'});EHTT=L.layerGroup();
   (KD.metro||[]).forEach(function(c){L.polyline(c,{renderer:rt,color:r.metro,interactive:false}).addTo(EHTT)});
@@ -965,8 +976,8 @@ function katmanCiz(){if(!KATMAN_DOSYA||!EH)return;var y=$('yolkutu'),t=$('ttkutu
   hatStil();EH.on('zoomend',hatStil)}
  if(EHTT){if(S.toplu)EHTT.addTo(EH);else EH.removeLayer(EHTT)}
  noktaYenile()}
-// metro hatti uzaktan cok silik ve ince, yaklastikca biraz belirgin (2026-11-02 kullanici)
-function hatStil(){if(!EHTT)return;var z=EH.getZoom(),s=z<13?{weight:.6,opacity:.18}:z<15?{weight:.8,opacity:.3}:{weight:1,opacity:.4};
+// metro / Marmaray hatti uzaktan ince, yaklastikca belirgin (2026-11-03 kullanici: yollardan daha belirgin olsun)
+function hatStil(){if(!EHTT)return;var z=EH.getZoom(),s=z<13?{weight:1,opacity:.35}:z<15?{weight:2,opacity:.6}:{weight:3,opacity:.85};
  EHTT.eachLayer(function(l){l.setStyle(s)})}
 // istasyon: ilan noktasindan (4-6) birkac boy kucuk, uzaktan silik
 function istStil(z){return z<13?{radius:2,weight:.5,opacity:.45,fillOpacity:.45}:z<15?{radius:2.5,weight:.7,opacity:.75,fillOpacity:.75}:{radius:3.5,weight:1,opacity:1,fillOpacity:1}}
@@ -992,6 +1003,7 @@ function durakCiz(b){if(!EHIS)EHIS=L.layerGroup().addTo(EH);EHIS.clearLayers();i
 // Sinirlar (bolge/harita_sinir.json) ilk gerektiginde yuklenir. Secim modunda ilan noktalari soluk ve dokunulmaz
 // (tuvalin isaretci olaylari kapanir), sinirlar dokunulabilir; normal modda yalniz secili bolgelerin sinir cizgisi.
 // Sinir adlari ilan verisindeki yazima anah() ile eslenir (mahalle_konum.anahtar ile ayni kural).
+var EHAI=null,EHAM=null,MAH_AD_ZOOM=14;
 var SINIR_DOSYA='harita-sinir.json?v=1c0c3a49e9',SN=null,SNY=0,SECMOD=null,EHS=null,EHH=null,EHT=null,EHT2=null,EHBI=null,EHBM=null,MAH_AG_ZOOM=12;
 // altlik: varsayilan sade (Esri gri, yazisiz; 2026-11-02 kullanici: 'harita zaten sade baslasin'), 'Detayli harita' = OSM (sokak adlari)
 // Esri gri altlik 16'dan sonra gercek karo vermiyor (17-19: 2,5 KB bos yer tutucu; 16 karosu buyutulunce bulanik,
@@ -1002,12 +1014,25 @@ function altlik(){var k=$('detaykutu');if(k)k.checked=S.detay;var d=S.detay||EH.
 // 'Sinirlar' (2026-11-02, kullanici: cok ince silik ilce, daha ince mahalle cizgisi, karisiklik yaratmasin):
 // ilce her olcekte; mahalle MAH_AG_ZOOM ve ustunde. Tuval, ilanlarin ve yollarin altinda, dokunulmaz.
 function sinirAg(){if(!EH||!SINIR_DOSYA)return;var k=$('sinirkutu');if(k)k.checked=S.sinir;
- if(!S.sinir){[EHBI,EHBM].forEach(function(g){if(g)EH.removeLayer(g)});return}
+ if(!S.sinir){[EHBI,EHBM,EHAI,EHAM].forEach(function(g){if(g)EH.removeLayer(g)});return}
  if(!SN)return sinirYukle(sinirAg);
  if(!EHBI){var rc=L.canvas({pane:'sinirag'}),c=koyu()?'#d1d1d6':'#3a3a3c';EHBI=L.layerGroup();EHBM=L.layerGroup();
   SN.ilce.forEach(function(x){L.polygon(x.h,{renderer:rc,color:c,weight:1,opacity:.35,fill:false,interactive:false}).addTo(EHBI)});
   SN.mah.forEach(function(x){L.polygon(x.h,{renderer:rc,color:c,weight:.5,opacity:.25,fill:false,interactive:false}).addTo(EHBM)})}
- EHBI.addTo(EH);if(EH.getZoom()>=MAH_AG_ZOOM)EHBM.addTo(EH);else EH.removeLayer(EHBM)}
+ if(!EHAI){EHAI=L.layerGroup();EHAM=L.layerGroup();
+  var ad=function(x,g,sn){var o=icNokta(x.h);if(o)L.marker(o,{icon:L.divIcon({className:'snr-ad '+sn,html:'<span>'+esc(x.ad||x.a)+'</span>',iconSize:null}),interactive:false,keyboard:false}).addTo(g)};
+  SN.ilce.forEach(function(x){ad(x,EHAI,'il')});SN.mah.forEach(function(x){ad(x,EHAM,'mh')})}
+ EHBI.addTo(EH);EHAI.addTo(EH);var yk=EH.getZoom()>=MAH_AG_ZOOM;
+ if(yk)EHBM.addTo(EH);else EH.removeLayer(EHBM);if(EH.getZoom()>=MAH_AD_ZOOM)EHAM.addTo(EH);else EH.removeLayer(EHAM)}
+// sinirin "ortasi": en buyuk halkanin alan agirlikli merkezi; sinir icbukeyse (merkez disarida) merkeze en yakin ic nokta
+function icNokta(h){var hs=[];(function f(a){if(typeof a[0][0]==='number')hs.push(a);else a.forEach(f)})(h);if(!hs.length)return null;
+ var alan=function(g){var s=0;for(var i=0,j=g.length-1;i<g.length;j=i++)s+=(g[j][1]*g[i][0]-g[i][1]*g[j][0]);return s/2};
+ var g=hs.sort(function(a,b){return Math.abs(alan(b))-Math.abs(alan(a))})[0],A=alan(g),cx=0,cy=0;
+ for(var i=0,j=g.length-1;i<g.length;j=i++){var k=g[j][1]*g[i][0]-g[i][1]*g[j][0];cx+=(g[j][0]+g[i][0])*k;cy+=(g[j][1]+g[i][1])*k}
+ var c=A?L.latLng(cx/(6*A),cy/(6*A)):L.latLngBounds(g).getCenter();if(icinde(c,[g]))return c;
+ var b=L.latLngBounds(g),en=null,ed=1e9;for(var a=1;a<12;a++)for(var e=1;e<12;e++){
+  var p=L.latLng(b.getSouth()+(b.getNorth()-b.getSouth())*a/12,b.getWest()+(b.getEast()-b.getWest())*e/12),d=p.distanceTo(c);
+  if(d<ed&&icinde(p,[g])){ed=d;en=p}}return en||c}
 function anah(t){t=String(t||'').replace(/[âÂ]/g,'a').replace(/[îÎ]/g,'i').replace(/[ûÛ]/g,'u').toLocaleUpperCase('tr').trim();
  t=t.replace(/\s+(MERKEZ|MAHALES[İI]|MAHALLES[İI])$/,'').replace(/(^|\s)(MAH\.?|MH\.?|MAHALLES[İI])(?=\s|$)/g,' ');
  return t.replace(/[^A-Z0-9ÇĞİÖŞÜ]/g,'')}
@@ -1233,7 +1258,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=daec1f1be6').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=ee29137f85').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
