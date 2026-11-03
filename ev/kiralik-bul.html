@@ -325,6 +325,23 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 .evharita .ehkat-dug{min-height:36px;font-size:13px;padding:0 11px}
 .evharita .ehkatman input{width:17px;height:17px}
 #ustTemizle:disabled{opacity:.45;cursor:default}
+/* secili kart: ince yesil cerceve + acik yesil zemin (2026-11-03) */
+ol.ilanlar:not(.tablo)>li.secili{box-shadow:0 0 0 1.5px var(--acc)}
+/* tablo: tek yuzey, satir arasi ince cizgi, solda secim kutusu; secili satir solda yesil serit + acik yesil zemin */
+ol.ilanlar.tablo{background:var(--yuzey);border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px var(--f0)}
+ol.ilanlar.tablo>li{display:grid;grid-template-columns:32px minmax(0,1fr);margin:0;border-radius:0;background:none;box-shadow:none;border-top:1px solid var(--f0)}
+ol.ilanlar.tablo>li:first-child{border-top:0}
+ol.ilanlar.tablo>li>.tay{grid-column:1/-1}
+ol.ilanlar.tablo>li.secili{background:var(--secz);box-shadow:inset 3px 0 0 var(--acc)}
+@media(hover:hover){ol.ilanlar.tablo>li:not(.secili):hover{background:var(--zemin);box-shadow:none}}
+label.tsec{display:flex;align-items:center;justify-content:center;cursor:pointer;min-height:38px}
+label.tsec input{width:16px;height:16px;margin:0;accent-color:var(--acc)}
+button.tsat{min-height:38px}
+button.tsat[aria-expanded=true]{border-radius:0}
+.tbas{padding-left:42px!important}
+@media(max-width:899px){.tbas{padding-left:40px!important}}
+@media(max-width:599px){ol.ilanlar.tablo>li{grid-template-columns:24px minmax(0,1fr)}label.tsec{justify-content:flex-end}
+ .tbas{padding-left:30px!important}}
 /* fiyat dususu rozeti: renksiz, ok isaretiyle */
 .fark.dus{background:var(--f0);color:var(--ink2);font-weight:600}
 /* fiyat kaydiricisi: iki range ust uste; yalniz tutamaclar dokunulur */
@@ -680,7 +697,7 @@ function kart(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
   // islem satiri: uygunluk solda, Ayrinti ve Sec sagda
   +'<div class="s4"><span class="puan">Uygunluk <b>'+Math.round(x.t)+'</b>/100</span>'
   +'<button type="button" class="ayb" aria-expanded="false">Ayrıntı<span class="sr"> '+esc(b.baslik)+'</span></button>'
-  +'<label class="sec"><input type="checkbox" data-no="'+r[F.no]+'"'+(sec?' checked':'')+'><span>'+(sec?'Seçildi':'Seç')+'</span><span class="sr"> '+esc(b.baslik)+'</span></label></div>'
+  +'<label class="sec"><input type="checkbox" data-no="'+r[F.no]+'"'+(sec?' checked':'')+'><span>Seç</span><span class="sr"> '+esc(b.baslik)+'</span></label></div>'
   +'<div class="ayrinti" hidden>'
   +(b.oz?'<p>'+esc(b.oz)+'</p>':'')
   +'<p>'+(b.yayin?esc(b.yayin)+' · ':'')+'<a href="'+b.harita+'" target="_blank" rel="noopener">haritada aç</a></p>'
@@ -699,7 +716,8 @@ function satir(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
  var ks=r[F.suph]?' su':(r[F.bek]&&!r[F.bekB]?(r[F.fiyat]<r[F.bekA]?' uc':(r[F.fiyat]>r[F.bekU]?' pa':'')):'');
  var yas=r[F.yas]===null?'':(r[F.yas]===0?'0':(r[F.yas]>=YAS_TAVAN?'31+':(r[F.yas]>5?'~':'')+r[F.yas]));
  var foto=b.foto?'<img class="ft" src="'+b.foto+'" alt="" width="80" height="60" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">':'';
- return'<li class="tsatir'+(sec?' secili':'')+'"><button type="button" class="tsat" aria-expanded="false">'
+ return'<li class="tsatir'+(sec?' secili':'')+'"><label class="tsec"><input type="checkbox" data-no="'+r[F.no]+'"'+(sec?' checked':'')+'><span class="sr">Seç: '+esc(b.baslik)+'</span></label>'
+  +'<button type="button" class="tsat" aria-expanded="false">'
   +'<span class="c-bas">'+(r[F.yeni]?'<i class="yeni-n"><span class="sr">yeni ilan, </span></i>':'')+esc(b.baslik)+'</span>'
   +'<span class="c-ilce">'+esc(D.ilce[r[F.ilce]])+'</span><span class="c-mah">'+esc(D.mah[r[F.mah]]||'')+'</span>'
   +'<span class="c-kira'+ks+'">'+tl(r[F.fiyat])+(r[F.eski]?'<small aria-label="kira düştü">↓</small>':'')+'</span>'
@@ -712,7 +730,6 @@ function satir(x){var r=x.r,b=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;
   +(r[F.eski]?' · önceki kira '+tl(r[F.eski])+' TL'+(dusus(r)?' ('+dusus(r).g+' düştü)':''):'')+'</p>'
   +(not.length?'<p class="not">'+not.join(' · ')+'</p>':'')+es
   +'<p class="dok">'+dok+'</p>'+(bek?'<p class="dok">'+bek+'</p>':'')
-  +'<label class="sec"><input type="checkbox" data-no="'+r[F.no]+'"'+(sec?' checked':'')+'><span>'+(sec?'Seçildi':'Seç')+'</span><span class="sr"> '+esc(b.baslik)+'</span></label>'
   +'</div></div></li>'}
 function adim(){return S.gor==='kart'?20:50}
 // sutun basliklari (tablo gorunumu): dokununca o sutuna gore sirala, ikinci dokunusta yonu cevir
@@ -1074,6 +1091,9 @@ function vurguKur(id,tur){var el=$(id),ac=function(e){var b=e.target.closest&&e.
   if(!b||!EH||S.gor!=='harita'||!GENIS.matches)return;sinirYukle(function(){vurgula(b.dataset.v,tur)})},
  kapa=function(){if(EHH){EH.removeLayer(EHH);EHH=null}};
  el.addEventListener('mouseover',ac);el.addEventListener('focusin',ac);el.addEventListener('mouseleave',kapa);el.addEventListener('focusout',kapa)}
+// ilan noktasi: mavi; PDF icin secili olan yesil ve bir boy buyuk (2026-11-03)
+function noktaStil(sec){var zz=EH.getZoom(),yr=zz<11?4:zz<13?4.5:6;
+ return{radius:sec?yr+2:yr,weight:yr<6&&!sec?1:1.5,color:koyu()?'#000':'#fff',fillColor:sec?(koyu()?'#4cc38a':'#1f6f4a'):(koyu()?'#9ec5ff':'#2f6fd6'),fillOpacity:sec?1:.9}}
 function noktaYenile(){if(!EH||S.gor!=='harita')return;
  // uzaktan bakinca ilan noktasi bir boy kucuk (2026-11-02 kullanici)
  var zz=EH.getZoom(),yr=zz<11?4:zz<13?4.5:6;
@@ -1083,16 +1103,18 @@ function noktaYenile(){if(!EH||S.gor!=='harita')return;
  durakCiz(EH.getBounds().pad(.1));var renk=koyu()?'#9ec5ff':'#2f6fd6',tum=EH.getZoom()>=EH_TUM,b=EH.getBounds().pad(.1),dolu={},n=0,top=0;
  var ik=$('ilankutu');if(ik)ik.checked=S.ilanlar;
  if(!S.ilanlar){if(EHN)EHN.textContent='İlanlar gizli · Katmanlar’dan açılır';return}
- SON.forEach(function(x){var r=x.r;if(r[F.lat]==null||r[F.lon]==null)return;top++;
+ var ciz1=function(x){var r=x.r;if(r[F.lat]==null||r[F.lon]==null)return;top++;
   if(!b.contains([r[F.lat],r[F.lon]]))return;
-  var buAcik=acik&&acik._no===r[F.no];
-  if(!tum){var p=EH.latLngToContainerPoint([r[F.lat],r[F.lon]]),k=Math.floor(p.x/EH_HUCRE)+'_'+Math.floor(p.y/EH_HUCRE);
+  var buAcik=acik&&acik._no===r[F.no],sec=SEC.indexOf(r[F.no])>=0;
+  // secili ilanlar seyreltmeye takilmaz, en uste cizilir
+  if(!tum&&!sec){var p=EH.latLngToContainerPoint([r[F.lat],r[F.lon]]),k=Math.floor(p.x/EH_HUCRE)+'_'+Math.floor(p.y/EH_HUCRE);
    if(dolu[k]&&!buAcik)return;dolu[k]=1}
-  n++;if(buAcik)return;
-  var mk=L.circleMarker([r[F.lat],r[F.lon]],{renderer:EHR,radius:yr,weight:yr<6?1:1.5,color:koyu()?'#000':'#fff',fillColor:renk,fillOpacity:.9,bubblingMouseEvents:false})
+  n++;if(buAcik)return;if(sec&&!sonra.ilk){sonra.push(x);return}
+  var mk=L.circleMarker([r[F.lat],r[F.lon]],L.extend({renderer:EHR,bubblingMouseEvents:false},noktaStil(sec)))
    .bindPopup(function(){var bb=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;return'<a class="hb" href="'+esc(bb.link)+'" target="_blank" rel="noopener">'+esc(bb.baslik)+'</a><b>'+r[F.fiyat].toLocaleString('tr-TR')+' TL</b>'+(dusus(r)?' <small>↓%'+dusus(r).y+' · '+dusus(r).g+'</small>':'')+'<br>'+esc(bb.kisa)+'<br><span class="hy">'+esc(bb.yer)+'</span>'
     +'<label class="sec"><input type="checkbox" data-no="'+r[F.no]+'"'+(sec?' checked':'')+'><span>'+(sec?'PDF için seçildi':'PDF için seç')+'</span></label>'
-    +'<a class="git" href="'+esc(bb.link)+'" target="_blank" rel="noopener">İlanı aç</a>'},{maxWidth:280,minWidth:220,autoPan:false}).addTo(EHK);mk._no=r[F.no]});
+    +'<a class="git" href="'+esc(bb.link)+'" target="_blank" rel="noopener">İlanı aç</a>'},{maxWidth:280,minWidth:220,autoPan:false}).addTo(EHK);mk._no=r[F.no]};
+ var sonra=[];SON.forEach(ciz1);sonra.ilk=1;sonra.forEach(function(x){n--;ciz1(x)});
  if(EHN)EHN.textContent=''}
 function liste(){
  var ol=$('liste'),hr=S.gor==='harita';ol.classList.toggle('tablo',S.gor==='tablo');basCiz();
@@ -1204,10 +1226,11 @@ function kur(){
   (b.classList.contains('tsat')?b.nextElementSibling:b.closest('.ilan').querySelector('.ayrinti')).hidden=!ac});
  $('liste').addEventListener('change',function(e){var c=e.target;if(!c.dataset||!c.dataset.no)return;
   var i=SEC.indexOf(c.dataset.no);if(c.checked&&i<0)SEC.push(c.dataset.no);if(!c.checked&&i>=0)SEC.splice(i,1);
-  c.closest('li').classList.toggle('secili',c.checked);c.nextElementSibling.textContent=c.checked?'Seçildi':'Seç';secKaydet();secCubuk()});
+  c.closest('li').classList.toggle('secili',c.checked);secKaydet();secCubuk()});
  $('evharita').addEventListener('change',function(e){var c=e.target;if(!c.dataset||!c.dataset.no)return;
   var i=SEC.indexOf(c.dataset.no);if(c.checked&&i<0)SEC.push(c.dataset.no);if(!c.checked&&i>=0)SEC.splice(i,1);
-  c.nextElementSibling.textContent=c.checked?'PDF için seçildi':'PDF için seç';secKaydet();secCubuk()});
+  c.nextElementSibling.textContent=c.checked?'PDF için seçildi':'PDF için seç';secKaydet();secCubuk();
+  EHK.eachLayer(function(l){if(l._no===c.dataset.no)l.setStyle(noktaStil(c.checked))})});
  $('yalniz').onclick=function(){S.yalnizSecili=!S.yalnizSecili;ciz();$('kaydir').scrollTop=0};
  $('secsil').onclick=function(){if(!confirm(SEC.length+' ilanın seçimi kaldırılsın mı?'))return;SEC=[];S.yalnizSecili=false;secKaydet();ciz()};
  $('buyuk-kapat').onclick=function(){$('buyuk').close()};
