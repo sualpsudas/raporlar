@@ -296,7 +296,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
  body>*:not(#yazdir){display:none!important}
  #yazdir{display:block!important;color:#000;font-size:10.5pt}
  #yazdir h1{font-size:16pt;margin:0 0 4mm}
- /* PDF karti (2026-11-03): ust satir no + yayin + konum | puan + fiyat; cizgi; ozellik etiketleri; kucuk harita + ulasim */
+ /* PDF karti (2026-11-03): ust satir no + yayin + konum | puan + fiyat; cizgi; ozellik etiketleri; ulasim satirlari (kucuk harita 2026-11-03 kaldirildi) */
  .p-ilan{padding:3.5mm 0 3mm;border-bottom:1px solid #ddd;break-inside:avoid;page-break-inside:avoid}
  .p-ilan.p-yeni{border-top:1.5px solid #000}
  .p-ust{display:flex;justify-content:space-between;align-items:center;gap:4mm;padding-bottom:2.2mm;border-bottom:1px solid #e6e6e6;margin-bottom:2.2mm}
@@ -315,10 +315,6 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
   -webkit-print-color-adjust:exact;print-color-adjust:exact}
  .p-etk li.eksi{background:#fdf0e6;color:#8a3200}
  .p-uyari{font-size:8.5pt;color:#8a3200;margin:0 0 2mm}
- .p-ulas{display:flex;gap:4mm;align-items:center}
- .p-harita{position:relative;overflow:hidden;flex:none;border:1px solid #ccc;border-radius:2mm;background:#eee}
- .p-harita img{position:absolute;width:256px;height:256px;max-width:none;border-radius:0}
- .p-harita svg{position:absolute;left:0;top:0}
  .p-ulas-yazi{font-size:9pt;color:#222;display:grid;gap:1.6mm}.p-ulas-yazi p{margin:0}
  .p-ren{display:inline-block;width:2.6mm;height:2.6mm;border-radius:50%;margin-right:1.6mm;vertical-align:-.2mm}
  .p-tur{color:#666}.p-mes{white-space:nowrap}
@@ -756,7 +752,7 @@ function pdfHazirla(){if(!D||!PUANLA||!SEC.length)return;yolYukle();
  // ust bilgi satirlari (ilan sayisi, suzgec, agirlik, harita kaynagi) 2026-11-03 kullanici istegiyle kaldirildi
  $('yazdir').innerHTML='<h1>Seçilen kiralık ilanlar</h1>'+pdfGruplar(rs)}
 var pdfZam;function pdfSonra(){clearTimeout(pdfZam);pdfZam=setTimeout(pdfHazirla,300)}
-// --- PDF'te ilan basina kucuk harita + en yakin metro / otobus duragina yurume (2026-11-02, kullanici istegi) ---
+// --- PDF'te ilan basina en yakin metro / otobus duragina yurume (2026-11-02; kucuk harita 2026-11-03 kaldirildi) ---
 // Rotalar ulasim/ilan_yol.json'dan (OSM yol agi), ilan_no % YOL_PARCA parcalara bolunmus; yalniz secilen ilanlarin
 // parcasi indirilir, gelince PDF yeniden hazirlanir. Kayit {kod: [ad, hat, metre, rota]}: o=otobus (her ilanda),
 // m=metro r=Marmaray t=tramvay b=metrobus (3 km icindeyse, rota cizilir), v=vapur f=funikuler (yalniz yazi);
@@ -773,39 +769,13 @@ var TT_TUR=[['o','Otobüs durağı','otobus'],['m','Metro','metro'],['r','Marmar
  ['b','Metrobüs','mb'],['v','Vapur','vapur'],['f','Füniküler','fun']];
 function mesafe(m){return m<1000?tl(Math.round(m/10)*10)+' m':(m/1000).toFixed(1).replace('.',',')+' km'}
 function dkYaz(m){return Math.max(1,Math.round(m/YURU_HIZ))+' dk'}
-// Web Merkator piksel (zoom z, 256 px karo)
-function mpx(la,lo,z){var n=256*Math.pow(2,z),s=Math.sin(la*Math.PI/180);
- return[(lo+180)/360*n,(.5-Math.log((1+s)/(1-s))/(4*Math.PI))*n]}
-function miniHarita(r,y){var la=r[F.lat],lo=r[F.lon],W=190,H=118,PAY=16,RN=RENK;
- // cizilecek rotalar; ayni duraga giden ikinci rota (metro + Marmaray ayni istasyon) tekrar cizilmez
- var rotalar=[],son={};
- TT_TUR.forEach(function(t){var k=y[t[0]];if(!k||!k[3].length)return;var ps=rotaCoz(k[3],la,lo),e=ps[ps.length-1],a=e[0].toFixed(4)+','+e[1].toFixed(4);
-  if(son[a])return;son[a]=1;rotalar.push([ps,RN[t[2]]])});
- if(!rotalar.length)return'';
- var tum=[[la,lo]],z=16,x0,y0;rotalar.forEach(function(x){tum=tum.concat(x[0])});
- for(;z>=11;z--){var ps=tum.map(function(p){return mpx(p[0],p[1],z)}),xs=ps.map(function(p){return p[0]}),ys=ps.map(function(p){return p[1]});
-  var mnx=Math.min.apply(0,xs),mxx=Math.max.apply(0,xs),mny=Math.min.apply(0,ys),mxy=Math.max.apply(0,ys);
-  if(mxx-mnx<=W-2*PAY&&mxy-mny<=H-2*PAY||z===11){x0=(mnx+mxx)/2-W/2;y0=(mny+mxy)/2-H/2;break}}
- var h='<div class="p-harita" style="width:'+W+'px;height:'+H+'px">';
- for(var tx=Math.floor(x0/256);tx<=Math.floor((x0+W)/256);tx++)for(var ty=Math.floor(y0/256);ty<=Math.floor((y0+H)/256);ty++)
-  h+='<img alt="" src="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/'+z+'/'+ty+'/'+tx
-   +'" style="left:'+Math.round(tx*256-x0)+'px;top:'+Math.round(ty*256-y0)+'px">';
- var xy=function(p){var q=mpx(p[0],p[1],z);return(q[0]-x0).toFixed(1)+','+(q[1]-y0).toFixed(1)};
- var cizgi=function(ps,renk){return'<polyline points="'+ps.map(xy).join(' ')+'" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round" opacity=".8"/>'
-  +'<polyline points="'+ps.map(xy).join(' ')+'" fill="none" stroke="'+renk+'" stroke-width="2.2" stroke-dasharray="5 4" stroke-linejoin="round" stroke-linecap="round"/>'};
- var nokta=function(p,renk,rr){var q=xy(p).split(',');return'<circle cx="'+q[0]+'" cy="'+q[1]+'" r="'+rr+'" fill="'+renk+'" stroke="#fff" stroke-width="1.5"/>'};
- // uzun rotalar once (alta), kisalar uste; duraklar en ustte, ev en son
- rotalar.sort(function(a,b){return b[0].length-a[0].length});
- h+='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'+rotalar.map(function(x){return cizgi(x[0],x[1])}).join('')
-  +rotalar.map(function(x){return nokta(x[0][x[0].length-1],x[1],4.5)}).join('')+nokta([la,lo],'#2f6fd6',6)+'</svg></div>';
- return h}
 function pdfUlasim(r){var y=YOL[r[F.no]];if(!y)return'';
  var s=[],rayli=false;
  TT_TUR.forEach(function(t){var k=y[t[0]];if(!k)return;if('mrtb'.indexOf(t[0])>=0)rayli=true;
   s.push('<p><i class="p-ren" style="background:'+RENK[t[2]]+'"></i><span class="p-tur">'+(t[0]==='o'?'Otobüs':t[1])+'</span> · '
    +esc(k[0]||'adsız')+(k[1]?' ('+esc(k[1])+')':'')+' · <b class="p-mes">'+mesafe(k[2])+' ('+dkYaz(k[2])+')</b></p>')});
  if(!rayli)s.push('<p class="p-ay">3 km içinde metro, Marmaray, tramvay ya da metrobüs yok</p>');
- return'<div class="p-ulas">'+(r[F.lat]!=null?miniHarita(r,y):'')+'<div class="p-ulas-yazi">'+s.join('')+'</div></div>'}
+ return'<div class="p-ulas-yazi">'+s.join('')+'</div>'}
 function pdf(){
  if(AYRI_UYG){window.open(urlYap()+'&sec='+SEC.join(',')+'&pdf=1','_blank');return}
  pdfHazirla();var eski=document.title;document.title='Kiralık ilanlar '+$('guncel').textContent;window.print();
@@ -816,7 +786,7 @@ function pdfGruplar(rs){var tr=function(a,b){return a.localeCompare(b,'tr')},onc
  return rs.map(function(x,i){var il=D.ilce[x.r[F.ilce]],yeni=il!==onceki;onceki=il;return pdfIlan(x,i+1,yeni)}).join('')}
 // PDF ilan karti (2026-11-03 kullanici istegi; iki taslagin birlesimi): ust satirda linkli ilan no + yayin suresi, altinda
 // ilce / mahalle; sagda renkli puan yuvarlagi + kira (altinda kucuk beklenen kira); cizgi; ozellikler kisa etiketler
-// (olumsuz olan asansorsuz turuncu); en altta kucuk harita + ulasim satirlari
+// (olumsuz olan asansorsuz turuncu); en altta ulasim satirlari
 function buyukHarf(s){return s?s.charAt(0).toLocaleUpperCase('tr')+s.slice(1):s}
 function pdfEtiket(r,b){var o=[],ek=function(v,eksi){if(v)o.push('<li'+(eksi?' class="eksi"':'')+'>'+esc(buyukHarf(v))+'</li>')};
  var ot=D.otopark[r[F.otop]],is=D.isitma[r[F.isit]];
@@ -836,7 +806,7 @@ function pdfIlan(x,no,yeniIlce){var r=x.r,b=bilgi(r),t=Math.round(x.t);
   +'<p class="p-konum">'+esc(D.ilce[r[F.ilce]])+(D.mah[r[F.mah]]?' / '+esc(D.mah[r[F.mah]]):'')+'</p></div>'
   +'<div class="p-sag"><span class="p-puan '+puanSinif(t)+'" title="Uygunluk puanı">'+t+'</span>'
   +'<div class="p-fiyat"><b>'+tl(r[F.fiyat])+' TL</b>'+(r[F.eski]?'<small>önceki '+tl(r[F.eski])+' TL</small>':'')
-  +(r[F.bek]?'<small>Beklenen ~'+tl(Math.round(r[F.bek]/1000)*1000)+' TL</small>':'')+'</div></div></div>'
+  +(r[F.bek]?'<small>Beklenen fiyat: ~'+tl(Math.round(r[F.bek]/1000)*1000)+' TL</small>':'')+'</div></div></div>'
   +pdfEtiket(r,b)+(b.uyari.length?'<p class="p-uyari">'+esc(b.uyari.join(' · '))+'</p>':'')+pdfUlasim(r)+'</div>'}
 // secilenleri mesaj olarak paylas (iPhone: paylas menusu -> WhatsApp; yoksa WhatsApp Web)
 function secPaylas(){
@@ -1180,7 +1150,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=f136d6c5b6').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=4225f51bb8').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
