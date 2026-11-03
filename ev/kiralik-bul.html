@@ -324,9 +324,33 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
  .p-tur{color:#666}.p-mes{white-space:nowrap}
  .p-ay{font-size:8pt;color:#666}
 }
+/* 2026-11-03 kullanici: sade ust bant, kucuk katman kutusu, telefonda kucuk yazi ve kucuk kart */
+.evharita .ehnot:empty{display:none}
+.evharita .leaflet-control-attribution{font-size:9px;line-height:1.4;padding:0 4px;opacity:.7}
+.evharita .ehkatman label{min-height:36px;font-size:13px;gap:7px;padding:0 10px}
+.evharita .ehkat-dug{min-height:36px;font-size:13px;padding:0 11px}
+.evharita .ehkatman input{width:17px;height:17px}
+#ustTemizle:disabled{opacity:.45;cursor:default}
+@media(max-width:899px){
+ .bas-satir h1{font-size:18px}
+ .arac{gap:5px;margin-top:4px}
+ .arac select{font-size:13.5px}.arac button.d{font-size:13px;padding:2px 10px}.seg button{font-size:13px;padding:0 10px}
+ .arac .seg button,.arac button.d,.arac select{min-height:36px}
+ .aktif button{font-size:12px;min-height:28px}
+}
+@media(max-width:599px){
+ ol.ilanlar>li{padding:9px 10px 2px;margin-bottom:9px;border-radius:10px}
+ .ilan{grid-template-columns:92px minmax(0,1fr);gap:0 10px}
+ .ilan .ft,.ilan .ftb{width:92px;height:69px}
+ li.isk{grid-template-columns:92px 1fr;min-height:90px}li.isk .i-ft{height:69px}
+ .ilan h2{font-size:13.5px}.yer{font-size:12.5px;margin-top:2px}.s2{font-size:12.5px}
+ .kira{font-size:16.5px}.kira del{font-size:12px}.fark{font-size:11px;padding:3px 6px}.s3{margin-top:4px}.s3 .u{font-size:12px}
+ .s4{margin-top:5px}.puan{font-size:12px}.puan b{font-size:14px}
+ button.ayb,label.sec{font-size:13px;min-height:34px}
+}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
-@media(max-width:389px){.ilan{grid-template-columns:112px minmax(0,1fr);gap:0 10px;grid-template-areas:"ft orta" "s3 s3" "s4 s4" "ay ay";grid-template-rows:auto}
- .ilan .ft{width:112px;height:84px}li.isk{grid-template-columns:112px 1fr}li.isk .i-ft{height:84px}}
+@media(max-width:389px){.ilan{grid-template-columns:92px minmax(0,1fr);gap:0 10px;grid-template-areas:"ft orta" "s3 s3" "s4 s4" "ay ay";grid-template-rows:auto}
+ .ilan .ft{width:92px;height:69px}li.isk{grid-template-columns:92px 1fr}li.isk .i-ft{height:69px}}
 @media(min-width:600px){li.isk{grid-template-columns:176px 1fr;min-height:156px}li.isk .i-ft{height:132px}}
 @media(min-width:600px){.ilan{grid-template-columns:176px minmax(0,1fr);gap:0 16px}.ilan .ft{width:176px;height:132px}}
 </style></head><body>
@@ -389,7 +413,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <div id="perde" hidden></div>
 
 <main id="sonuclar">
-<div class="bas-satir"><h1>Kiralık evler</h1><p class="alt-bas">İstanbul · <span id="say" role="status" aria-live="polite">İlanlar yükleniyor…</span></p></div>
+<div class="bas-satir"><h1>Kiralık evler</h1><p class="sr"><span id="say" role="status" aria-live="polite">İlanlar yükleniyor…</span></p></div>
 <div class="ust-blok">
 <div class="arac">
 <button type="button" class="d" id="ac" aria-controls="panel" aria-expanded="false">Süzgeçler <span class="sayi" id="acsayi" hidden></span></button>
@@ -397,6 +421,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <option value="yeni">Yeni ilanlar</option><option value="m2">Büyük olan</option><option value="yakin">Hedefe yakın</option>
 <option value="baslik">İlan adı</option><option value="ilce">İlçe</option><option value="mah">Mahalle</option><option value="kat">Kat</option>
 <option value="yas">Bina yaşı</option></select></label>
+<button type="button" class="d" id="ustTemizle" aria-label="Süzgeçleri temizle">Temizle</button>
 <div class="seg" id="gor" role="group" aria-label="Görünüm"><button type="button" data-g="kart">Kart</button><button type="button" data-g="tablo">Tablo</button><button type="button" data-g="harita">Harita</button></div>
 <div class="aktif" id="aktif" aria-label="Seçili süzgeçler" hidden></div>
 </div>
@@ -416,20 +441,6 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 <span class="secdug"><button type="button" class="d" id="secpaylas">Seçilenleri paylaş</button>
 <button type="button" class="d ana" id="pdf">PDF oluştur</button></span></div>
 
-<details class="aciklama"><summary>Uygunluk puanı nasıl hesaplanıyor?</summary>
-<p>Öncelik sırası: kat, bina yeniliği, kira, hedef konum (seçildiyse), site içinde, bölge, net m² (ağırlıklar Uygunluk puanı bölümünde).
-<b>Kat:</b> ara kat tam puan; en üst kat olabilecek kat 70, 1. kat 50, en üst kat 40, çatı katı 30,
-giriş / bahçe katı 20, bodrum ve kot sıfır. Asansörsüz binada 3. kat 10, 4. kat 25, daha yukarısı 40 puan kaybeder.
-<b>Bina yeniliği:</b> sıfır bina tam puan; yaş arttıkça düşüş hızlanır (yaklaşık 10 yaş 72, 20 yaş 37), 35 yaş ve üstü sıfır.
-<b>Kira:</b> kirası düşük olan yüksek puan alır. <b>Site içinde:</b> evet ise tam puan.
-<b>Bölge:</b> mahallenin sosyo-ekonomik sınıfı (İBB, 2016); yoksa ilçenin gelişmişlik puanı (2022).
-<b>Net m²:</b> büyük olan yüksek puan alır. Bilgisi girilmemiş başlık ortalama (50) sayılır.
-Sağ üstteki yüzde (beklenen kiraya göre) puana girmez.</p>
-<p><b>Hedef konum</b> seçilirse ilan ile hedef arasındaki kuş uçuşu uzaklık puana katılır: 2 km'ye kadar tam puan,
-5 km yaklaşık 65, 10 km 32, 20 km 8. Boğaz'ın öbür yakası için 5 km eklenir. Puandaki payı Uygunluk puanı bölümündeki
-"Hedef konum" sürgüsüyle ayarlanır; hedef seçilmemişse bu başlık hesaba girmez. Uzaklık evin ilandaki harita konumundan ölçülür; konumu olmayan ilanda mahalle merkezinden (kaba).
-<b>Ayvaz Rota</b> seçilirse uzaklık servis rotası çizgisine ölçülür: çizginin üstünde tam puan, 3 km'ye doğru azalır, 3 km'den uzak evler bu başlıktan puan almaz.</p>
-</details>
 </div>
 </main>
 </div>
@@ -725,7 +736,7 @@ function ozet(){degerYaz();var e=etiketler(),el=$('aktif');
  el.innerHTML=e.map(function(x,i){return'<button type="button" data-i="'+i+'" aria-label="'+esc(x[0])+' süzgecini kaldır">'+esc(x[0])+'<span aria-hidden="true">×</span></button>'}).join('');
  el.hidden=!e.length;
  el.onclick=function(ev){var b=ev.target.closest('button');if(!b)return;e[+b.dataset.i][1]();kaydet();arayuzYaz();ciz()};
- $('acsayi').textContent=e.length||'';$('acsayi').hidden=!e.length}
+ $('acsayi').textContent=e.length||'';$('ustTemizle').disabled=!e.length;$('acsayi').hidden=!e.length}
 
 function ciz(){SON=hesap();GOSTER=adim();liste();ozet();yerSay();ilceCiz();mahCiz()}
 // --- secim (cihazda kalir; suzgec temizlemek silmez) ve PDF (tarayicinin yazdirma ozelligiyle)
@@ -865,13 +876,13 @@ function leafletYukle(f){if(window.L)return f();if(EHY){EHY.push(f);return}EHY=[
  s.onerror=function(){$('evharita').textContent='Harita yüklenemedi (internet bağlantısını kontrol edin).'};document.head.appendChild(s)}
 function koyu(){return matchMedia('(prefers-color-scheme: dark)').matches}
 function haritaCiz(){leafletYukle(function(){
- if(!EH){EH=L.map('evharita',{zoomSnap:.5,attributionControl:true}).setView([40.98,29.15],11);EH.attributionControl.setPrefix('');
+ if(!EH){EH=L.map('evharita',{zoomSnap:.5,zoomControl:false,attributionControl:true}).setView([40.98,29.15],11);EH.attributionControl.setPrefix('');
   // OSM altlik, CSS ile soluk gri (kullanici: sade, renksiz); CARTO artik anahtar istiyor (2026-11-02 yine denendi)
   EHT=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,className:koyu()?'karo-koyu':'karo-acik',
-   attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> katkıcıları'});
+   attribution:'© <a href="https://www.openstreetmap.org/copyright">OSM</a>'});
   // 'Sade harita' (2026-11-02, kullanici: sokak adi yazmayan, karisik olmayan): Esri gri altlik, yazisiz, anahtarsiz; 16'dan sonra buyutulur
   EHT2=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_'+(koyu()?'Dark':'Light')+'_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-   {maxZoom:19,maxNativeZoom:SADE_TAVAN,attribution:'Altlık © Esri, HERE, Garmin · © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> katkıcıları'});
+   {maxZoom:19,maxNativeZoom:SADE_TAVAN,attribution:'© Esri · © <a href="https://www.openstreetmap.org/copyright">OSM</a>'});
   altlik();
   // tolerance: parmakla dokunmada nokta cevresinde ek piksel
   EHR=L.canvas({padding:.3,tolerance:matchMedia('(pointer:coarse)').matches?12:4});EHK=L.layerGroup().addTo(EH);
@@ -1046,9 +1057,8 @@ function noktaYenile(){if(!EH||S.gor!=='harita')return;
   var mk=L.circleMarker([r[F.lat],r[F.lon]],{renderer:EHR,radius:yr,weight:yr<6?1:1.5,color:koyu()?'#000':'#fff',fillColor:renk,fillOpacity:.9})
    .bindPopup(function(){var bb=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;return'<a class="hb" href="'+esc(bb.link)+'" target="_blank" rel="noopener">'+esc(bb.baslik)+'</a><b>'+r[F.fiyat].toLocaleString('tr-TR')+' TL</b><br>'+esc(bb.kisa)+'<br><span class="hy">'+esc(bb.yer)+'</span>'
     +'<label class="sec"><input type="checkbox" data-no="'+r[F.no]+'"'+(sec?' checked':'')+'><span>'+(sec?'PDF için seçildi':'PDF için seç')+'</span></label>'
-    +'<a class="git" href="'+esc(bb.link)+'" target="_blank" rel="noopener">İlanı aç</a>'},{maxWidth:280,minWidth:220,autoPanPaddingTopLeft:[62,64],autoPanPaddingBottomRight:[10,40]}).addTo(EHK);mk._no=r[F.no]});
- if(EHN)EHN.textContent=(tum?n.toLocaleString('tr-TR')+' ilan':n.toLocaleString('tr-TR')+' / '+top.toLocaleString('tr-TR')+' ilan gösteriliyor · yaklaştıkça artar')
-  +(S.toplu&&EH.getZoom()<DURAK_ZOOM?' · otobüs durakları yakınlaşınca':'')}
+    +'<a class="git" href="'+esc(bb.link)+'" target="_blank" rel="noopener">İlanı aç</a>'},{maxWidth:280,minWidth:220,autoPan:false}).addTo(EHK);mk._no=r[F.no]});
+ if(EHN)EHN.textContent=''}
 function liste(){
  var ol=$('liste'),hr=S.gor==='harita';ol.classList.toggle('tablo',S.gor==='tablo');basCiz();
  $('gor').querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.g===S.gor)});
@@ -1164,7 +1174,7 @@ function kur(){
  $('buyuk-kapat').onclick=function(){$('buyuk').close()};
  $('buyuk').addEventListener('click',function(e){if(e.target===this)this.close()});
  $('buyuk').addEventListener('close',function(){$('buyuk-ft').removeAttribute('src')});
- $('pdf').onclick=pdf;$('secpaylas').onclick=secPaylas;
+ $('pdf').onclick=pdf;$('ustTemizle').onclick=function(){$('temizle').click()};$('secpaylas').onclick=secPaylas;
  $('paylas').onclick=function(){var u=urlYap(),b=$('paylas');
   if(navigator.share){navigator.share({title:document.title,url:u}).catch(function(){});return}
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
