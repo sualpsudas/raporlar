@@ -482,7 +482,7 @@ button.tsat[aria-expanded=true]{border-radius:0}
 <div id="yazdir" aria-hidden="true"></div>
 <script>
 (function(){
-var AG=[["kat", 14, "Kat"], ["yas", 13, "Bina yeniliği"], ["fiyat", 11, "Kira"], ["konum", 11, "Hedef konum"], ["site", 9, "Site içinde"], ["deger", 8, "Fiyatına değer"], ["ulasim", 7, "Ulaşım"], ["bolge", 7, "Bölge"], ["m2", 6, "Ferahlık"], ["donanim", 4, "Donanım"]],YAS_TAVAN=35,YAS_EGRI=[[0, 100], [3, 92], [8, 78], [13, 64], [18, 46], [23, 24], [28, 10], [35, 0]],BIL=50,VERI_GUN=new Date('2026-11-02'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
+var AG=[["kat", 15, "Kat"], ["yas", 14, "Bina yeniliği"], ["konum", 12, "Hedef konum"], ["deger", 11, "Fiyatına değer"], ["m2", 10, "Net m²"], ["site", 9, "Site içinde"], ["ulasim", 7, "Ulaşım"], ["bolge", 7, "Bölge"], ["donanim", 5, "Donanım"]],YAS_TAVAN=35,YAS_EGRI=[[0, 100], [3, 92], [8, 78], [13, 64], [18, 46], [23, 24], [28, 10], [35, 0]],BIL=50,VERI_GUN=new Date('2026-11-02'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
 var F={no:0,bas:1,link:2,foto:3,fiyat:4,net:5,brut:6,oda:7,ilce:8,mah:9,kat:10,katS:11,katP:12,katN:13,yas:14,bolge:15,
  ses:16,site:17,asan:18,otop:19,isit:20,balk:21,yeni:22,eski:23,es:24,suph:25,tarih:26,kiraP:27,m2P:28,
  bek:29,bekA:30,bekU:31,bekB:32,kn:33,lat:34,lon:35,kim:36,dusT:37,deger:38,ulasim:39,donanim:40,deprem:41,doga:42,mutfak:43};
@@ -591,7 +591,7 @@ function suz(r,yerHaric){
  if(S.asansor&&r[F.asan]!==1)return false;if(S.site&&r[F.site]!==1)return false;
  if(S.balkon&&r[F.balk]!==1)return false;if(S.uygunkat&&r[F.katN]!==0)return false;
  if(S.sahibi&&r[F.kim]!==1)return false;
- // mutfak (2026-11-03): yalniz biri secilince suzer; ikisi birden = hepsi; bilgisi olmayan teki secilince gizlenir
+ // mutfak (2026-11-03): acik ya da ayri (ikisi birden secilemez); bilgisi olmayan ilan gizlenir
  if(S.mutAcik!==S.mutAyri&&r[F.mutfak]!==(S.mutAcik?1:2))return false;
  if(S.otopark&&!/Otopark/.test(D.otopark[r[F.otop]]))return false;
  var b=kucuk(r[F.bas]);
@@ -1206,7 +1206,8 @@ function genislik(){if(GENIS.matches){$('panel').classList.remove('acik');$('per
 function kur(){
  cipler('oda',ODALAR,function(v){return S.oda.indexOf(v)>=0},aCik('oda'));
  $('ilceler').onclick=function(e){var b=e.target.closest('button');if(!b)return;aCik('ilce')(b.dataset.v);kaydet();arayuzYaz();ciz()};
- cipler('ozellik',OZ,function(v){return S[v]},function(v){S[v]=!S[v]});
+ // acik / ayri mutfak birbirini dislar (2026-11-03 kullanici): biri secilince oteki kalkar
+ cipler('ozellik',OZ,function(v){return S[v]},function(v){S[v]=!S[v];if(S[v]&&v==='mutAcik')S.mutAyri=false;if(S[v]&&v==='mutAyri')S.mutAcik=false});
  arayuzYaz();var zam;
  ALAN.forEach(function(id){var el=$(id);
   el.addEventListener(el.tagName==='SELECT'?'change':'input',function(){S[id]=el.value;clearTimeout(zam);zam=setTimeout(function(){kaydet();ciz()},250)})});
@@ -1258,7 +1259,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=ee29137f85').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=9475c97436').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
