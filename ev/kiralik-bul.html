@@ -306,8 +306,7 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
  .p-sag{display:flex;align-items:center;gap:3.5mm;flex:none}
  .p-puan{display:inline-flex;align-items:center;justify-content:center;width:10.5mm;height:10.5mm;border-radius:50%;
   font-size:11.5pt;font-weight:700;border:1.3px solid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
- .p-puan.iyi{background:#e7f8ee;border-color:#16a34a;color:#15803d}.p-puan.orta{background:#fef6e0;border-color:#d97706;color:#92400e}
- .p-puan.zayif{background:#fdecec;border-color:#dc2626;color:#991b1b}
+ .p-puan{border-color:#888;color:#111;background:#fff}
  .p-fiyat{text-align:right;line-height:1.15}.p-fiyat b{font-size:15pt;color:#111}
  .p-fiyat small{display:block;font-size:7.5pt;color:#666;margin-top:.6mm}
  .p-etk{display:flex;flex-wrap:wrap;gap:1.4mm;margin:0 0 2mm;padding:0;list-style:none}
@@ -316,7 +315,6 @@ body.secvar{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
  .p-etk li.eksi{background:#fdf0e6;color:#8a3200}
  .p-uyari{font-size:8.5pt;color:#8a3200;margin:0 0 2mm}
  .p-ulas-yazi{font-size:9pt;color:#222;display:grid;gap:1.6mm}.p-ulas-yazi p{margin:0}
- .p-ren{display:inline-block;width:2.6mm;height:2.6mm;border-radius:50%;margin-right:1.6mm;vertical-align:-.2mm}
  .p-tur{color:#666}.p-mes{white-space:nowrap}
  .p-ay{font-size:8pt;color:#666}
 }
@@ -772,7 +770,7 @@ function dkYaz(m){return Math.max(1,Math.round(m/YURU_HIZ))+' dk'}
 function pdfUlasim(r){var y=YOL[r[F.no]];if(!y)return'';
  var s=[],rayli=false;
  TT_TUR.forEach(function(t){var k=y[t[0]];if(!k)return;if('mrtb'.indexOf(t[0])>=0)rayli=true;
-  s.push('<p><i class="p-ren" style="background:'+RENK[t[2]]+'"></i><span class="p-tur">'+(t[0]==='o'?'Otobüs':t[1])+'</span> · '
+  s.push('<p><span class="p-tur">'+(t[0]==='o'?'Otobüs':t[1])+'</span> · '
    +esc(k[0]||'adsız')+(k[1]?' ('+esc(k[1])+')':'')+' · <b class="p-mes">'+mesafe(k[2])+' ('+dkYaz(k[2])+')</b></p>')});
  if(!rayli)s.push('<p class="p-ay">3 km içinde metro, Marmaray, tramvay ya da metrobüs yok</p>');
  return'<div class="p-ulas-yazi">'+s.join('')+'</div>'}
@@ -799,12 +797,11 @@ function pdfEtiket(r,b){var o=[],ek=function(v,eksi){if(v)o.push('<li'+(eksi?' c
  if(r[F.ses])ek(r[F.ses]+' mahalle');
  if(r[F.kim]===1)ek('sahibinden');
  return'<ul class="p-etk">'+o.join('')+'</ul>'}
-function puanSinif(t){return t>=70?'iyi':(t>=50?'orta':'zayif')}
 function pdfIlan(x,no,yeniIlce){var r=x.r,b=bilgi(r),t=Math.round(x.t);
  return'<div class="p-ilan'+(yeniIlce?' p-yeni':'')+'">'
   +'<div class="p-ust"><div><p class="p-no">'+no+'. <a href="'+b.link+'">'+r[F.no]+'</a>'+(b.yayin?' <small>· '+b.yayin+'</small>':'')+'</p>'
   +'<p class="p-konum">'+esc(D.ilce[r[F.ilce]])+(D.mah[r[F.mah]]?' / '+esc(D.mah[r[F.mah]]):'')+'</p></div>'
-  +'<div class="p-sag"><span class="p-puan '+puanSinif(t)+'" title="Uygunluk puanı">'+t+'</span>'
+  +'<div class="p-sag"><span class="p-puan" title="Uygunluk puanı">'+t+'</span>'
   +'<div class="p-fiyat"><b>'+tl(r[F.fiyat])+' TL</b>'+(r[F.eski]?'<small>önceki '+tl(r[F.eski])+' TL</small>':'')
   +(r[F.bek]?'<small>Beklenen fiyat: ~'+tl(Math.round(r[F.bek]/1000)*1000)+' TL</small>':'')+'</div></div></div>'
   +pdfEtiket(r,b)+(b.uyari.length?'<p class="p-uyari">'+esc(b.uyari.join(' · '))+'</p>':'')+pdfUlasim(r)+'</div>'}
@@ -1150,7 +1147,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('kiralik-bul.json?v=4225f51bb8').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('kiralik-bul.json?v=e9b69b5a66').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
