@@ -450,7 +450,7 @@ button.tsat[aria-expanded=true]{border-radius:0}
 <div id="perde" hidden></div>
 
 <main id="sonuclar">
-<nav class="turlar" aria-label="İlan türü"><a href="ev-bul.html" aria-current="page">Kiralık</a><a href="ev-bul-satilik-anadolu.html">Satılık</a></nav><div class="bas-satir"><h1>Ev Bul</h1><p class="sr"><span id="say" role="status" aria-live="polite">İlanlar yükleniyor…</span></p></div>
+<nav class="turlar" aria-label="İlan türü"><a href="ev-bul.html" aria-current="page">Kiralık</a><a href="ev-bul-satilik.html">Satılık</a></nav><div class="bas-satir"><h1>Ev Bul</h1><p class="sr"><span id="say" role="status" aria-live="polite">İlanlar yükleniyor…</span></p></div>
 <div class="ust-blok">
 <div class="arac">
 <button type="button" class="d" id="ac" aria-controls="panel" aria-expanded="false">Süzgeçler <span class="sayi" id="acsayi" hidden></span></button>
@@ -1273,7 +1273,12 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('ev-bul-kiralik.json?v=48782a1f2e').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+// koordinati olmayan ilan haritada mahalle/ilce noktasinda (satilik, 2026-11-04); ayni noktaya yigilmasin diye
+// ilan no'dan sabit kucuk kayma. Gercek koordinat gelince kullanilmaz.
+function yaklasikKonum(){if(!0)return;D.satir.forEach(function(r){var k=D.kn[r[F.kn]];
+ if(r[F.lat]!=null||!k||k[2]==null)return;var n=+String(r[F.no]).slice(-6);
+ r[F.lat]=k[2]+((n%997)/997-.5)*.012;r[F.lon]=k[3]+((n%991)/991-.5)*.016})}
+fetch('ev-bul-kiralik.json?v=1d43bd6a7c').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;yaklasikKonum();kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
