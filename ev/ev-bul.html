@@ -1211,7 +1211,9 @@ function noktaYenile(){if(!EH||S.gor!=='harita')return;
     +'<label class="sec"><input type="checkbox" data-no="'+r[F.no]+'"'+(sec?' checked':'')+'><span>'+(sec?'PDF için seçildi':'PDF için seç')+'</span></label>'
     +'<a class="git" href="'+esc(bb.link)+'" target="_blank" rel="noopener">İlanı aç</a>'},{maxWidth:280,minWidth:220,autoPan:false}).addTo(EHK);mk._no=r[F.no]};
  var sonra=[];SON.forEach(ciz1);sonra.ilk=1;sonra.forEach(function(x){n--;ciz1(x)});
- if(EHN)EHN.textContent=''}
+ // 2026-11-06 (kullanici karari): haritada yalniz gercek koordinat; koordinatsiz ilan uydurma noktaya konmaz, sayisi yazilir
+ var yok=SON.filter(function(x){return x.r[F.lat]==null||x.r[F.lon]==null}).length;
+ if(EHN)EHN.textContent=yok?yok.toLocaleString('tr-TR')+' ilanın gerçek konumu henüz yok, haritada gösterilmiyor':''}
 function liste(){
  var ol=$('liste'),hr=S.gor==='harita';ol.classList.toggle('tablo',S.gor==='tablo');basCiz();
  $('gor').querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.g===S.gor)});
@@ -1348,12 +1350,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-// koordinati olmayan ilan haritada mahalle/ilce noktasinda (satilik, 2026-11-04); ayni noktaya yigilmasin diye
-// ilan no'dan sabit kucuk kayma. Gercek koordinat gelince kullanilmaz.
-function yaklasikKonum(){if(!0)return;D.satir.forEach(function(r){var k=D.kn[r[F.kn]];
- if(r[F.lat]!=null||!k||k[2]==null)return;var n=+String(r[F.no]).slice(-6);
- r[F.lat]=k[2]+((n%997)/997-.5)*.012;r[F.lon]=k[3]+((n%991)/991-.5)*.016})}
-fetch('ev-bul-kiralik.json?v=f5f4b1fa45').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;yaklasikKonum();kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('ev-bul-kiralik.json?v=f5f4b1fa45').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
