@@ -394,7 +394,7 @@ button.tsat[aria-expanded=true]{border-radius:0}
 @media(min-width:600px){li.isk{grid-template-columns:176px 1fr;min-height:156px}li.isk .i-ft{height:132px}}
 @media(min-width:600px){.ilan{grid-template-columns:176px minmax(0,1fr);gap:0 16px}.ilan .ft{width:176px;height:132px}}
 </style></head><body>
-<span id="guncel" hidden>31 Ekim 2026</span>
+<span id="guncel" hidden>8 Kasım 2026</span>
 <div class="duzen">
 
 <aside class="panel" id="panel" aria-labelledby="panel-baslik">
@@ -486,7 +486,7 @@ button.tsat[aria-expanded=true]{border-radius:0}
 <div id="yazdir" aria-hidden="true"></div>
 <script>
 (function(){
-var AG=[["kat", 15, "Kat"], ["yas", 14, "Bina yeniliği"], ["konum", 12, "Hedef konum"], ["m2", 10, "Net m²"], ["site", 9, "Site içinde"], ["ulasim", 7, "Ulaşım"], ["bolge", 7, "Bölge"], ["donanim", 5, "Donanım"], ["butce", 10, "Bütçe"]],YAS_TAVAN=35,YAS_EGRI=[[0, 100], [3, 92], [8, 78], [13, 64], [18, 46], [23, 24], [28, 10], [35, 0]],BIL=50,VERI_GUN=new Date('2026-10-31'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
+var AG=[["kat", 15, "Kat"], ["yas", 14, "Bina yeniliği"], ["konum", 12, "Hedef konum"], ["m2", 10, "Net m²"], ["site", 9, "Site içinde"], ["ulasim", 7, "Ulaşım"], ["bolge", 7, "Bölge"], ["donanim", 5, "Donanım"], ["butce", 10, "Bütçe"]],YAS_TAVAN=35,YAS_EGRI=[[0, 100], [3, 92], [8, 78], [13, 64], [18, 46], [23, 24], [28, 10], [35, 0]],BIL=50,VERI_GUN=new Date('2026-11-08'),LO='https://www.sahibinden.com/ilan/',FO='https://i0.shbdn.com/photos/';
 var F={no:0,bas:1,link:2,foto:3,fiyat:4,net:5,brut:6,oda:7,ilce:8,mah:9,kat:10,katS:11,katP:12,katN:13,yas:14,bolge:15,
  ses:16,site:17,asan:18,otop:19,isit:20,balk:21,yeni:22,eski:23,es:24,suph:25,tarih:26,kiraP:27,m2P:28,
  bek:29,bekA:30,bekU:31,bekB:32,kn:33,lat:34,lon:35,kim:36,dusT:37,deger:38,ulasim:39,donanim:40,deprem:41,doga:42,mutfak:43,esya:44,nt:45,dol:46};
@@ -1350,7 +1350,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('ev-bul-satilik.json?v=cab0b44dd1').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('ev-bul-satilik.json?v=f0f4847a21').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
