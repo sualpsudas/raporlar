@@ -452,7 +452,7 @@ button.tsat[aria-expanded=true]{border-radius:0}
 <div id="perde" hidden></div>
 
 <main id="sonuclar">
-<nav class="turlar" aria-label="İlan türü"><a href="ev-bul.html" aria-current="page">Kiralık</a><a href="ev-bul-satilik.html">Satılık</a></nav><div class="bas-satir"><h1>Ev Bul</h1><p class="sr"><span id="say" role="status" aria-live="polite">İlanlar yükleniyor…</span></p></div>
+<nav class="ust-nav" aria-label="Raporlar"><a href="../">🏠 Genel raporlar</a><a href="index.html">↑ Ev Raporları</a></nav><nav class="turlar" aria-label="İlan türü"><a href="ev-bul.html" aria-current="page">Kiralık</a><a href="ev-bul-satilik.html">Satılık</a></nav><div class="bas-satir"><h1>Ev Bul</h1><p class="sr"><span id="say" role="status" aria-live="polite">İlanlar yükleniyor…</span></p></div>
 <div class="ust-blok">
 <div class="arac">
 <button type="button" class="d" id="ac" aria-controls="panel" aria-expanded="false">Süzgeçler <span class="sayi" id="acsayi" hidden></span></button>
@@ -1350,7 +1350,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('ev-bul-kiralik.json?v=ab5b156794').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('ev-bul-kiralik.json?v=8ad1f20882').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
