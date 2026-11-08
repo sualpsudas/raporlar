@@ -837,7 +837,7 @@ var pdfZam;function pdfSonra(){clearTimeout(pdfZam);pdfZam=setTimeout(pdfHazirla
 // parcasi indirilir, gelince PDF yeniden hazirlanir. Kayit {kod: [ad, hat, metre, rota]}: o=otobus (her ilanda),
 // m=metro r=Marmaray t=tramvay b=metrobus (3 km icindeyse, rota cizilir), v=vapur f=funikuler (yalniz yazi);
 // rota 1e-5 derece tamsayi farklari, ilk fark ilanin koordinatina gore (2026-11-02 kullanici karari).
-var YOL_SURUM='ce4bef481a',YOL_PARCA=64,YOL={},YOLP={},YURU_HIZ=80;
+var YOL_SURUM='d140a0374e',YOL_PARCA=64,YOL={},YOLP={},YURU_HIZ=80;
 function yolYukle(){if(!YOL_SURUM)return;var bek=0;
  SEC.forEach(function(no){var p=('0'+(+no%YOL_PARCA)).slice(-2);if(YOLP[p])return;YOLP[p]=1;bek++;
   fetch('yol/'+p+'.json?v='+YOL_SURUM).then(function(r){if(!r.ok)throw 0;return r.json()})
@@ -1350,7 +1350,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('ev-bul-kiralik.json?v=fbb85aaef4').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('ev-bul-kiralik.json?v=7d53c2fab0').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
