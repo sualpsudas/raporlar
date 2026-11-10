@@ -901,7 +901,10 @@ function secPaylas(){
 var EH=null,EHK=null,EHR=null,EHA='',EHY=0,EHN=null;
 // uzaktan seyrek: ekran EH_HUCRE px karelere bolunur, her karede siralamada en ustteki ilan; yaklastikca artar,
 // EH_TUM zoom ve ustunde hepsi (kullanici 2026-10-29: "uzaktan hepsi gozukmesin, yaklastikca artsin")
-var EH_HUCRE=34,EH_TUM=17;
+var EH_HUCRE=34,EH_TUM=17,ILAN_TUM=16,EH_MAX=3500;
+// 2026-11-10 (kullanici: satilikta yakinlasinca da az): kare boyu yakinlastikca kuculur (eskiden z17'ye kadar hep 34 px = ekranda en cok ~300 nokta);
+// z16 ve ustu hepsi; ekranda en cok EH_MAX nokta (siralamada ustte olanlar, telefon yavaslamasin)
+function ilanHucre(z){return z<11?18:z<12?15:z<13?12:z<14?10:z<15?8:6}
 // Ayvaz servis rotasinin Anadolu yakasi (2026-11-02, kullanici istegi): Fetih -> Unalan -> Altunizade -> 15 Temmuz koprusu basi.
 // Kullanicinin Google Haritalar rotasindaki 7 isaretten OSM yol agiyla cikarildi (routing.openstreetmap.de), 3 m sadelestirme.
 // Servis bu cizgi boyunca alir (durak yok); haritadaki 'Ayvaz Rota' kutucuguyla gosterilir.
@@ -948,8 +951,8 @@ function haritaCiz(){leafletYukle(function(){
    d.innerHTML='<button type="button" class="ehkat-dug" id="katdug" aria-expanded="false" aria-controls="katic">Katmanlar<span class="sayi" id="katsay" hidden></span></button>'
     +'<div class="ehkat-ic" id="katic">'
     +'<label><input type="checkbox" id="ilankutu"><span>İlanlar</span>'+sw(koyu()?'#9ec5ff':'#2f6fd6',1)+'</label>'
-    +(SINIR_DOSYA?'<label><input type="checkbox" id="kirakutu"><span>Fiyat seviyesi</span><i class="sw" style="width:22px;background:linear-gradient(90deg,'+KIRA_RENK[0]+','+KIRA_RENK[4]+')"></i></label>'
-    +'<label><input type="checkbox" id="carpankutu"><span>Kira çarpanı</span><i class="sw" style="width:22px;background:linear-gradient(90deg,'+CP_RENK[0]+','+CP_RENK[4]+')"></i></label>':'')
+    +(SINIR_DOSYA?'<label><input type="checkbox" id="kirakutu"><span>Fiyat seviyesi</span><i class="sw" style="width:22px;background:linear-gradient(90deg,'+KIRA_RENK[0]+','+KIRA_RENK[4]+')"></i></label>':'')
+    +(SINIR_DOSYA&&CARPAN_VAR?'<label><input type="checkbox" id="carpankutu"><span>Kira çarpanı</span><i class="sw" style="width:22px;background:linear-gradient(90deg,'+CP_RENK[0]+','+CP_RENK[4]+')"></i></label>':'')
     +'<label><input type="checkbox" id="rotakutu"><span>Ayvaz Rota</span>'+sw(koyu()?'#ff9b3d':'#e8730c')+'</label>'
     +(KATMAN_DOSYA?'<label><input type="checkbox" id="yolkutu"><span>Yollar</span>'+sw(r.e5)+sw(r.tem)+'</label>'
     +'<label><input type="checkbox" id="ttkutu"><span>Toplu taşıma</span>'+['metro','marmaray','tram','mb','otobus'].map(function(k){return sw(r[k],1)}).join('')+'</label>':'')
@@ -965,7 +968,7 @@ function haritaCiz(){leafletYukle(function(){
    d.querySelector('#ilankutu').addEventListener('change',function(){S.ilanlar=this.checked;kaydet();noktaYenile()});
    d.querySelector('#rotakutu').addEventListener('change',function(){S.rota=this.checked;kaydet();rotaCiz(true)});
    if(SINIR_DOSYA){d.querySelector('#kirakutu').addEventListener('change',function(){S.kira=this.checked;if(S.kira)S.carpan=false;kaydet();kiraCiz();carpanCiz()});
-    d.querySelector('#carpankutu').addEventListener('change',function(){S.carpan=this.checked;if(S.carpan)S.kira=false;kaydet();kiraCiz();carpanCiz()})}
+    if(CARPAN_VAR)d.querySelector('#carpankutu').addEventListener('change',function(){S.carpan=this.checked;if(S.carpan)S.kira=false;kaydet();kiraCiz();carpanCiz()})}
    if(KATMAN_DOSYA){d.querySelector('#yolkutu').addEventListener('change',function(){S.yol=this.checked;kaydet();katmanCiz()});
     d.querySelector('#ttkutu').addEventListener('change',function(){S.toplu=this.checked;kaydet();katmanCiz()})}
    if(SINIR_DOSYA)d.querySelector('#sinirkutu').addEventListener('change',function(){S.sinir=this.checked;kaydet();sinirAg()});
@@ -1034,6 +1037,7 @@ function durakCiz(b){if(!EHIS)EHIS=L.layerGroup().addTo(EH);EHIS.clearLayers();i
 // (tuvalin isaretci olaylari kapanir), sinirlar dokunulabilir; normal modda yalniz secili bolgelerin sinir cizgisi.
 // Sinir adlari ilan verisindeki yazima anah() ile eslenir (mahalle_konum.anahtar ile ayni kural).
 var EHAI=null,EHAM=null,MAH_AD_ZOOM=14;
+var CARPAN_VAR='1'==='1';  // kira carpani katmani yalniz satilik sayfasinda (kullanici 2026-11-10: kiralikta gerek yok)
 var SINIR_DOSYA='harita-sinir.json?v=1c0c3a49e9',SN=null,SNY=0,SECMOD=null,EHS=null,EHH=null,EHT=null,EHT2=null,EHBI=null,EHBM=null,MAH_AG_ZOOM=12;
 // altlik: varsayilan sade (Esri gri, yazisiz; 2026-11-02 kullanici: 'harita zaten sade baslasin'), 'Detayli harita' = OSM (sokak adlari)
 // Esri gri altlik 16'dan sonra gercek karo vermiyor (17-19: 2,5 KB bos yer tutucu; 16 karosu buyutulunce bulanik,
@@ -1133,7 +1137,7 @@ function cpDeger(a,b){var o={};for(var x in a){if(!b[x]||a[x].length<CP_EN_AZ||b
   o[x]=[ortanca(b[x])/ortanca(a[x])/12,a[x].length,b[x].length]}return o}
 function cpBul(m){return CP_DEG[anah(m.i)+'|'+anah(m.a)]||CP_IL[anah(m.i)]}
 function ortanca(a){a.sort(function(p,q){return p-q});var n=a.length,h=n>>1;return n%2?a[h]:(a[h-1]+a[h])/2}
-function carpanCiz(){var k=$('carpankutu');if(k)k.checked=S.carpan;if(!EH)return;
+function carpanCiz(){if(!CARPAN_VAR)S.carpan=false;var k=$('carpankutu');if(k)k.checked=S.carpan;if(!EH)return;
  if(EHCP){EH.removeLayer(EHCP);EHCP=null}CP_DEG=CP_IL=CP_ESIK=null;
  if(!S.carpan){carpanLejant();return}
  sinirYukle(function(){carpanYukle(function(){if(!S.carpan||EHCP)return;var a=cpTopla(CP.k),b=cpTopla(CP.s),deg=cpDeger(a.m,b.m),ti=cpDeger(a.i,b.i),il={},dolu={},vs=[],x;
@@ -1196,15 +1200,16 @@ function noktaYenile(){if(!EH||S.gor!=='harita')return;
  // 2026-11-03: acik balloncugun noktasi silinmez -> balloncuk acilinca harita kayip (autoPan) yeniden cizse de kapanmaz
  var acik=null;EHK.eachLayer(function(l){if(l.isPopupOpen&&l.isPopupOpen())acik=l});
  if(acik&&S.ilanlar)EHK.eachLayer(function(l){if(l!==acik)EHK.removeLayer(l)});else{EHK.clearLayers();acik=null}
- durakCiz(EH.getBounds().pad(.1));var renk=koyu()?'#9ec5ff':'#2f6fd6',tum=EH.getZoom()>=EH_TUM,b=EH.getBounds().pad(.1),dolu={},n=0,top=0;
+ durakCiz(EH.getBounds().pad(.1));var renk=koyu()?'#9ec5ff':'#2f6fd6',tum=EH.getZoom()>=ILAN_TUM,hc=ilanHucre(EH.getZoom()),b=EH.getBounds().pad(.1),dolu={},n=0,top=0,ib=0;
  var ik=$('ilankutu');if(ik)ik.checked=S.ilanlar;
  if(!S.ilanlar){if(EHN)EHN.textContent='İlanlar gizli · Katmanlar’dan açılır';return}
  var ciz1=function(x){var r=x.r;if(r[F.lat]==null||r[F.lon]==null)return;top++;
-  if(!b.contains([r[F.lat],r[F.lon]]))return;
+  if(!b.contains([r[F.lat],r[F.lon]]))return;ib++;
   var buAcik=acik&&acik._no===r[F.no],sec=SEC.indexOf(r[F.no])>=0;
   // secili ilanlar seyreltmeye takilmaz, en uste cizilir
-  if(!tum&&!sec){var p=EH.latLngToContainerPoint([r[F.lat],r[F.lon]]),k=Math.floor(p.x/EH_HUCRE)+'_'+Math.floor(p.y/EH_HUCRE);
+  if(!tum&&!sec){var p=EH.latLngToContainerPoint([r[F.lat],r[F.lon]]),k=Math.floor(p.x/hc)+'_'+Math.floor(p.y/hc);
    if(dolu[k]&&!buAcik)return;dolu[k]=1}
+  if(n>=EH_MAX&&!sec&&!buAcik)return;
   n++;if(buAcik)return;if(sec&&!sonra.ilk){sonra.push(x);return}
   var mk=L.circleMarker([r[F.lat],r[F.lon]],L.extend({renderer:EHR,bubblingMouseEvents:false},noktaStil(sec)))
    .bindPopup(function(){var bb=bilgi(r),sec=SEC.indexOf(r[F.no])>=0;return'<a class="hb" href="'+esc(bb.link)+'" target="_blank" rel="noopener">'+esc(bb.baslik)+'</a><b>'+r[F.fiyat].toLocaleString('tr-TR')+' TL</b>'+(dusus(r)?' <small>↓%'+dusus(r).y+' · '+dusus(r).g+'</small>':'')+'<br>'+esc(bb.kisa)+'<br><span class="hy">'+esc(bb.yer)+'</span>'
@@ -1213,7 +1218,9 @@ function noktaYenile(){if(!EH||S.gor!=='harita')return;
  var sonra=[];SON.forEach(ciz1);sonra.ilk=1;sonra.forEach(function(x){n--;ciz1(x)});
  // 2026-11-06 (kullanici karari): haritada yalniz gercek koordinat; koordinatsiz ilan uydurma noktaya konmaz, sayisi yazilir
  var yok=SON.filter(function(x){return x.r[F.lat]==null||x.r[F.lon]==null}).length;
- if(EHN)EHN.textContent=yok?yok.toLocaleString('tr-TR')+' ilanın gerçek konumu henüz yok, haritada gösterilmiyor':''}
+ var az=ib>n?'Bu ekranda '+ib.toLocaleString('tr-TR')+' ilandan '+n.toLocaleString('tr-TR')+' tanesi çiziliyor · yakınlaştıkça artar':'';
+ var ky=yok?yok.toLocaleString('tr-TR')+' ilanın gerçek konumu henüz yok, haritada gösterilmiyor':'';
+ if(EHN)EHN.textContent=[az,ky].filter(Boolean).join(' · ')}
 function liste(){
  var ol=$('liste'),hr=S.gor==='harita';ol.classList.toggle('tablo',S.gor==='tablo');basCiz();
  $('gor').querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.g===S.gor)});
@@ -1350,7 +1357,7 @@ function kur(){
   (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){b.textContent='Kopyalandı';
    setTimeout(function(){b.textContent='Aramayı paylaş'},2500)},function(){prompt('Bu bağlantıyı kopyalayın:',u)})};
 }
-fetch('ev-bul-satilik.json?v=7649b1b207').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
+fetch('ev-bul-satilik.json?v=b2dbe011ea').then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(v){D=v;kur();ciz();if(SEC_URL&&new URLSearchParams(location.search).get('pdf')&&!AYRI_UYG){pdfHazirla();setTimeout(function(){window.print()},1500)}})
  .catch(function(){$('say').textContent='İlanlar yüklenemedi. Sayfayı yenileyin.'});
 })();
 </script></body></html>
